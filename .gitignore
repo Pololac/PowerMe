@@ -1,0 +1,23 @@
+# --- Global ---
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# --- Node / Angular ---
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# --- Java / Maven ---
+backend/target/
+backend/.settings/
+backend/.classpath
+backend/.project
+
+# --- Gradle (si utilisé) ---
+backend/.gradle/
+backend/build/
+
+# --- OS junk ---
+Thumbs.db
