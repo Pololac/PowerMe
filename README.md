@@ -169,8 +169,8 @@ Dépendances listées dans `package-lock.json`
 
 ## PROD : création du JAR final ##
 # Build optimisé pour déploiement
-./mvn clean package
-# → Compile + Tests + JAR
+./mvn clean verify
+# → Compile + Tests unitaires + Tests integration + JAR
 
 # Build avec profil production (si tu as un profil)
 ./mvn clean package -Pprod
@@ -191,7 +191,6 @@ cd /opt/app
 # Lancer l'application sur le serveur de prod
 java -jar demo-app-1.0.0.jar
 ```
-PORTS
 
 ### Frontend
 ```bash
