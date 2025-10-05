@@ -1,6 +1,42 @@
-FROM nginx:alpine
-# copie du build Angular
-COPY dist/ /usr/share/nginx/html
-# remplace la conf par défaut du conteneur pour proxifier /api vers le service "api"
+#  STAGE 1: "build" (temporaire, jeté après)
+FROM node:20-alpine AS build
+# ↑ Image de 100 MB avec Node.js installé
+# AS build = donne un nom à ce stage
+
+WORKDIR /app
+# Cache des dépendances
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Build de l'app
+COPY . .
+RUN npm run build:prod
+#Résultat dans /app/dist/
+
+#  STAGE 2: Production (c'est ça qui sera gardé)
+FROM nginx:1.28-alpine-slim
+# ↑ Nouvelle image fraîche (10 MB)
+# Tout le stage précédent est OUBLIÉ
+
+# Configuration nginx (version "container")
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copie des fichiers buildés
+COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html/
+# ↑ --from=build = va chercher UNIQUEMENT ce fichier
+#   dans le stage "build" (qui sera ensuite détruit)
+
+# ✅ L'image finale contient SEULEMENT:
+# - Nginx (10 MB)
+# - Fichiers HTML/JS/CSS compilés (10 MB)
+# = TOTAL: 20 MB
+
+# Sécurité : permissions correctes
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+
 EXPOSE 80

@@ -4,22 +4,30 @@
 .vscode/
 .idea/
 
-# --- VPS ---
-Config-VPS/
+# --- Docker ---
+*.log                         # ✅ Logs divers
 
-# --- Environnement ---
-.env.dev
+# --- Secrets & Config ---
+.env                    # ✅ Production secrets (VPS)
 
 # --- Node / Angular ---
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 
 # --- Java / Maven ---
 backend/target/
 backend/.settings/
 backend/.classpath
 backend/.project
+backend/.factorypath          # ✅ Eclipse
+backend/bin/                  # ✅ Binaires compilés
+backend/*.iml                 # ✅ IntelliJ modules
 
 # --- OS junk ---
+.DS_Store
 Thumbs.db
+desktop.ini
