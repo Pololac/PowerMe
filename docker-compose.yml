@@ -1,0 +1,53 @@
+services:
+  web:
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:${FRONT_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "80:80" # Seul port exposé
+    depends_on: [api]
+    networks:
+      - powerme-network
+
+  api:
+    #Utilise FRONT_TAG si défini, sinon "latest"
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:${BACK_TAG:-latest}
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:postgresql://db:5432/${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - SHOW_SQL=false
+      - DDL_AUTO=validate
+      - LOG_LEVEL=WARN
+      - APP_LOG_LEVEL=INFO
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - powerme-network
+    # PAS de ports = accessible uniquement via le réseau Docker
+
+  db:
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  powerme-network:
+    driver: bridge
