@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:17.6-alpine
+    container_name: powerme-postgres-dev
+    env_file:
+      - .env.dev # Charge les variables
+    environment:
+      POSTGRES_DB: ${DB_NAME} # Lit depuis .env.dev
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "${DB_PORT:-5432}:5432" # Port configurable
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Bonus: interface graphique pour la BDD
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pm-pgadmin-dev
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80" # Hôte:container
+    depends_on:
+      - db
+
+volumes:
+  postgres_dev_data:

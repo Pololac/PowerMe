@@ -1,0 +1,15 @@
+/* Variables spécifiques à votre app */
+:root {
+  /* 🏢 Couleurs de marque personnalisées */
+  --brand-primary: #6366f1;
+  --brand-secondary: #8b5cf6;
+  --brand-accent: #06b6d4;
+
+  /* 🎯 Variables métier */
+  --status-pending: #f59e0b;
+  --status-active: #10b981;
+  --status-inactive: #6b7280;
+  --priority-high: #ef4444;
+  --priority-medium: #f59e0b;
+  --priority-low: #10b981;
+}
