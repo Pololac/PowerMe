@@ -1,7 +1,8 @@
 name: ci
 on:
   push:
-    branches: ["dev/**", "feat/**", "fix/**", "refacto/**"]
+    # branches: ["dev/**", "feat/**", "fix/**", "refacto/**"]
+    branches: ["main"]
   pull_request:
     branches: ["main"]
 
