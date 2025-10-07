@@ -8,7 +8,9 @@
 *.log                         # ✅ Logs divers
 
 # --- Secrets & Config ---
-.env                    # ✅ Production secrets (VPS)
+.env              # ✅ Production secrets (VPS)
+*.local
+.env.*.local
 
 # --- Node / Angular ---
 frontend/node_modules/
