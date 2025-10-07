@@ -3,12 +3,16 @@
 *.log
 .vscode/
 .idea/
+tmp/
+logs/
 
 # --- Docker ---
 *.log                         # ✅ Logs divers
 
 # --- Secrets & Config ---
 .env                    # ✅ Production secrets (VPS)
+*.local
+.env.*.local
 
 # --- Node / Angular ---
 frontend/node_modules/
@@ -17,17 +21,33 @@ frontend/.angular/
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
+frontend/.parcel-cache/
+frontend/.turbo/
+frontend/.output/
+frontend/.cache/
 
 # --- Java / Maven ---
 backend/target/
+backend/build/
+backend/out/
+backend/bin/
+backend/logs/
+
+!backend/.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/timing.properties
+backend/.mvn/wrapper/maven-wrapper.properties
+
 backend/.settings/
 backend/.classpath
 backend/.project
-backend/.factorypath          # ✅ Eclipse
-backend/bin/                  # ✅ Binaires compilés
-backend/*.iml                 # ✅ IntelliJ modules
+backend/.factorypath
+backend/*.iml
 
-# --- OS junk ---
-.DS_Store
-Thumbs.db
-desktop.ini
+# --- Spring / IDE ---
+backend/.sts4-cache/
+backend/.springBeans/
+
+# --- Optional (Docs, local data) ---
+HELP.md
+*.swp
+*.tmp

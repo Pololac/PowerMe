@@ -1,0 +1,46 @@
+# ==============================================
+# Configuration DEV
+# ==============================================
+
+spring:
+  # ====== BASE DE DONNÉES ======
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:powerme_dev}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  # ====== JPA / HIBERNATE ======
+  jpa:
+    hibernate:
+      ddl-auto: update  # IMPORTANT : Hibernate modifie automatiquement la BDD
+    show-sql: true      # Affiche les requêtes SQL dans les logs
+    properties:
+      hibernate:
+        format_sql: true  # Formate les requêtes SQL (plus lisible)
+        use_sql_comments: true  # Ajoute des commentaires dans les requêtes
+
+  # ====== EMAIL (pour tests locaux) ======
+  #mail:
+  #  host: ${MAIL_HOST:localhost}
+  #  port: ${MAIL_PORT:1025} # Port de MailHog ou MailDev (serveur SMTP local)
+  #  username: ${MAIL_USERNAME:dev@localhost}
+  #  password: ${MAIL_PASSWORD:dev}
+  #  properties:
+  #    mail:
+  #      smtp:
+  #        auth: false  # Pas d'authentification en local
+  #        starttls:
+  #          enable: false
+
+# ====== SERVEUR ======
+server:
+  port: ${SERVER_PORT:8080}  # Port du backend
+
+# ====== LOGGING ======
+logging:
+  level:
+    root: INFO  # Niveau global
+    com.powerme: DEBUG  # Tes classes en mode DEBUG (+ de détails)
+    org.hibernate.SQL: DEBUG  # Logs SQL détaillés
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # Valeurs des paramètres SQL
