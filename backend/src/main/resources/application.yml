@@ -1,0 +1,22 @@
+# ==============================================
+# Configuration COMMUNE
+# ==============================================
+
+spring:
+  application:
+    name: powerme
+
+  jpa:
+    open-in-view: false  # IMPORTANT : évite les problèmes de lazy loading
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Europe/Paris
+
+server:
+  compression:
+    enabled: true  # Compresse les réponses HTTP (+ rapide)
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"  # Format des logs
