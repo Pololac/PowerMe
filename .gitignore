@@ -1,3 +1,10 @@
+# --- Secrets & Config (IMPORTANT) ---
+.env
+*.local
+.env.*.local
+!.env.dev
+!.env.template
+
 # --- Global ---
 .DS_Store
 *.log
@@ -5,10 +12,7 @@
 .idea/
 
 # --- Docker ---
-*.log                         # ✅ Logs divers
-
-# --- Secrets & Config ---
-.env                    # ✅ Production secrets (VPS)
+*.log
 
 # --- Node / Angular ---
 frontend/node_modules/
@@ -23,11 +27,10 @@ backend/target/
 backend/.settings/
 backend/.classpath
 backend/.project
-backend/.factorypath          # ✅ Eclipse
-backend/bin/                  # ✅ Binaires compilés
-backend/*.iml                 # ✅ IntelliJ modules
+backend/.factorypath
+backend/bin/
+backend/*.iml
 
 # --- OS junk ---
-.DS_Store
 Thumbs.db
 desktop.ini
