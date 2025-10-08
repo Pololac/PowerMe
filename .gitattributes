@@ -1,0 +1,45 @@
+# --- Global ---
+# Force LF (line feed) pour tous les fichiers texte (évite les problèmes Windows/Mac/Linux)
+* text=auto eol=lf
+
+# --- Source code encodings ---
+*.java      text diff=java
+*.xml       text
+*.yml       text
+*.yaml      text
+*.json      text
+*.html      text
+*.css       text
+*.js        text
+*.ts        text
+*.tsx       text
+*.scss      text
+*.md        text
+*.sql       text
+*.properties text
+*.gradle    text
+*.sh        text eol=lf
+*.bat       text eol=crlf
+
+# --- Binary files (no diff) ---
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.jar       binary
+*.class     binary
+*.so        binary
+*.dll       binary
+*.exe       binary
+
+# --- Maven Wrapper ---
+*.mvn/wrapper/maven-wrapper.jar binary
+
+# --- Git diff improvements ---
+# Better diffs for certain file types
+*.java diff=java
+*.xml  diff=xml
+*.html diff=html
