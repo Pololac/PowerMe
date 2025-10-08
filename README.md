@@ -46,15 +46,7 @@ java -version
 javac -version
 ```
 
-- **Maven 3.9.5** (Maven wrapper 3.2.0)
-
-```bash
-# Installation Maven
-sudo apt install maven=3.9.5
-
-# Vérifier
-./mvn -v
-```
+- **Maven** : pas d'installation nécessaire grâce au Maven Wrapper inclus
 
 - **Spring Boot CLI 3.5(LTS)** : pas d'installation nécessaire sur serveur de prod
 
@@ -155,7 +147,7 @@ Dépendances listées dans `package-lock.json`
 > Toujours utiliser le wrapper pour garantir la même version de Maven
 
 ```bash
-## DEV ##
+## DEV (macOS/Linux) ##
 # Build basique pour développer
 ./mvn clean compile
 # → Compile juste le code, pas de JAR, pas de tests
@@ -177,7 +169,7 @@ Dépendances listées dans `package-lock.json`
 # → Lance tous les tests unitaires
 
 
-## PROD : création du JAR final ##
+## PROD (Linux): création du JAR final ##
 # Build optimisé pour déploiement
 ./mvn clean verify
 # → Compile + Tests unitaires + Tests integration + JAR

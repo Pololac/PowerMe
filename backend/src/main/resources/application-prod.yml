@@ -1,0 +1,65 @@
+# ==============================================
+# Configuration PRODUCTION
+# ==============================================
+# ⚠️ Toutes les variables sont OBLIGATOIRES (depuis .env)
+# ⚠️ Pas de valeurs par défaut
+
+spring:
+  # ====== BASE DE DONNÉES ======
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver
+
+  # ====== JPA / HIBERNATE ======
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Ne modifie PAS le schéma (sécurité)
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  # ====== EMAIL SMTP ======
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 10000
+          timeout: 10000
+
+# ====== SERVEUR ======
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  error:
+    include-stacktrace: never
+    include-message: always
+
+# ====== LOGGING (minimal en prod) ======
+logging:
+  level:
+    root: WARN
+    com.powerme: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.web: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
