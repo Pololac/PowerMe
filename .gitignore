@@ -10,6 +10,8 @@
 *.log
 .vscode/
 .idea/
+tmp/
+logs/
 
 # --- Docker ---
 *.log
@@ -21,9 +23,22 @@ frontend/.angular/
 frontend/npm-debug.log*
 frontend/yarn-debug.log*
 frontend/yarn-error.log*
+frontend/.parcel-cache/
+frontend/.turbo/
+frontend/.output/
+frontend/.cache/
 
 # --- Java / Maven ---
 backend/target/
+backend/build/
+backend/out/
+backend/bin/
+backend/logs/
+
+!backend/.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/timing.properties
+backend/.mvn/wrapper/maven-wrapper.properties
+
 backend/.settings/
 backend/.classpath
 backend/.project
