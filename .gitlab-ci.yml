@@ -1,0 +1,11 @@
+---
+stages:
+  - analyse
+  - build
+  - package
+  - deploy
+
+test-pipeline:
+  stage: analyse
+  script:
+    - echo "Success"
