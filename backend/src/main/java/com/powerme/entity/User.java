@@ -46,6 +46,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    /**
+     * Un utilisateur peut avoir plusieurs rôles (USER, ADMIN, OWNER). Ces rôles sont stockés dans
+     * une Enum. JPA/Hibernate doit stocker cette relation "ManyToMany" dans une table de liaison.
+     * {@code @ElementCollection} permet de créer automatiquement cette table de liaison.
+     */
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
