@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -33,10 +34,10 @@ public class Booking {
     private UUID id;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDateTime startTime;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private LocalDateTime endTime;
 
     /**
      * Statut de la réservation.
@@ -52,8 +53,8 @@ public class Booking {
      *
      * <p>Calculé automatiquement : tarif horaire × durée en heures.</p>
      */
-    @Column(nullable = false)
-    private Double totalPrice;
+    @Column(nullable = false, precision = 8, scale = 2)
+    private BigDecimal totalPrice;
 
     /**
      * Utilisateur qui effectue la réservation.
@@ -99,19 +100,19 @@ public class Booking {
     }
 
     public LocalDateTime getStartDate() {
-        return startDate;
+        return startTime;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
+    public void setStartTime(LocalDateTime startDate) {
+        this.startTime = startTime;
     }
 
-    public LocalDateTime getEndDate() {
-        return endDate;
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
-        this.endDate = endDate;
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public BookingStatus getStatus() {
@@ -122,11 +123,11 @@ public class Booking {
         this.status = status;
     }
 
-    public Double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(Double totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 

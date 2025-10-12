@@ -11,33 +11,42 @@ package com.powerme.entity.enums;
  * </ul>
  */
 public enum BookingStatus {
-
     /**
      * Réservation créée, en attente de validation par le propriétaire.
      */
-    PENDING,
+    PENDING("En attente de validation"),
 
     /**
      * Réservation acceptée par le propriétaire.
      *
      * <p>La borne est bloquée pour la période réservée.</p>
      */
-    ACCEPTED,
+    ACCEPTED("Acceptée"),
 
     /**
      * Réservation refusée par le propriétaire.
      */
-    REFUSED,
+    REFUSED("Refusée"),
 
     /**
      * Réservation terminée (date de fin dépassée).
      *
      * <p>Transition automatique depuis ACCEPTED.</p>
      */
-    COMPLETED,
+    COMPLETED("Terminée"),
 
     /**
      * Réservation annulée par le client ou le propriétaire.
      */
-    CANCELLED
+    CANCELLED("Annulée");
+
+    private final String displayName;
+
+    BookingStatus(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 }
