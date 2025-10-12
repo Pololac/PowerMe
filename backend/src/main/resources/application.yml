@@ -6,6 +6,10 @@ spring:
   application:
     name: powerme
 
+  # Active le profil dev par défaut
+  profiles:
+    active: dev
+
   jpa:
     open-in-view: false  # IMPORTANT : évite les problèmes de lazy loading
     properties:
