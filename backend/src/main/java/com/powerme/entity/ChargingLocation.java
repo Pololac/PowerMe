@@ -59,7 +59,7 @@ public class ChargingLocation {
     private BigDecimal longitude;
 
     /**
-     * Point géographique PostGIS
+     * Point géographique PostGIS.
      */
     @Column(columnDefinition = "geography(Point, 4326)", nullable = false)
     private Point location;
