@@ -99,11 +99,11 @@ public class Booking {
         this.id = id;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDateTime startDate) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
