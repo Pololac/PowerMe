@@ -61,7 +61,7 @@ public class ChargingStation {
      * <p>Montant en euros avec 2 décimales de précision.
      * </p>
      */
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false)
     private Double hourlyRate;
 
     /**
