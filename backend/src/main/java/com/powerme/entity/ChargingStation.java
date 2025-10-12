@@ -2,6 +2,7 @@ package com.powerme.entity;
 
 import com.powerme.entity.enums.ChargingPower;
 import com.powerme.entity.enums.SocketType;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -69,8 +70,19 @@ public class ChargingStation {
      * Indique si la borne est actuellement disponible à la réservation.
      */
     @Column(nullable = false)
-    private Boolean isAvailable = true;
+    private Boolean isActive = true;
 
+    /**
+     * Heure de début de disponibilité quotidienne (ex : "08:00"). Si null, disponible 24h/24.
+     */
+    private String availableFrom; // Format HH:mm
+
+    /**
+     * Heure de fin de disponibilité quotidienne (ex : "20:00"). Si null, disponible 24h/24.
+     */
+    private String availableTo; // Format HH:mm
+
+    // RELATIONS
     /**
      * ChargingLocation "possède" ses ChargingStations. Le parent (Location) ne doit PAS être
      * supprimé par l'enfant (Station).
@@ -84,6 +96,13 @@ public class ChargingStation {
      */
     @OneToMany(mappedBy = "chargingStation")
     private List<Booking> bookings = new ArrayList<>();
+
+    /**
+     * Périodes de blocage (vacances, maintenance, etc.).
+     */
+    @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UnavailabilityPeriod> unavailabilityPeriods = new ArrayList<>();
+
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -111,6 +130,24 @@ public class ChargingStation {
      */
     public double getPowerInKilowatts() {
         return power != null ? power.getKilowatts() : 0.0;
+    }
+
+    /**
+     * Ajoute une période d'indisponibilité à cette borne. Gère automatiquement la relation
+     * bidirectionnelle.
+     */
+    public void addUnavailabilityPeriod(UnavailabilityPeriod period) {
+        unavailabilityPeriods.add(period);
+        period.setChargingStation(this);
+    }
+
+    /**
+     * Retire une période d'indisponibilité de cette borne. Gère automatiquement la relation
+     * bidirectionnelle.
+     */
+    public void removeUnavailabilityPeriod(UnavailabilityPeriod period) {
+        unavailabilityPeriods.remove(period);
+        period.setChargingStation(null);
     }
 
 
@@ -147,12 +184,28 @@ public class ChargingStation {
         this.hourlyRate = hourlyRate;
     }
 
-    public Boolean getIsAvailable() {
-        return isAvailable;
+    public Boolean getIsActive() {
+        return isActive;
     }
 
-    public void setIsAvailable(Boolean isAvailable) {
-        this.isAvailable = isAvailable;
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public String getAvailableFrom() {
+        return availableFrom;
+    }
+
+    public void setAvailableFrom(String availableFrom) {
+        this.availableFrom = availableFrom;
+    }
+
+    public String getAvailableTo() {
+        return availableTo;
+    }
+
+    public void setAvailableTo(String availableTo) {
+        this.availableTo = availableTo;
     }
 
     public ChargingLocation getChargingLocation() {
