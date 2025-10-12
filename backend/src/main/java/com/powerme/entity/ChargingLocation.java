@@ -12,10 +12,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 /**
  * Lieu de recharge contenant une ou plusieurs bornes électriques.
@@ -37,25 +41,39 @@ public class ChargingLocation {
 
     private String description;
 
+    // COORDONNÉES GPS
     /**
      * Latitude GPS du lieu de recharge.
      *
-     * <p>Dupliquée depuis Address pour optimiser les recherches géographiques.</p>
+     * <p>Déduite depuis Address pour optimiser les recherches géographiques.</p>
      */
-    @Column(nullable = false)
-    private Double latitude;
+    @Column(nullable = false, precision = 10, scale = 8)
+    private BigDecimal latitude;
 
     /**
      * Longitude GPS du lieu de recharge.
      *
-     * <p>Dupliquée depuis Address pour optimiser les recherches géographiques.</p>
+     * <p>Déduite depuis Address pour optimiser les recherches géographiques.</p>
      */
-    @Column(nullable = false)
-    private Double longitude;
+    @Column(nullable = false, precision = 11, scale = 8)
+    private BigDecimal longitude;
 
+    /**
+     * Point géographique PostGIS
+     */
+    @Column(columnDefinition = "geography(Point, 4326)", nullable = false)
+    private Point location;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    // Relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
@@ -67,10 +85,6 @@ public class ChargingLocation {
     @OneToMany(mappedBy = "chargingLocation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChargingStation> chargingStations = new ArrayList<>();
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 
     public ChargingLocation() {
     }
@@ -79,11 +93,27 @@ public class ChargingLocation {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        createPoint();
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        createPoint();
+    }
+
+    /**
+     * Crée le point PostGIS à partir de latitude/longitude. Appelée automatiquement par @PrePersist
+     * et @PreUpdate.
+     */
+    private void createPoint() {
+        if (latitude != null && longitude != null) {
+            GeometryFactory geometryFactory = new GeometryFactory();
+            this.location = geometryFactory.createPoint(
+                new Coordinate(longitude.doubleValue(), latitude.doubleValue())
+            );
+            this.location.setSRID(4326); // WGS84
+        }
     }
 
     // Méthodes utilitaires
@@ -102,6 +132,29 @@ public class ChargingLocation {
     public void removeChargingStation(ChargingStation station) {
         chargingStations.remove(station);
         station.setChargingLocation(null);
+    }
+
+    /**
+     * Définit les coordonnées GPS et met à jour le point PostGIS.
+     *
+     * @param latitude  latitude en degrés décimaux (-90 à 90)
+     * @param longitude longitude en degrés décimaux (-180 à 180)
+     */
+    public void setCoordinates(BigDecimal latitude, BigDecimal longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        createPoint();
+    }
+
+    /**
+     * Retourne le nombre de bornes de recharge disponibles.
+     *
+     * @return le nombre de bornes avec isAvailable = true
+     */
+    public long getAvailableStationsCount() {
+        return chargingStations.stream()
+            .filter(ChargingStation::getIsAvailable)
+            .count();
     }
 
     // Getters et Setters
@@ -129,19 +182,19 @@ public class ChargingLocation {
         this.description = description;
     }
 
-    public Double getLatitude() {
+    public BigDecimal getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(Double latitude) {
+    public void setLatitude(BigDecimal latitude) {
         this.latitude = latitude;
     }
 
-    public Double getLongitude() {
+    public BigDecimal getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(Double longitude) {
+    public void setLongitude(BigDecimal longitude) {
         this.longitude = longitude;
     }
 
