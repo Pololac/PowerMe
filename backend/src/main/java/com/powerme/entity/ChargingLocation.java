@@ -146,17 +146,6 @@ public class ChargingLocation {
         createPoint();
     }
 
-    /**
-     * Retourne le nombre de bornes de recharge disponibles.
-     *
-     * @return le nombre de bornes avec isAvailable = true
-     */
-    public long getAvailableStationsCount() {
-        return chargingStations.stream()
-            .filter(ChargingStation::getIsAvailable)
-            .count();
-    }
-
     // Getters et Setters
     public UUID getId() {
         return id;
