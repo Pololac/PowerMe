@@ -1,7 +1,11 @@
 package com.powerme.entity;
 
+import com.powerme.entity.enums.ChargingPower;
+import com.powerme.entity.enums.SocketType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,35 +39,31 @@ public class ChargingStation {
     @Column(nullable = false)
     private String name;
 
-    private String description;
-
     /**
-     * Type de prise disponible sur cette borne.
-     *
-     * <p>Par défaut "Type 2S" selon le cahier des charges.
-     * </p>
+     * Type de prise de la borne (par défaut Type 2S).
      */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String socketType = "Type 2S";
+    private SocketType socketType = SocketType.TYPE_2S;
 
     /**
      * Puissance de la borne en kilowatts (kW).
      *
      * <p>Permet de différencier les bornes de même type mais de puissances différentes
-     * (ex : 3,7 kW, 7 kW, 11 kW, 22 kW, 50 kW, etc.).
+     * (ex : 3,7 kW, 7,4 kW, 11 kW, 22 kW, 50 kW, etc.).
      * </p>
      */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Double power;
+    private ChargingPower power = ChargingPower.POWER_7_4;
 
     /**
      * Tarif horaire de la borne défini par le propriétaire.
      *
-     * <p>Montant en euros avec deux décimales de précision.
-     * </p>
+     * <p>Montant en euros</p>
      */
-    @Column(nullable = false)
-    private Double hourlyRate;
+    @Column(name = "hourly_rate", precision = 8, scale = 2)
+    private BigDecimal hourlyRate;
 
     /**
      * Indique si la borne est actuellement disponible à la réservation.
@@ -103,6 +104,16 @@ public class ChargingStation {
         updatedAt = LocalDateTime.now();
     }
 
+    // Méthodes utilitaires
+
+    /**
+     * Permet d'obtenir la valeur numérique en kW.
+     */
+    public double getPowerInKilowatts() {
+        return power != null ? power.getKilowatts() : 0.0;
+    }
+
+
     // Getters et Setters
     public UUID getId() {
         return id;
@@ -120,35 +131,19 @@ public class ChargingStation {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getSocketType() {
+    public SocketType getSocketType() {
         return socketType;
     }
 
-    public void setSocketType(String socketType) {
+    public void setSocketType(SocketType socketType) {
         this.socketType = socketType;
     }
 
-    public Double getPower() {
-        return power;
-    }
-
-    public void setPower(Double power) {
-        this.power = power;
-    }
-
-    public Double getHourlyRate() {
+    public BigDecimal getHourlyRate() {
         return hourlyRate;
     }
 
-    public void setHourlyRate(Double hourlyRate) {
+    public void setHourlyRate(BigDecimal hourlyRate) {
         this.hourlyRate = hourlyRate;
     }
 
