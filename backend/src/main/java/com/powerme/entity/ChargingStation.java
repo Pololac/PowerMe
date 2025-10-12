@@ -49,7 +49,7 @@ public class ChargingStation {
      * Puissance de la borne en kilowatts (kW).
      *
      * <p>Permet de différencier les bornes de même type mais de puissances différentes
-     * (ex: 3,7 kW, 7 kW, 11 kW, 22 kW, 50 kW, etc.).
+     * (ex : 3,7 kW, 7 kW, 11 kW, 22 kW, 50 kW, etc.).
      * </p>
      */
     @Column(nullable = false)
@@ -58,7 +58,7 @@ public class ChargingStation {
     /**
      * Tarif horaire de la borne défini par le propriétaire.
      *
-     * <p>Montant en euros avec 2 décimales de précision.
+     * <p>Montant en euros avec deux décimales de précision.
      * </p>
      */
     @Column(nullable = false)
