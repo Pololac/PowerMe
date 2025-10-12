@@ -29,7 +29,7 @@ public class UserActivation {
     /**
      * Code d'activation du compte envoyé par email.
      *
-     * <p>Format: 6 chiffres (ex: 123456)
+     * <p>Format: 6 chiffres (ex: 123 456)
      * </p>
      */
     @Column(nullable = false, unique = true)
