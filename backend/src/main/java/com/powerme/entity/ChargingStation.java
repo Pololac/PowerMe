@@ -16,11 +16,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Borne de recharge électrique appartenant à un lieu de recharge.
@@ -34,9 +35,10 @@ import java.util.UUID;
 public class ChargingStation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @NotNull(message = "Il est obligatoire de donner un nom à la station")
     @Column(nullable = false)
     private String name;
 
@@ -44,8 +46,9 @@ public class ChargingStation {
      * Type de prise de la borne (par défaut Type 2S).
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SocketType socketType = SocketType.TYPE_2S;
+    @Column(nullable = false,
+            columnDefinition = "socket_type")   // Type PostgreSQL ENUM
+    private SocketType connectorType = SocketType.TYPE_2S;
 
     /**
      * Puissance de la borne en kilowatts (kW).
@@ -55,15 +58,18 @@ public class ChargingStation {
      * </p>
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ChargingPower power = ChargingPower.POWER_7_4;
+    @Column(nullable = false,
+            columnDefinition = "charging_power"  // Type PostgreSQL ENUM
+    )
+    private ChargingPower maxPower = ChargingPower.POWER_7_4;
 
     /**
      * Tarif horaire de la borne défini par le propriétaire.
      *
      * <p>Montant en euros</p>
      */
-    @Column(name = "hourly_rate", precision = 8, scale = 2)
+    @NotNull(message = "Tarif horaire obligatoire")
+    @Column(nullable = false, precision = 8, scale = 2)
     private BigDecimal hourlyRate;
 
     /**
@@ -75,12 +81,12 @@ public class ChargingStation {
     /**
      * Heure de début de disponibilité quotidienne (ex : "08:00"). Si null, disponible 24h/24.
      */
-    private String availableFrom; // Format HH:mm
+    private LocalTime availableFrom; // Format HH:mm
 
     /**
      * Heure de fin de disponibilité quotidienne (ex : "20:00"). Si null, disponible 24h/24.
      */
-    private String availableTo; // Format HH:mm
+    private LocalTime availableTo; // Format HH:mm
 
     // RELATIONS
     /**
@@ -103,11 +109,12 @@ public class ChargingStation {
     @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UnavailabilityPeriod> unavailabilityPeriods = new ArrayList<>();
 
-
+    // Timestamps
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    private LocalDateTime updatedAt;
+    @Column(nullable = false)
+    private Instant updatedAt;
 
     public ChargingStation() {
     }
@@ -115,12 +122,13 @@ public class ChargingStation {
     // Lifecycle callbacks
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
     }
 
     // Méthodes utilitaires
@@ -129,7 +137,7 @@ public class ChargingStation {
      * Permet d'obtenir la valeur numérique en kW.
      */
     public double getPowerInKilowatts() {
-        return power != null ? power.getKilowatts() : 0.0;
+        return maxPower != null ? maxPower.getKilowatts() : 0.0;
     }
 
     /**
@@ -152,11 +160,11 @@ public class ChargingStation {
 
 
     // Getters et Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -168,12 +176,20 @@ public class ChargingStation {
         this.name = name;
     }
 
-    public SocketType getSocketType() {
-        return socketType;
+    public SocketType getConnectorType() {
+        return connectorType;
     }
 
-    public void setSocketType(SocketType socketType) {
-        this.socketType = socketType;
+    public void setConnectorType(SocketType connectorType) {
+        this.connectorType = connectorType;
+    }
+
+    public ChargingPower getMaxPower() {
+        return maxPower;
+    }
+
+    public void setMaxPower(ChargingPower maxPower) {
+        this.maxPower = maxPower;
     }
 
     public BigDecimal getHourlyRate() {
@@ -192,19 +208,19 @@ public class ChargingStation {
         this.isActive = isActive;
     }
 
-    public String getAvailableFrom() {
+    public LocalTime getAvailableFrom() {
         return availableFrom;
     }
 
-    public void setAvailableFrom(String availableFrom) {
+    public void setAvailableFrom(LocalTime availableFrom) {
         this.availableFrom = availableFrom;
     }
 
-    public String getAvailableTo() {
+    public LocalTime getAvailableTo() {
         return availableTo;
     }
 
-    public void setAvailableTo(String availableTo) {
+    public void setAvailableTo(LocalTime availableTo) {
         this.availableTo = availableTo;
     }
 
@@ -224,19 +240,19 @@ public class ChargingStation {
         this.bookings = bookings;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

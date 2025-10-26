@@ -9,33 +9,34 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * Période d'indisponibilité d'une borne (vacances, maintenance, etc.).
  */
 @Entity
-@Table(name = "unavailability_periods")
 public class UnavailabilityPeriod {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "start_time", nullable = false)
-    private LocalDateTime startTime;
+    @NotNull(message = "Le jour de début est obligatoire")
+    @Column(nullable = false)
+    private LocalDateTime startDate;
 
-    @Column(name = "end_time", nullable = false)
-    private LocalDateTime endTime;
+    @NotNull(message = "Le jour de fin est obligatoire")
+    @Column(nullable = false)
+    private LocalDateTime endDate;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
 
     // Relations
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "charging_station_id", nullable = false)
     private ChargingStation chargingStation;
 
 
@@ -46,7 +47,7 @@ public class UnavailabilityPeriod {
     // Lifecycle callbacks
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
     }
 
     // Méthodes utilitaires
@@ -60,12 +61,11 @@ public class UnavailabilityPeriod {
      */
     public boolean overlapsWith(LocalDateTime otherStart, LocalDateTime otherEnd) {
         // Chevauchement si: start < otherEnd ET end > otherStart
-        return this.startTime.isBefore(otherEnd) && this.endTime.isAfter(otherStart);
+        return this.startDate.isBefore(otherEnd) && this.endDate.isAfter(otherStart);
     }
 
-
     // GETTERS / SETTERS
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
@@ -77,23 +77,23 @@ public class UnavailabilityPeriod {
         this.chargingStation = chargingStation;
     }
 
-    public LocalDateTime getStartTime() {
-        return startTime;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 }

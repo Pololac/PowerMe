@@ -13,9 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * Représente une réservation de borne de recharge.
@@ -30,12 +31,14 @@ import java.util.UUID;
 public class Booking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @NotNull(message = "L'heure de début est obligatoire")
     @Column(nullable = false)
     private LocalDateTime startTime;
 
+    @NotNull(message = "L'heure de fin est obligatoire")
     @Column(nullable = false)
     private LocalDateTime endTime;
 
@@ -45,8 +48,9 @@ public class Booking {
      * <p>Valeur par défaut : PENDING (en attente de validation du propriétaire).</p>
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BookingStatus status = BookingStatus.PENDING;
+    @Column(nullable = false,
+            columnDefinition = "booking_status")  // Type PostgreSQL ENUM
+    private BookingStatus bookingStatus = BookingStatus.PENDING;
 
     /**
      * Montant total de la réservation en euros.
@@ -55,6 +59,13 @@ public class Booking {
      */
     @Column(nullable = false, precision = 8, scale = 2)
     private BigDecimal totalPrice;
+
+    // Timestamps
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(nullable = false)
+    private Instant updatedAt;
 
     /**
      * Utilisateur qui effectue la réservation.
@@ -70,20 +81,16 @@ public class Booking {
     @JoinColumn(name = "charging_station_id", nullable = false)
     private ChargingStation chargingStation;
 
-    // Timestamps
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
     }
 
     // Constructeur
@@ -91,11 +98,11 @@ public class Booking {
     }
 
     // Getters et Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -115,12 +122,12 @@ public class Booking {
         this.endTime = endTime;
     }
 
-    public BookingStatus getStatus() {
-        return status;
+    public BookingStatus getBookingStatus() {
+        return bookingStatus;
     }
 
-    public void setStatus(BookingStatus status) {
-        this.status = status;
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
     }
 
     public BigDecimal getTotalPrice() {
@@ -147,19 +154,19 @@ public class Booking {
         this.chargingStation = chargingStation;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

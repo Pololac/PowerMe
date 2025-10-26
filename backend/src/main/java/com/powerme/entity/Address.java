@@ -8,10 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Représente les adresses des utilisateurs et des stations de recharge.
@@ -20,26 +20,35 @@ import java.util.UUID;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @NotNull(message = "L'adresse est obligatoire")
     @Column(nullable = false)
     private String streetAddress;
 
+    @NotNull(message = "La ville est obligatoire")
     @Column(nullable = false)
     private String city;
 
+    @NotNull(message = "Le code postal est obligatoire")
     @Column(nullable = false)
     private String postalCode;
 
+    @NotNull(message = "Le pays est obligatoire")
+    @Column(nullable = false)
     private String country;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    private LocalDateTime updatedAt;
+    @Column(nullable = false)
+    private Instant updatedAt;
 
-    // Relations sans Cascade pour éviter des suppressions problématiques
+    // Relations
+    /**
+     * Pas de cascade pour éviter des suppressions problématiques.
+     */
     @OneToMany(mappedBy = "address")
     private List<User> users = new ArrayList<>();
 
@@ -53,12 +62,13 @@ public class Address {
     // Lifecycle callbacks
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
     }
 
     // Méthode utilitaire
@@ -67,12 +77,11 @@ public class Address {
     }
 
     // Getters & Setters
-
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -108,19 +117,19 @@ public class Address {
         this.country = country;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
