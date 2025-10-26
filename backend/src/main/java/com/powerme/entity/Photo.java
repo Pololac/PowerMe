@@ -9,8 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.Instant;
 
 /**
  * Représente une photo associée à un lieu de recharge ou une station.
@@ -22,8 +21,8 @@ import java.util.UUID;
 public class Photo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * Nom unique du fichier stocké.
@@ -36,7 +35,7 @@ public class Photo {
     private String filename;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "charging_location_id")
@@ -49,29 +48,19 @@ public class Photo {
     // Lifecycle
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
     }
 
-    // Constructeur
+    // Constructeur vide
     public Photo() {
     }
 
-    public Photo(ChargingLocation location, String filename) {
-        this.chargingLocation = location;
-        this.filename = filename;
-    }
-
-    public Photo(ChargingStation station, String filename) {
-        this.chargingStation = station;
-        this.filename = filename;
-    }
-
     // Getters et Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -83,11 +72,11 @@ public class Photo {
         this.filename = filename;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 

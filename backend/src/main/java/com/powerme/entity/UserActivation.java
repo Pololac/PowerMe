@@ -9,8 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.Instant;
 
 /**
  * Code d'activation à six chiffres pour la validation d'un compte utilisateur.
@@ -23,8 +22,8 @@ import java.util.UUID;
 public class UserActivation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     /**
      * Code d'activation du compte envoyé par email.
@@ -42,7 +41,7 @@ public class UserActivation {
      * </p>
      */
     @Column(nullable = false)
-    private LocalDateTime expirationDate;
+    private Instant expirationDate;
 
     /**
      * Indique si le code a déjà été utilisé.
@@ -53,8 +52,8 @@ public class UserActivation {
     @Column(nullable = false)
     private Boolean isUsed = false;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false, columnDefinition = "timestamptz")
+    private Instant createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -67,7 +66,7 @@ public class UserActivation {
     // Lifecycle callbacks
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
     }
 
     // Méthodes utilitaires
@@ -78,7 +77,7 @@ public class UserActivation {
      * @return true si la date d'expiration est dépassée
      */
     public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expirationDate);
+        return Instant.now().isAfter(expirationDate);
     }
 
     /**
@@ -101,11 +100,11 @@ public class UserActivation {
     }
 
     // Getters & Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -117,11 +116,11 @@ public class UserActivation {
         this.code = code;
     }
 
-    public LocalDateTime getExpirationDate() {
+    public Instant getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(LocalDateTime expirationDate) {
+    public void setExpirationDate(Instant expirationDate) {
         this.expirationDate = expirationDate;
     }
 
@@ -133,11 +132,11 @@ public class UserActivation {
         this.isUsed = isUsed;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 

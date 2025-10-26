@@ -1,6 +1,5 @@
 package com.powerme.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,14 +11,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 
 /**
  * Lieu de recharge contenant une ou plusieurs bornes électriques.
@@ -33,9 +35,10 @@ import org.locationtech.jts.geom.Point;
 public class ChargingLocation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @NotNull(message = "Il est obligatoire de donner un nom à ce lieu")
     @Column(nullable = false)
     private String name;
 
@@ -61,46 +64,53 @@ public class ChargingLocation {
     /**
      * Point géographique PostGIS.
      */
-    @Column(columnDefinition = "geography(Point, 4326)", nullable = false)
+    @Column(columnDefinition = "geography(Point, 4326)")
+    @JdbcTypeCode(SqlTypes.GEOGRAPHY)
     private Point location;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    private LocalDateTime updatedAt;
+    @Column(nullable = false)
+    private Instant updatedAt;
 
     // Relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
     /**
-     * La suppression d'un lieu de recharge supprime ses bornes associées.
+     * Pas de cascade par défaut afin d'éviter les suppressions involontaires. La logique métier
+     * sera gérée côté service.
      */
-    @OneToMany(mappedBy = "chargingLocation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chargingLocation")
     private List<ChargingStation> chargingStations = new ArrayList<>();
 
-
+    // Constructeur vide
     public ChargingLocation() {
     }
 
     // Lifecycle callbacks
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
         createPoint();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
         createPoint();
     }
+
+    // Factory statique pour éviter de la recréer à chaque fois
+    private static final GeometryFactory GEOMETRY_FACTORY =
+            new GeometryFactory(new PrecisionModel(), 4326);
 
     /**
      * Crée le point PostGIS à partir de latitude/longitude. Appelée automatiquement par @PrePersist
@@ -108,11 +118,9 @@ public class ChargingLocation {
      */
     private void createPoint() {
         if (latitude != null && longitude != null) {
-            GeometryFactory geometryFactory = new GeometryFactory();
-            this.location = geometryFactory.createPoint(
-                new Coordinate(longitude.doubleValue(), latitude.doubleValue())
+            this.location = GEOMETRY_FACTORY.createPoint(
+                    new Coordinate(longitude.doubleValue(), latitude.doubleValue())
             );
-            this.location.setSRID(4326); // WGS84
         }
     }
 
@@ -147,11 +155,11 @@ public class ChargingLocation {
     }
 
     // Getters et Setters
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -203,19 +211,19 @@ public class ChargingLocation {
         this.owner = owner;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

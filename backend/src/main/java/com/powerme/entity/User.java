@@ -2,6 +2,7 @@ package com.powerme.entity;
 
 import com.powerme.entity.enums.Role;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -17,13 +18,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Utilisateur de la plateforme PowerMe.
@@ -37,12 +38,14 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @NotNull(message = "L'email est obligatoire")
     @Column(nullable = false, unique = true)
     private String email;
 
+    @NotNull(message = "Le mot de passe est obligatoire")
     @Column(nullable = false)
     private String password;
 
@@ -51,7 +54,12 @@ public class User {
      * une Enum. JPA/Hibernate doit stocker cette relation "ManyToMany" dans une table de liaison.
      * {@code @ElementCollection} permet de créer automatiquement cette table de liaison.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "roles", nullable = false, columnDefinition = "user_role")
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
@@ -72,10 +80,12 @@ public class User {
 
     // Timestamps
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
+    @Column(nullable = false)
+    private Instant updatedAt;
+
+    private Instant deletedAt;
 
     // Relations
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,14 +93,22 @@ public class User {
     private Address address;
 
     /**
-     * La suppression d'un utilisateur supprimera aussi ses lieux de recharges.
+     * Pas de cascade par défaut afin d'éviter les suppressions involontaires. La logique métier
+     * sera gérée côté service.
      */
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner")
     private List<ChargingLocation> chargingLocations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    /**
+     * Pas de cascade par défaut afin d'éviter les suppressions involontaires. La logique métier
+     * sera gérée côté service.
+     */
+    @OneToMany(mappedBy = "user")
     private List<Booking> bookings = new ArrayList<>();
 
+    /**
+     * Dépend totalement de User => cascade OK.
+     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserActivation> activations = new ArrayList<>();
 
@@ -102,12 +120,31 @@ public class User {
     // Lifecycle callbacks
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        updatedAt = Instant.now();
+    }
+
+    // Soft delete
+
+    /**
+     * Pour supprimer un utilisateur sans l'effacer complètement.
+     */
+    public void softDelete() {
+        this.deletedAt = Instant.now();
+    }
+
+    /**
+     * Pour savoir si l'utilisateur est supprimé.
+     *
+     * @return true si l'utilisateur est bien supprimé
+     */
+    public boolean isDeleted() {
+        return this.deletedAt != null;
     }
 
     // Méthodes utilitaires
@@ -141,22 +178,6 @@ public class User {
     }
 
     /**
-     * Pour supprimer un utilisateur sans l'effacer complètement.
-     */
-    public void softDelete() {
-        this.deletedAt = LocalDateTime.now();
-    }
-
-    /**
-     * Pour savoir si l'utilisateur est supprimé.
-     *
-     * @return true si l'utilisateur est bien supprimé
-     */
-    public boolean isDeleted() {
-        return this.deletedAt != null;
-    }
-
-    /**
      * Pour récupérer le nom complet de l'utilisateur.
      *
      * @return prénom + nom (ex: "John Doe")
@@ -175,11 +196,11 @@ public class User {
     }
 
     // Getters & Setters
-    public UUID getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(final UUID id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -255,27 +276,27 @@ public class User {
         this.isActivated = activated;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return this.createdAt;
     }
 
-    public void setCreatedAt(final LocalDateTime createdAt) {
+    public void setCreatedAt(final Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return this.updatedAt;
     }
 
-    public void setUpdatedAt(final LocalDateTime updatedAt) {
+    public void setUpdatedAt(final Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getDeletedAt() {
+    public Instant getDeletedAt() {
         return this.deletedAt;
     }
 
-    public void setDeletedAt(final LocalDateTime deletedAt) {
+    public void setDeletedAt(final Instant deletedAt) {
         this.deletedAt = deletedAt;
     }
 
