@@ -2,6 +2,12 @@
 # Configuration COMMUNE
 # ==============================================
 
+security:
+  jwt:
+    secret: ${SECURITY_JWT_SECRET} # secret lu depuis .env
+    access-token-expiration: 900 # 15 minutes
+    refresh-token-expiration: 2592000 # 30 jours
+
 spring:
   application:
     name: powerme
@@ -10,8 +16,15 @@ spring:
   profiles:
     active: dev
 
+  # ====== BASE DE DONNÉES ======
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver # Logs plus propres
+
   jpa:
-    open-in-view: false  # IMPORTANT : évite les problèmes de lazy loading
+    open-in-view: false # IMPORTANT : évite les problèmes de lazy loading
     properties:
       hibernate:
         jdbc:
@@ -19,8 +32,8 @@ spring:
 
 server:
   compression:
-    enabled: true  # Compresse les réponses HTTP (+ rapide)
+    enabled: true # Compresse les réponses HTTP (+ rapide)
 
 logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"  # Format des logs
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n" # Format des logs
