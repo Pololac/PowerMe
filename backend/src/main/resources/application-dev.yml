@@ -3,28 +3,21 @@
 # ==============================================
 
 spring:
-  # ====== BASE DE DONNÉES ======
-  datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:powerme_dev}
-    username: ${DB_USER:powerme_user}
-    password: ${DB_PASS:dev}
-    driver-class-name: org.postgresql.Driver  # Logs plus propres
-
   # ====== JPA / HIBERNATE avec POSTGIS ======
   jpa:
     hibernate:
       ddl-auto: update # Hibernate modifie automatiquement la BDD
-    show-sql: true      # Affiche les requêtes SQL dans les logs
+    show-sql: true # Affiche les requêtes SQL dans les logs
     properties:
       hibernate:
-        format_sql: true  # Formate les requêtes SQL (plus lisible)
-        use_sql_comments: true  # Ajoute des commentaires dans les requêtes
+        format_sql: true # Formate les requêtes SQL (plus lisible)
+        use_sql_comments: true # Ajoute des commentaires dans les requêtes
         dialect: org.hibernate.dialect.PostgreSQLDialect # Nécessaire pour qu'Hibernate comprenne le dialecte PostGIS
 
   # ====== FLYWAY : SVG migrations ======
   flyway:
     enabled: false
-    baseline-on-migrate: true  # Si BDD existe déjà
+    baseline-on-migrate: true # Si BDD existe déjà
     locations: classpath:db/migration
     validate-on-migrate: true
     clean-disabled: true
@@ -43,12 +36,12 @@ spring:
 
 # ====== SERVEUR ======
 server:
-  port: ${SERVER_PORT:8081}  # Port du backend
+  port: ${SERVER_PORT:8081} # Port du backend
 
 # ====== LOGGING ======
 logging:
   level:
-    root: INFO  # Niveau global
-    com.powerme: DEBUG  # Tes classes en mode DEBUG (+ de détails)
-    org.hibernate.SQL: DEBUG  # Logs SQL détaillés
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # Valeurs des paramètres SQL
+    root: INFO # Niveau global
+    com.powerme: DEBUG # Tes classes en mode DEBUG (+ de détails)
+    org.hibernate.SQL: DEBUG # Logs SQL détaillés
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # Valeurs des paramètres SQL
