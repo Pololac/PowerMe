@@ -3,30 +3,20 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.5.6</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
+
   <groupId>com.powerme</groupId>
   <artifactId>powerme</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>PowerMe</name>
   <description>Application de réservation de bornes électriques entre particuliers</description>
-  <url/>
-  <licenses>
-    <license/>
-  </licenses>
-  <developers>
-    <developer/>
-  </developers>
-  <scm>
-    <connection/>
-    <developerConnection/>
-    <tag/>
-    <url/>
-  </scm>
+
   <properties>
     <java.version>21</java.version>
     <!-- Force Logback 1.5.19 to fix CVE-2025-11226 -->
@@ -35,6 +25,7 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- Logging -->
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
@@ -56,6 +47,14 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -139,6 +138,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <!-- MapStruct plugin-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -154,6 +154,47 @@
             </path>
           </annotationProcessorPaths>
         </configuration>
+      </plugin>
+      <!-- Flyway -->
+      <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>11.7.2</version>
+        <configuration>
+          <url>jdbc:postgresql://localhost:5432/powerme_dev</url>
+          <user>powerme_user</user>
+          <password>dev</password>
+          <locations>
+            <location>classpath:db/migration</location>
+          </locations>
+        </configuration>
+      </plugin>
+      <!-- JavaDoc -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.11.3</version>
+        <configuration>
+          <source>21</source>
+          <encoding>UTF-8</encoding>
+          <!-- Arrête le build si la Javadoc contient des erreurs -->
+          <failOnError>true</failOnError>
+          <!-- Désactive seulement le warning “missing comment” -->
+          <additionalOptions>
+            <additionalOption>-Xdoclint:all,-missing</additionalOption>
+          </additionalOptions>
+          <!-- Génère un site Javadoc dans target/site/apidocs -->
+          <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
+        </configuration>
+        <!-- Exécuter la génération à chaque build (ou uniquement sur 'site') -->
+        <executions>
+          <execution>
+            <id>attach-javadoc</id>
+            <goals>
+              <goal>javadoc</goal>      <!-- génère le site HTML -->
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
