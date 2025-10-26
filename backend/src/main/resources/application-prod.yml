@@ -5,17 +5,10 @@
 # ⚠️ Pas de valeurs par défaut
 
 spring:
-  # ====== BASE DE DONNÉES ======
-  datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASS}
-    driver-class-name: org.postgresql.Driver
-
   # ====== JPA / HIBERNATE ======
   jpa:
     hibernate:
-      ddl-auto: validate  # Ne modifie PAS le schéma (sécurité)
+      ddl-auto: validate # Ne modifie PAS le schéma (sécurité)
     show-sql: false
     properties:
       hibernate:
