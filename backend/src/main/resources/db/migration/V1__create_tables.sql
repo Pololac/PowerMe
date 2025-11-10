@@ -2,11 +2,11 @@
 -- POWERME - SCHEMA PRODUCTION-READY
 -- ============================================
 
--- ATTENTION : Exécuter AVANT ce script (depuis psql -U postgres) :
+-- ATTENTION: Exécuter AVANT ce script (depuis psql -U postgres) :
 -- DROP DATABASE IF EXISTS powerme_dev;
 -- CREATE DATABASE powerme_dev OWNER powerme_user;
--- Puis :
--- psql -U powerme_user -d powerme -f schema-optimized.sql
+-- Puis:
+-- psql -U powerme_user -d powerme_dev -f schema-optimized.sql
 
 
 -- ============================================
@@ -29,51 +29,6 @@ DROP TABLE IF EXISTS charging_station CASCADE;
 DROP TABLE IF EXISTS charging_location CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS address CASCADE;
-DROP TABLE IF EXISTS role CASCADE;
-
--- Suppression des types ENUM (si existants)
-DROP TYPE IF EXISTS user_role CASCADE;
-DROP TYPE IF EXISTS booking_status CASCADE;
-DROP TYPE IF EXISTS socket_type CASCADE;
-DROP TYPE IF EXISTS charging_power CASCADE;
-
-
--- ============================================
--- TYPES ENUM (Optionnel)
--- ============================================
-
-CREATE TYPE user_role AS ENUM (
-    'ROLE_USER',
-    'ROLE_ADMIN',
-    'ROLE_OWNER'
-    );
-
-CREATE TYPE booking_status AS ENUM (
-    'PENDING',
-    'ACCEPTED',
-    'REFUSED',
-    'COMPLETED',
-    'CANCELLED'
-    );
-
-CREATE TYPE socket_type AS ENUM (
-    'TYPE_2S',
-    'TYPE_2',
-    'CCS',
-    'CHADEMO'
-    );
-
-CREATE TYPE charging_power AS ENUM (
-    'POWER_3_7',
-    'POWER_7_4',
-    'POWER_11',
-    'POWER_22',
-    'POWER_50',
-    'POWER_100',
-    'POWER_150',
-    'POWER_350'
-    );
-
 
 -- ============================================
 -- TABLES
@@ -82,7 +37,7 @@ CREATE TYPE charging_power AS ENUM (
 -- Address
 CREATE TABLE address
 (
-    id             SERIAL PRIMARY KEY,
+    id             BIGSERIAL PRIMARY KEY,
     created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
 
@@ -98,7 +53,7 @@ COMMENT ON TABLE address IS 'Adresses postales des utilisateurs et des lieux de 
 -- Users
 CREATE TABLE users
 (
-    id           SERIAL PRIMARY KEY,
+    id           BIGSERIAL PRIMARY KEY,
     created_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_at   TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     deleted_at   TIMESTAMPTZ,
@@ -112,7 +67,7 @@ CREATE TABLE users
     avatar_url   VARCHAR(500),
     is_activated BOOLEAN      NOT NULL DEFAULT FALSE,
 
-    address_id   INTEGER,
+    address_id   BIGINT,
 
     CONSTRAINT uk_users_email UNIQUE (email),
     CONSTRAINT fk_users_address FOREIGN KEY (address_id)
@@ -122,19 +77,34 @@ CREATE TABLE users
 COMMENT ON TABLE users IS 'Utilisateurs de PowerMe (propriétaires et locataires de bornes)';
 
 
--- Table de collection user_roles (générée par Hibernate automatiquement)
+-- Table user_roles (stocke les rôles de chaque utilisateur)
+CREATE TABLE user_roles
+(
+    user_id BIGINT      NOT NULL,
+    role    VARCHAR(50) NOT NULL,
+
+    CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id)
+        REFERENCES users (id) ON DELETE CASCADE,
+
+    -- Contrainte d'unicité pour qu'un user n'est pas plusieurs fois le même rôle
+    CONSTRAINT uk_user_roles UNIQUE (user_id, role),
+
+    -- Contrainte pour valider les valeurs (équivalent ENUM)
+    CONSTRAINT chk_user_roles_valid
+        CHECK (role IN ('ROLE_USER', 'ROLE_ADMIN', 'ROLE_OWNER'))
+);
 
 -- Table: user_activation
 CREATE TABLE user_activation
 (
-    id              SERIAL PRIMARY KEY,
+    id              BIGSERIAL PRIMARY KEY,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-    activation_code VARCHAR(6)  NOT NULL,
+    activation_code INTEGER     NOT NULL,
     expiration_date TIMESTAMPTZ NOT NULL,
     is_used         BOOLEAN     NOT NULL DEFAULT FALSE,
 
-    user_id         INTEGER     NOT NULL,
+    user_id         BIGINT      NOT NULL,
 
     CONSTRAINT uk_user_activation_code UNIQUE (activation_code),
     CONSTRAINT fk_user_activation_user FOREIGN KEY (user_id)
@@ -147,7 +117,7 @@ COMMENT ON TABLE user_activation IS 'Codes d''activation à 6 chiffres envoyés 
 -- Table: charging_location
 CREATE TABLE charging_location
 (
-    id          SERIAL PRIMARY KEY,
+    id          BIGSERIAL PRIMARY KEY,
     created_at  TIMESTAMPTZ            NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ            NOT NULL DEFAULT NOW(),
 
@@ -157,11 +127,11 @@ CREATE TABLE charging_location
     longitude   NUMERIC(11, 8)         NOT NULL,
     location    GEOGRAPHY(Point, 4326) NOT NULL,
 
-    owner_id    INTEGER                NOT NULL,
-    address_id  INTEGER                NOT NULL,
+    owner_id    BIGINT                 NOT NULL,
+    address_id  BIGINT                 NOT NULL,
 
     CONSTRAINT fk_charging_location_owner FOREIGN KEY (owner_id)
-        REFERENCES users (id),
+        REFERENCES users (id) ON DELETE RESTRICT, -- Empêche suppression user si locations
     CONSTRAINT fk_charging_location_address FOREIGN KEY (address_id)
         REFERENCES address (id)
 );
@@ -173,41 +143,42 @@ COMMENT ON COLUMN charging_location.location IS 'Coordonnées GPS (PostGIS Point
 -- Table: charging_station
 CREATE TABLE charging_station
 (
-    id                   SERIAL PRIMARY KEY,
-    created_at           TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
-    updated_at           TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
-    deleted_at           TIMESTAMPTZ,
+    id                   BIGSERIAL PRIMARY KEY,
+    created_at           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    updated_at           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
 
-    name                 VARCHAR(255)   NOT NULL,
-    description          TEXT,
-    is_active            BOOLEAN        NOT NULL DEFAULT FALSE,
-    max_power            charging_power NOT NULL,
-    connector_type       socket_type    NOT NULL,
-    hourly_rate          NUMERIC(6, 2)  NOT NULL,
+    name                 VARCHAR(255)  NOT NULL,
+    connector_type       VARCHAR(20)   NOT NULL
+        CHECK (connector_type IN ('TYPE_2S', 'TYPE_2', 'CCS', 'CHADEMO')),
+    max_power            VARCHAR(20)   NOT NULL
+        CHECK (max_power IN ('POWER_3_7', 'POWER_7_4', 'POWER_11', 'POWER_22',
+                             'POWER_50', 'POWER_100', 'POWER_150', 'POWER_350')),
+    hourly_rate          NUMERIC(8, 2) NOT NULL,
+    is_active            BOOLEAN       NOT NULL DEFAULT TRUE,
+    available_from       TIME,
+    available_to         TIME,
 
-    charging_location_id INTEGER        NOT NULL,
+    charging_location_id BIGINT        NOT NULL,
 
     CONSTRAINT fk_charging_station_location FOREIGN KEY (charging_location_id)
-        REFERENCES charging_location (id)
+        REFERENCES charging_location (id) ON DELETE CASCADE -- Suppression si CL supprimées
 );
 
-COMMENT ON TABLE charging_station IS 'Bornes de recharge (soft delete si pas de réservations)';
-COMMENT ON COLUMN charging_station.deleted_at IS 'Soft delete géré par service Java';
-
+COMMENT ON TABLE charging_station IS 'Bornes de recharge';
 
 -- Table: unavailability_period
 CREATE TABLE unavailability_period
 (
-    id                  SERIAL PRIMARY KEY,
-    created_at          TIMESTAMPTZ  NOT NULL,
+    id                  BIGSERIAL PRIMARY KEY,
+    created_at          TIMESTAMPTZ NOT NULL,
 
-    start_date          TIMESTAMP(6) NOT NULL,
-    end_date            TIMESTAMP(6) NOT NULL,
+    start_date          DATE        NOT NULL,
+    end_date            DATE        NOT NULL,
 
-    charging_station_id INTEGER      NOT NULL,
+    charging_station_id BIGINT      NOT NULL,
 
     CONSTRAINT fk_unavailability_station FOREIGN KEY (charging_station_id)
-        REFERENCES charging_station (id)
+        REFERENCES charging_station (id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE unavailability_period IS 'Périodes d''indisponibilité des bornes';
@@ -216,19 +187,29 @@ COMMENT ON TABLE unavailability_period IS 'Périodes d''indisponibilité des bor
 -- Table: booking
 CREATE TABLE booking
 (
-    id                  SERIAL PRIMARY KEY,
-    created_at          TIMESTAMPTZ    NOT NULL,
-    updated_at          TIMESTAMPTZ    NOT NULL,
+    id                       BIGSERIAL PRIMARY KEY,
+    created_at               TIMESTAMPTZ   NOT NULL,
+    updated_at               TIMESTAMPTZ   NOT NULL,
 
-    start_time          timestamp(6)   NOT NULL,
-    end_time            timestamp(6)   NOT NULL,
-    total_price         NUMERIC(8, 2)  NOT NULL,
-    booking_status      booking_status NOT NULL,
+    start_time               TIMESTAMPTZ   NOT NULL,
+    end_time                 TIMESTAMPTZ   NOT NULL,
+    total_price              NUMERIC(8, 2) NOT NULL,
+    booking_status           VARCHAR(20)   NOT NULL
+        CHECK (booking_status IN ('PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED')),
 
-    user_id             INTEGER        NOT NULL,
-    charging_station_id INTEGER        NOT NULL,
+    user_id                  BIGINT        NOT NULL,
 
-    CONSTRAINT fk_booking_station FOREIGN KEY (charging_station_id) REFERENCES charging_station (id),
+    -- Relation nullable (peut devenir NULL si borne supprimée)
+    charging_station_id      BIGINT,
+
+    -- Snapshots : infos figées au moment de la réservation
+    station_name_snapshot    VARCHAR(255)  NOT NULL,
+    station_address_snapshot TEXT          NOT NULL,
+    hourly_rate_snapshot     NUMERIC(8, 2) NOT NULL,
+
+    -- Garde le booking même si borne supprimée (CS_id Null mais infos dans "snapshots")
+    CONSTRAINT fk_booking_station FOREIGN KEY (charging_station_id)
+        REFERENCES charging_station (id) ON DELETE SET NULL,
     CONSTRAINT fk_booking_user FOREIGN KEY (user_id) REFERENCES users (id)
 
 );
@@ -239,17 +220,19 @@ COMMENT ON TABLE booking IS 'Réservations de bornes de recharge';
 -- Table: photo
 CREATE TABLE photo
 (
-    id                   SERIAL PRIMARY KEY,
+    id                   BIGSERIAL PRIMARY KEY,
     created_at           TIMESTAMPTZ  NOT NULL,
 
     filename             VARCHAR(255) NOT NULL,
 
-    charging_location_id INTEGER,
-    charging_station_id  INTEGER,
+    charging_location_id BIGINT,
+    charging_station_id  BIGINT,
 
     CONSTRAINT uk_photo_filename UNIQUE (filename),
-    CONSTRAINT fk_photo_location FOREIGN KEY (charging_location_id) REFERENCES charging_location (id),
-    CONSTRAINT fk_photo_station FOREIGN KEY (charging_station_id) REFERENCES charging_station (id)
+    CONSTRAINT fk_photo_location FOREIGN KEY (charging_location_id)
+        REFERENCES charging_location (id) ON DELETE CASCADE,
+    CONSTRAINT fk_photo_station FOREIGN KEY (charging_station_id)
+        REFERENCES charging_station (id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE photo IS 'Photos des lieux et/ou des bornes de recharge';
