@@ -1,5 +1,6 @@
 package com.powerme.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -84,11 +85,13 @@ public class ChargingLocation {
     private User owner;
 
     /**
-     * Pas de cascade par défaut afin d'éviter les suppressions involontaires. La logique métier
-     * sera gérée côté service.
+     * Supprime les stations quand la location est supprimée.
      */
-    @OneToMany(mappedBy = "chargingLocation")
+    @OneToMany(mappedBy = "chargingLocation", cascade = CascadeType.REMOVE)
     private List<ChargingStation> chargingStations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chargingLocation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos = new ArrayList<>();
 
     // Constructeur vide
     public ChargingLocation() {
@@ -152,6 +155,22 @@ public class ChargingLocation {
         this.latitude = latitude;
         this.longitude = longitude;
         createPoint();
+    }
+
+    /**
+     * Ajoute une photo.
+     */
+    public void addPhoto(Photo photo) {
+        photos.add(photo);
+        photo.setChargingLocation(this);
+    }
+
+    /**
+     * Supprime une photo.
+     */
+    public void removePhoto(Photo photo) {
+        photos.remove(photo);
+        photo.setChargingLocation(null);
     }
 
     // Getters et Setters
@@ -233,5 +252,13 @@ public class ChargingLocation {
 
     public void setChargingStations(List<ChargingStation> chargingStations) {
         this.chargingStations = chargingStations;
+    }
+
+    public List<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photo> photos) {
+        this.photos = photos;
     }
 }
