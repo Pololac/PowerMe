@@ -30,6 +30,14 @@ spring:
         jdbc:
           time_zone: Europe/Paris
 
+  # ====== MAIL ======
+  mail:
+    protocol: ${MAIL_PROTOCOL}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+
 server:
   compression:
     enabled: true # Compresse les réponses HTTP (+ rapide)
