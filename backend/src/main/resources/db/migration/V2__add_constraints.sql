@@ -6,6 +6,19 @@
 ALTER TABLE charging_station
     ADD CONSTRAINT chk_station_rate_positive
         CHECK (hourly_rate > 0);
+ALTER TABLE charging_station
+    ADD CONSTRAINT chk_available_hours
+        CHECK (
+            (available_from IS NULL AND available_to IS NULL)
+                OR
+            (available_from IS NOT NULL AND available_to IS NOT NULL)
+            );
+
+-- Unavailable Period
+ALTER TABLE unavailability_period
+    ADD CONSTRAINT chk_unavailability_dates_valid
+        CHECK (end_date >= start_date);
+-- possible de rendre indisponible un seul jour
 
 -- Booking
 ALTER TABLE booking
