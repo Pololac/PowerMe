@@ -63,7 +63,7 @@ public class User implements UserDetails {
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    @Column(name = "roles", nullable = false, columnDefinition = "user_role")
+    @Column(name = "role", nullable = false, columnDefinition = "user_role")
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
