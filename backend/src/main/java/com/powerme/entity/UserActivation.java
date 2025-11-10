@@ -32,7 +32,7 @@ public class UserActivation {
      * </p>
      */
     @Column(nullable = false, unique = true)
-    private Integer code;
+    private Integer activationCode;
 
     /**
      * Date limite de validité du code.
@@ -50,7 +50,7 @@ public class UserActivation {
      * </p>
      */
     @Column(nullable = false)
-    private Boolean isUsed = false;
+    private boolean isUsed = false;
 
     @Column(nullable = false, updatable = false, columnDefinition = "timestamptz")
     private Instant createdAt;
@@ -69,7 +69,7 @@ public class UserActivation {
         createdAt = Instant.now();
     }
 
-    // Méthodes utilitaires
+    // HELPERS
 
     /**
      * Vérifie si le code est expiré.
@@ -108,12 +108,12 @@ public class UserActivation {
         this.id = id;
     }
 
-    public Integer getCode() {
-        return code;
+    public Integer getActivationCode() {
+        return activationCode;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public void setActivationCode(Integer activationCode) {
+        this.activationCode = activationCode;
     }
 
     public Instant getExpirationDate() {
@@ -124,12 +124,12 @@ public class UserActivation {
         this.expirationDate = expirationDate;
     }
 
-    public Boolean getIsUsed() {
+    public boolean isUsed() {
         return isUsed;
     }
 
-    public void setIsUsed(Boolean isUsed) {
-        this.isUsed = isUsed;
+    public void setUsed(boolean used) {
+        this.isUsed = used;
     }
 
     public Instant getCreatedAt() {
