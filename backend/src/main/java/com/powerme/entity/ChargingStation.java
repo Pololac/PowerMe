@@ -1,7 +1,7 @@
 package com.powerme.entity;
 
-import com.powerme.entity.enums.ChargingPower;
-import com.powerme.entity.enums.SocketType;
+import com.powerme.enums.ChargingPower;
+import com.powerme.enums.SocketType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,12 +43,12 @@ public class ChargingStation {
     private String name;
 
     /**
-     * Type de prise de la borne (par défaut Type 2S).
+     * Type de prise de la borne.
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false,
-            columnDefinition = "socket_type")   // Type PostgreSQL ENUM
-    private SocketType connectorType = SocketType.TYPE_2S;
+            columnDefinition = "connector_type")   // Type PostgreSQL ENUM
+    private SocketType connectorType;
 
     /**
      * Puissance de la borne en kilowatts (kW).
@@ -58,10 +58,8 @@ public class ChargingStation {
      * </p>
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false,
-            columnDefinition = "charging_power"  // Type PostgreSQL ENUM
-    )
-    private ChargingPower maxPower = ChargingPower.POWER_7_4;
+    @Column(name = "max_power", nullable = false)
+    private ChargingPower maxPower;
 
     /**
      * Tarif horaire de la borne défini par le propriétaire.
@@ -76,7 +74,7 @@ public class ChargingStation {
      * Indique si la borne est actuellement disponible à la réservation.
      */
     @Column(nullable = false)
-    private Boolean isActive = true;
+    private boolean isActive = true;
 
     /**
      * Heure de début de disponibilité quotidienne (ex : "08:00"). Si null, disponible 24h/24.
@@ -97,9 +95,6 @@ public class ChargingStation {
     @JoinColumn(name = "charging_location_id", nullable = false)
     private ChargingLocation chargingLocation;
 
-    /**
-     * Pas de CASCADE pour conserver l'historique des réservations passées pour une borne donnée.
-     */
     @OneToMany(mappedBy = "chargingStation")
     private List<Booking> bookings = new ArrayList<>();
 
@@ -108,6 +103,9 @@ public class ChargingStation {
      */
     @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UnavailabilityPeriod> unavailabilityPeriods = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos = new ArrayList<>();
 
     // Timestamps
     @Column(nullable = false, updatable = false)
@@ -131,13 +129,34 @@ public class ChargingStation {
         updatedAt = Instant.now();
     }
 
-    // Méthodes utilitaires
+    // HELPERS METIER
 
     /**
      * Permet d'obtenir la valeur numérique en kW.
      */
     public double getPowerInKilowatts() {
         return maxPower != null ? maxPower.getKilowatts() : 0.0;
+    }
+
+    /**
+     * Réactive la borne (car activée par défaut).
+     */
+    public void activate() {
+        this.isActive = true;
+    }
+
+    /**
+     * Désactive la borne.
+     */
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+    /**
+     * Vérifie la dispo (dans le sens "est-elle en location").
+     */
+    public boolean isAvailable() {
+        return isActive;
     }
 
     /**
@@ -156,6 +175,22 @@ public class ChargingStation {
     public void removeUnavailabilityPeriod(UnavailabilityPeriod period) {
         unavailabilityPeriods.remove(period);
         period.setChargingStation(null);
+    }
+
+    /**
+     * Ajoute une photo.
+     */
+    public void addPhoto(Photo photo) {
+        photos.add(photo);
+        photo.setChargingStation(this);
+    }
+
+    /**
+     * Supprime une photo.
+     */
+    public void removePhoto(Photo photo) {
+        photos.remove(photo);
+        photo.setChargingStation(null);
     }
 
 
@@ -200,12 +235,12 @@ public class ChargingStation {
         this.hourlyRate = hourlyRate;
     }
 
-    public Boolean getIsActive() {
+    public boolean isActive() {
         return isActive;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setActive(boolean active) {
+        this.isActive = active;
     }
 
     public LocalTime getAvailableFrom() {
@@ -232,6 +267,23 @@ public class ChargingStation {
         this.chargingLocation = chargingLocation;
     }
 
+    public List<Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<Photo> photos) {
+        this.photos = photos;
+    }
+
+    public List<UnavailabilityPeriod> getUnavailabilityPeriods() {
+        return unavailabilityPeriods;
+    }
+
+    public void setUnavailabilityPeriods(
+            List<UnavailabilityPeriod> unavailabilityPeriods) {
+        this.unavailabilityPeriods = unavailabilityPeriods;
+    }
+
     public List<Booking> getBookings() {
         return bookings;
     }
@@ -255,5 +307,7 @@ public class ChargingStation {
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+
 }
 
