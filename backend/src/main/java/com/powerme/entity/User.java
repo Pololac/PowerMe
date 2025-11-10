@@ -1,6 +1,6 @@
 package com.powerme.entity;
 
-import com.powerme.entity.enums.Role;
+import com.powerme.enums.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -22,9 +22,14 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Utilisateur de la plateforme PowerMe.
@@ -35,7 +40,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,12 +59,12 @@ public class User {
      * une Enum. JPA/Hibernate doit stocker cette relation "ManyToMany" dans une table de liaison.
      * {@code @ElementCollection} permet de créer automatiquement cette table de liaison.
      */
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    @Column(name = "roles", nullable = false, columnDefinition = "user_role")
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
@@ -332,4 +337,26 @@ public class User {
         this.bookings = bookings;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    // Soft delete = compte verrouillé
+    @Override
+    public boolean isAccountNonLocked() {
+        return deletedAt == null;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActivated && deletedAt == null;
+    }
 }

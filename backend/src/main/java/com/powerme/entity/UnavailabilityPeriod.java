@@ -11,7 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * Période d'indisponibilité d'une borne (vacances, maintenance, etc.).
@@ -25,11 +25,11 @@ public class UnavailabilityPeriod {
 
     @NotNull(message = "Le jour de début est obligatoire")
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @NotNull(message = "Le jour de fin est obligatoire")
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -50,18 +50,16 @@ public class UnavailabilityPeriod {
         createdAt = Instant.now();
     }
 
-    // Méthodes utilitaires
 
-    /**
-     * Vérifie si cette période d'indisponibilité chevauche une autre période.
-     *
-     * @param otherStart Début de l'autre période
-     * @param otherEnd   Fin de l'autre période
-     * @return true si les périodes se chevauchent
-     */
-    public boolean overlapsWith(LocalDateTime otherStart, LocalDateTime otherEnd) {
-        // Chevauchement si: start < otherEnd ET end > otherStart
-        return this.startDate.isBefore(otherEnd) && this.endDate.isAfter(otherStart);
+    // HELPERS
+    // Helper pour vérifier si une date donnée est dans la période
+    public boolean includes(LocalDate date) {
+        return !date.isBefore(startDate) && !date.isAfter(endDate);
+    }
+
+    // Helper pour vérifier si une période chevauche celle-ci
+    public boolean overlaps(LocalDate otherStart, LocalDate otherEnd) {
+        return !otherEnd.isBefore(startDate) && !otherStart.isAfter(endDate);
     }
 
     // GETTERS / SETTERS
@@ -77,19 +75,19 @@ public class UnavailabilityPeriod {
         this.chargingStation = chargingStation;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
