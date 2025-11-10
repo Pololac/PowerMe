@@ -1,4 +1,4 @@
-package com.powerme.entity.enums;
+package com.powerme.enums;
 
 /**
  * Types de prises pour bornes de recharge électrique.

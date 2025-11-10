@@ -1,4 +1,4 @@
-package com.powerme.entity.enums;
+package com.powerme.enums;
 
 /**
  * Statuts possibles d'une réservation.
@@ -26,7 +26,7 @@ public enum BookingStatus {
     /**
      * Réservation refusée par le propriétaire.
      */
-    REFUSED("Refusée"),
+    REJECTED("Refusée"),
 
     /**
      * Réservation terminée (date de fin dépassée).
