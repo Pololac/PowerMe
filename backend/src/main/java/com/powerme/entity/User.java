@@ -22,9 +22,13 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Utilisateur de la plateforme PowerMe.
@@ -35,7 +39,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,7 +80,7 @@ public class User {
      * </p>
      */
     @Column(nullable = false)
-    private Boolean isActivated = false;
+    private boolean isActivated = false;
 
     // Timestamps
     @Column(nullable = false, updatable = false)
@@ -268,11 +272,11 @@ public class User {
         this.avatarUrl = avatarUrl;
     }
 
-    public Boolean isActivated() {
+    public boolean isActivated() {
         return isActivated;
     }
 
-    public void setActivated(final Boolean activated) {
+    public void setActivated(final boolean activated) {
         this.isActivated = activated;
     }
 
@@ -332,4 +336,25 @@ public class User {
         this.bookings = bookings;
     }
 
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .toList();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActivated && !isDeleted();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !isDeleted();
+    }
 }
