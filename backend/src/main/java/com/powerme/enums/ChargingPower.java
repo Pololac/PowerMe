@@ -1,4 +1,4 @@
-package com.powerme.entity.enums;
+package com.powerme.enums;
 
 /**
  * Puissances standard pour bornes de recharge électrique (en kW).
