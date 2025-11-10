@@ -1,6 +1,6 @@
 package com.powerme.entity;
 
-import com.powerme.enums.Role;
+import com.powerme.entity.enums.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,12 +58,12 @@ public class User implements UserDetails {
      * une Enum. JPA/Hibernate doit stocker cette relation "ManyToMany" dans une table de liaison.
      * {@code @ElementCollection} permet de créer automatiquement cette table de liaison.
      */
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    @Column(name = "role", nullable = false)
+    @Column(name = "roles", nullable = false, columnDefinition = "user_role")
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
@@ -81,7 +80,7 @@ public class User implements UserDetails {
      * </p>
      */
     @Column(nullable = false)
-    private Boolean isActivated = false;
+    private boolean isActivated = false;
 
     // Timestamps
     @Column(nullable = false, updatable = false)
@@ -273,11 +272,11 @@ public class User implements UserDetails {
         this.avatarUrl = avatarUrl;
     }
 
-    public Boolean isActivated() {
+    public boolean isActivated() {
         return isActivated;
     }
 
-    public void setActivated(final Boolean activated) {
+    public void setActivated(final boolean activated) {
         this.isActivated = activated;
     }
 
@@ -338,25 +337,24 @@ public class User implements UserDetails {
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
-                .collect(Collectors.toSet());
-    }
-
-    @Override
     public String getUsername() {
         return email;
     }
 
-    // Soft delete = compte verrouillé
     @Override
-    public boolean isAccountNonLocked() {
-        return deletedAt == null;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.name()))
+                .toList();
     }
 
     @Override
     public boolean isEnabled() {
-        return isActivated && deletedAt == null;
+        return isActivated && !isDeleted();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !isDeleted();
     }
 }
