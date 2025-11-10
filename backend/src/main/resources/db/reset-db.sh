@@ -8,6 +8,6 @@ psql -U postgres -c "DROP DATABASE IF EXISTS powerme_dev;" 2>/dev/null || true
 psql -U postgres -c "CREATE DATABASE powerme_dev OWNER powerme_user;"
 
 # Ajout extension postgis
-psql -U powerme_user -d powerme_dev -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+psql -U postgres -d powerme_dev -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 
 echo "✅ Base de données réinitialisée avec succès !"
