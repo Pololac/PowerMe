@@ -6,17 +6,17 @@ spring:
   # ====== JPA / HIBERNATE avec POSTGIS ======
   jpa:
     hibernate:
-      ddl-auto: update # Hibernate modifie automatiquement la BDD
+      ddl-auto: validate # Hibernate modifie automatiquement la BDD
     show-sql: true # Affiche les requêtes SQL dans les logs
     properties:
       hibernate:
         format_sql: true # Formate les requêtes SQL (plus lisible)
         use_sql_comments: true # Ajoute des commentaires dans les requêtes
-        dialect: org.hibernate.dialect.PostgreSQLDialect # Nécessaire pour qu'Hibernate comprenne le dialecte PostGIS
+        database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   # ====== FLYWAY : SVG migrations ======
   flyway:
-    enabled: false
+    enabled: true
     baseline-on-migrate: true # Si BDD existe déjà
     locations: classpath:db/migration
     validate-on-migrate: true
