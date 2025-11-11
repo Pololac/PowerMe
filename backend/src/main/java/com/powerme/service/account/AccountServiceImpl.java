@@ -83,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
         User u = jwtService.validateAndLoadUser(token);
         // Encode le nv mdp avant de l'enregistrer
         u.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(u);
+        userRepository.save(u); // Si erreur, GlobalExceptionHandler catche avec DataAccessException
 
         // On supprime tous les refresh tokens de l'User pour le forcer à se reconnecter
         // sur tous ses devices avec le nouveau MdP
@@ -94,7 +94,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void changePasswordAuthenticated(User user, String newPassword) {
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        userRepository.save(
+                user); // Si erreur, GlobalExceptionHandler catche avec DataAccessException
 
         // On supprime tous les refresh tokens de l'User pour le forcer à se reconnecter
         // sur tous ses devices avec le nouveau MdP
