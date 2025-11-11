@@ -23,20 +23,20 @@ public class MailServiceImpl implements MailService {
     public void sendActivationEmail(User user, String token) {
         String serverUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
         String message = """
-                To validate your account click on <a href="%s">this link</a>
-                """
-                .formatted(serverUrl + "/api/account/validate/" + token);
-        sendBaseMail(user.getEmail(), message, "Spring Holiday Email Validation");
+            Pour activer votre compte, cliquez sur <a href="%s">ce lien</a>
+            """
+            .formatted(serverUrl + "/api/account/validate/" + token);
+        sendBaseMail(user.getEmail(), message, "PowerMe - Activation du compte");
     }
 
     @Override
     public void sendResetPasswordEmail(User user, String token) {
         String serverUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
         String message = """
-                To reset your password click on <a href="%s">this link</a>
-                """
-                .formatted(serverUrl + "/reset-password.html?token=" + token);
-        sendBaseMail(user.getEmail(), message, "Spring Holiday Reset Password");
+            Pour réinitialiser votre mot de passe, cliquez sur <a href="%s">ce lien</a>
+            """
+            .formatted(serverUrl + "/reset-password.html?token=" + token);
+        sendBaseMail(user.getEmail(), message, "PowerMe - Réinitialisation du mot de passe");
     }
 
 
@@ -45,7 +45,7 @@ public class MailServiceImpl implements MailService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
             helper.setTo(to);
-            helper.setFrom("springholiday@human-booster.fr");
+            helper.setFrom("admin@powerme.fr");
             helper.setSubject(subject);
 
             helper.setText(message, true); //Temporaire, email à remplacer par un JWT
