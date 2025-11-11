@@ -2,6 +2,7 @@ package com.powerme.service.security;
 
 import com.powerme.entity.RefreshToken;
 import com.powerme.entity.User;
+import com.powerme.exception.InvalidTokenException;
 import com.powerme.repository.RefreshTokenRepository;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
@@ -48,13 +49,13 @@ public class RefreshTokenService {
      */
     public User validateAndGetUser(String token) {
         RefreshToken rt = refreshTokenRepo.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
+                .orElseThrow(() -> new InvalidTokenException("Refresh token not found"));
 
         // Vérifie qu'il n'est pas expiré
         if (rt.getExpiresAt().isBefore(Instant.now())) {
             // Si expiré, le supprime de la base et retourne une exception
             refreshTokenRepo.delete(rt);
-            throw new IllegalStateException("Refresh token expiré");
+            throw new InvalidTokenException("Refresh token expired");
         }
 
         return rt.getUser();
