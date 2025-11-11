@@ -49,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
         // Hache le password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         // Sauvegarde le nv User
-        User saved = userRepository.save(user);
+        userRepository.save(user);
 
         // Génère un token d'activation avec le JwtService (avec une expiration à 7j).
         String token = jwtService.generateToken(user, Instant.now().plus(7, ChronoUnit.DAYS));
