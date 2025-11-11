@@ -42,6 +42,19 @@ server:
   compression:
     enabled: true # Compresse les réponses HTTP (+ rapide)
 
+
+# ====== LOGGING ======
 logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n" # Format des logs
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+  level:
+    root: INFO
+    com.powerme.backend: INFO
+    org.springframework.web: WARN
+    org.hibernate: WARN
+
+# ====== CONFIGURATION CUSTOM ======
+app:
+  debug: false  # Valeur par défaut (surchargée par les profils)
