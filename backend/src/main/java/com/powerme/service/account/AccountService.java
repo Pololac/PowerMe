@@ -21,21 +21,27 @@ public interface AccountService {
     void activateAccount(String token);
 
     /**
-     * Déclenche un reset password : envoie un lien avec un token permettant de créer un nouveau mot
-     * de passe.
+     * Envoie un email avec un lien pour réinitialiser le mot de passe.
      *
      * @param email Le mail de la personne
      */
-    void resetPassword(String email);
+    void sendResetEmail(String email);
 
     /**
-     * Modifie le mot de passe d’un user authentifié : hache le nouveau mot de passe du User et lui
-     * assigne avant de le faire persister.
+     * Reset le password du user non connecté.
+     *
+     * @param token       le token envoyé dans l'email de reset
+     * @param newPassword le nouveau mot de passe à enregistrer
+     */
+    void resetPasswordWithToken(String token, String newPassword);
+
+    /**
+     * Reset le mot de passe d’un user authentifié
      *
      * @param user        Le User souhaitant modifier son mot de passe
      * @param newPassword Le nouveau mot de passe du User
      */
-    void updatePassword(User user, String newPassword);
+    void changePasswordAuthenticated(User user, String newPassword);
 
     /**
      * Suppression (soft delete) du compte utilisateur (RGPD).

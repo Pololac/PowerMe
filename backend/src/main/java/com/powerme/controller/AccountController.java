@@ -1,16 +1,16 @@
 package com.powerme.controller;
 
+import com.powerme.dto.ResetPasswordDto;
 import com.powerme.dto.SimpleMessageDto;
-import com.powerme.dto.UpdatePasswordDto;
 import com.powerme.dto.UserRegisterDto;
 import com.powerme.entity.User;
 import com.powerme.mapper.UserMapper;
 import com.powerme.service.account.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -50,7 +50,7 @@ public class AccountController {
         User user = userMapper.toEntity(dto);
         accountService.register(user);
         return new SimpleMessageDto(
-                "Registration successful. Check your email to validate your account.");
+            "Registration successful. Check your email to validate your account.");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -60,21 +60,35 @@ public class AccountController {
         return new SimpleMessageDto("Account activated.");
     }
 
+    /**
+     * Réinitialisation du mot de passe dans le cas d'un oubli.
+     */
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/password/{email}")
-    public SimpleMessageDto resetPassword(@PathVariable String email) {
-        accountService.resetPassword(email);
+    @PostMapping("/password/forgot/{email}")
+    public SimpleMessageDto forgotPassword(@PathVariable String email) {
+        accountService.sendResetEmail(email);
         return new SimpleMessageDto("If the email exists, a reset link has been sent.");
     }
 
     /**
-     * User forcément connecté pour faire la demande de changement.
+     * Finalisation de la réinitialisation du mdp avec token.
      */
     @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("/password")
-    public SimpleMessageDto updatePassword(@Valid @RequestBody UpdatePasswordDto dto,
-            @AuthenticationPrincipal User user) {
-        accountService.updatePassword(user, dto.getNewPassword());
-        return new SimpleMessageDto("Password updated.");
+    @PostMapping("/password/reset")
+    public ResponseEntity<SimpleMessageDto> resetPassword(
+        @RequestBody @Valid ResetPasswordDto dto) {
+        accountService.resetPasswordWithToken(dto.getToken(), dto.getNewPassword());
+        return ResponseEntity.ok(new SimpleMessageDto("Password reset successfully"));
+    }
+
+    /**
+     * User connecté qui change son mdp.
+     */
+    @PostMapping("/password/change")
+    public ResponseEntity<SimpleMessageDto> changePassword(
+        @RequestBody ResetPasswordDto dto,
+        @AuthenticationPrincipal User user) {
+        accountService.changePasswordAuthenticated(user, dto.getNewPassword());
+        return ResponseEntity.ok(new SimpleMessageDto("Password changed successfully"));
     }
 }
