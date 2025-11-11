@@ -2,7 +2,6 @@ package com.powerme.service.account;
 
 import com.powerme.entity.User;
 import com.powerme.exception.UserAlreadyExistsException;
-import com.powerme.exception.UserNotFoundException;
 import com.powerme.repository.UserRepository;
 import com.powerme.service.mail.MailService;
 import com.powerme.service.security.JwtService;
@@ -27,10 +26,10 @@ public class AccountServiceImpl implements AccountService {
     private final MailService mailService;
 
     public AccountServiceImpl(UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            JwtService jwtService,
-            RefreshTokenService refreshTokenService,
-            MailService mailService) {
+        PasswordEncoder passwordEncoder,
+        JwtService jwtService,
+        RefreshTokenService refreshTokenService,
+        MailService mailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -41,6 +40,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public User register(User user) {
         Optional<User> optUser = userRepository.findByEmail(user.getEmail());
+
         // Vérifie si le User n'existe pas déjà
         if (optUser.isPresent()) {
             throw new UserAlreadyExistsException();
@@ -70,18 +70,29 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void resetPassword(String email) {
+    public void sendResetEmail(String email) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found with email " + email));
+        String token = jwtService.generateToken(user, Instant.now().plusSeconds(3600));
+        mailService.sendResetPasswordEmail(user, token);
+    }
+
+    @Override
+    public void resetPasswordWithToken(String token, String newPassword) {
         // Vérifie que le User existe
-        User u = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException());
-        // Renvoie un token de reset valide 1h
-        String token = jwtService.generateToken(u, Instant.now().plusSeconds(3600));
-        mailService.sendResetPasswordEmail(u, token);
+        User u = jwtService.validateAndLoadUser(token);
+        // Encode le nv mdp avant de l'enregistrer
+        u.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(u);
+
+        // On supprime tous les refresh tokens de l'User pour le forcer à se reconnecter
+        // sur tous ses devices avec le nouveau MdP
+        refreshTokenService.deleteByUser(u);
     }
 
     @Override
     @Transactional
-    public void updatePassword(User user, String newPassword) {
+    public void changePasswordAuthenticated(User user, String newPassword) {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
