@@ -3,12 +3,15 @@ package com.powerme.controller;
 import com.powerme.dto.LoginCredentialsDto;
 import com.powerme.dto.LoginResponseDto;
 import com.powerme.dto.RefreshResponseDto;
+import com.powerme.exception.InvalidTokenException;
 import com.powerme.service.security.AuthService;
 import com.powerme.service.security.AuthService.LoginResult;
 import com.powerme.service.security.AuthService.RefreshResult;
 import jakarta.validation.Valid;
 import java.time.Duration;
+import java.util.Map;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -68,10 +71,14 @@ public class AuthController {
      * POST /auth/refresh : lit le refresh en cookie et renvoie une nouvelle paire de tokens.
      */
     @PostMapping("/refresh")
-    public ResponseEntity<RefreshResponseDto> refresh(
+    public ResponseEntity<?> refresh(
             @CookieValue(name = REFRESH_COOKIE, required = false) String refreshCookie) {
         if (refreshCookie == null || refreshCookie.isBlank()) {
-            return ResponseEntity.status(401).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of(
+                            "error", "Unauthorized",
+                            "message", "Refresh token is missing"
+                    ));
         }
         try {
             RefreshResult res = authService.refreshTokens(refreshCookie);
@@ -81,12 +88,15 @@ public class AuthController {
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
                     .body(new RefreshResponseDto(res.accessToken()));
 
-        } catch (Exception e) {
+        } catch (InvalidTokenException e) {
             // refresh invalide/expiré/révoqué → on supprime le cookie
             ResponseCookie clear = clearRefreshCookie();
-            return ResponseEntity.status(401)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .header(HttpHeaders.SET_COOKIE, clear.toString())
-                    .build();
+                    .body(Map.of(
+                            "error", "Unauthorized",
+                            "message", e.getMessage()
+                    ));
         }
     }
 
