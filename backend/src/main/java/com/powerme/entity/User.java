@@ -354,7 +354,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isActivated && !isDeleted();
+        return isActivated;
     }
 
     @Override
