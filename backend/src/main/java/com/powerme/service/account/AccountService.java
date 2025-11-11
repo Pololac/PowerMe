@@ -10,9 +10,8 @@ public interface AccountService {
      * token de validation par email.
      *
      * @param user Le nouvel User à faire persister
-     * @return User persisté
      */
-    User register(User user);
+    void register(User user);
 
     /**
      * Validation d’un compte via token : décode le token, en extrait un User et active son compte
@@ -36,7 +35,7 @@ public interface AccountService {
     void resetPasswordWithToken(String token, String newPassword);
 
     /**
-     * Reset le mot de passe d’un user authentifié
+     * Reset le mot de passe d’un user authentifié.
      *
      * @param user        Le User souhaitant modifier son mot de passe
      * @param newPassword Le nouveau mot de passe du User

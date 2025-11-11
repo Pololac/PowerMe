@@ -26,10 +26,10 @@ public class AccountServiceImpl implements AccountService {
     private final MailService mailService;
 
     public AccountServiceImpl(UserRepository userRepository,
-        PasswordEncoder passwordEncoder,
-        JwtService jwtService,
-        RefreshTokenService refreshTokenService,
-        MailService mailService) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService,
+            RefreshTokenService refreshTokenService,
+            MailService mailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
@@ -38,7 +38,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public User register(User user) {
+    public void register(User user) {
         Optional<User> optUser = userRepository.findByEmail(user.getEmail());
 
         // Vérifie si le User n'existe pas déjà
@@ -56,8 +56,6 @@ public class AccountServiceImpl implements AccountService {
 
         // Envoie ce token dans un lien cliquable au mail indiqué pour le User qu'on a persisté
         mailService.sendActivationEmail(user, token);
-
-        return saved;
     }
 
     @Override
@@ -72,7 +70,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void sendResetEmail(String email) {
         User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found with email " + email));
+                .orElseThrow(() -> new RuntimeException("User not found with email " + email));
         String token = jwtService.generateToken(user, Instant.now().plusSeconds(3600));
         mailService.sendResetPasswordEmail(user, token);
     }
