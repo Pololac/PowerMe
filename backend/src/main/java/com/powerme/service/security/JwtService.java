@@ -5,6 +5,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.powerme.entity.User;
+import com.powerme.exception.InvalidTokenException;
+import com.powerme.exception.UserNotFoundException;
 import java.time.Instant;
 import java.util.stream.Collectors;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -29,23 +31,23 @@ public class JwtService {
     }
 
     /**
-     * Génère un token contenant l'identifiant de l'utilisateur passé en paramètre.
+     * Génère un token contenant l'identifiant de l'utilisateur et sa date d'expiration.
      *
-     * @param user       le User pour lequel on souhaite créer le JWT
+     * @param user       le User pour lequel on souhaite créer le token
      * @param expiration durée d'expiration
      * @return le token généré avec le temps d'expiration défini
      */
     public String generateToken(User user, Instant expiration) {
         return JWT.create()
-                .withSubject(
-                        user.getUsername())  // username = email du user en subject dans le payload
-                .withExpiresAt(expiration)
-                .withClaim("roles",
-                        user.getRoles().stream()
-                                .map(Enum::name)
-                                .collect(Collectors.toList())
-                )
-                .sign(algorithm);
+            .withSubject(
+                user.getUsername())  // username = email du user en subject dans le payload
+            .withExpiresAt(expiration)
+            .withClaim("roles",
+                user.getRoles().stream()
+                    .map(Enum::name)
+                    .collect(Collectors.toList())
+            )
+            .sign(algorithm);
     }
 
     /**
@@ -72,19 +74,12 @@ public class JwtService {
             DecodedJWT decodedJwt = verifier.verify(token);
 
             // Récupère l'identifiant de l'User dans le payload
-            String email = decodedJwt.getSubject();
+            String userIdentifier = decodedJwt.getSubject();
             // On utilise le service pour récupérer le User en base de données (casté car UserDetails)
-            User user = (User) userService.loadUserByUsername(email);
 
-            // Vérifie que le compte est "enabled" (activé & non supprimé).
-            if (!user.isEnabled()) {
-                throw new AuthorizationDeniedException("User disabled") {
-                };
-            }
+            return (User) userService.loadUserByUsername(userIdentifier);
 
-            return user;
-
-        } catch (Exception e) {
+        } catch (InvalidTokenException | UserNotFoundException e) {
             // En cas d'erreur de validation ou de chargement de l'User, on renvoie une erreur 403 Forbidden.
             throw new AuthorizationDeniedException("Error verifying token") {
             };
