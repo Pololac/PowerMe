@@ -3,13 +3,13 @@ package com.powerme.service.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.powerme.entity.User;
-import com.powerme.exception.InvalidTokenException;
+import com.powerme.exception.UnauthorizedException;
 import com.powerme.exception.UserNotFoundException;
 import java.time.Instant;
 import java.util.stream.Collectors;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,15 +39,15 @@ public class JwtService {
      */
     public String generateToken(User user, Instant expiration) {
         return JWT.create()
-            .withSubject(
-                user.getUsername())  // username = email du user en subject dans le payload
-            .withExpiresAt(expiration)
-            .withClaim("roles",
-                user.getRoles().stream()
-                    .map(Enum::name)
-                    .collect(Collectors.toList())
-            )
-            .sign(algorithm);
+                .withSubject(
+                        user.getUsername())  // username = email du user en subject dans le payload
+                .withExpiresAt(expiration)
+                .withClaim("roles",
+                        user.getRoles().stream()
+                                .map(Enum::name)
+                                .collect(Collectors.toList())
+                )
+                .sign(algorithm);
     }
 
     /**
@@ -79,10 +79,13 @@ public class JwtService {
 
             return (User) userService.loadUserByUsername(userIdentifier);
 
-        } catch (InvalidTokenException | UserNotFoundException e) {
-            // En cas d'erreur de validation ou de chargement de l'User, on renvoie une erreur 403 Forbidden.
-            throw new AuthorizationDeniedException("Error verifying token") {
+        } catch (JWTVerificationException e) {
+            // Token invalide ou expiré → erreur 401
+            throw new UnauthorizedException("Invalid or expired token") {
             };
+        } catch (UserNotFoundException e) {
+            // User n'existe pas ou plus → transformation en erreur 401
+            throw new UnauthorizedException("User not found");
         }
     }
 }
