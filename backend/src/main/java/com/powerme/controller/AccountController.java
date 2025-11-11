@@ -50,7 +50,7 @@ public class AccountController {
         User user = userMapper.toEntity(dto);
         accountService.register(user);
         return new SimpleMessageDto(
-            "Registration successful. Check your email to validate your account.");
+                "Registration successful. Check your email to validate your account.");
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -76,7 +76,7 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/password/reset")
     public ResponseEntity<SimpleMessageDto> resetPassword(
-        @RequestBody @Valid ResetPasswordDto dto) {
+            @RequestBody @Valid ResetPasswordDto dto) {
         accountService.resetPasswordWithToken(dto.getToken(), dto.getNewPassword());
         return ResponseEntity.ok(new SimpleMessageDto("Password reset successfully"));
     }
@@ -86,8 +86,8 @@ public class AccountController {
      */
     @PostMapping("/password/change")
     public ResponseEntity<SimpleMessageDto> changePassword(
-        @RequestBody ResetPasswordDto dto,
-        @AuthenticationPrincipal User user) {
+            @RequestBody @Valid ResetPasswordDto dto,
+            @AuthenticationPrincipal User user) {
         accountService.changePasswordAuthenticated(user, dto.getNewPassword());
         return ResponseEntity.ok(new SimpleMessageDto("Password changed successfully"));
     }
