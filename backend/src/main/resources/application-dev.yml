@@ -38,10 +38,17 @@ spring:
 server:
   port: ${SERVER_PORT:8081} # Port du backend
 
-# ====== LOGGING ======
+# ====== LOGGING DÉTAILLÉ ======
 logging:
   level:
     root: INFO # Niveau global
-    com.powerme: DEBUG # Tes classes en mode DEBUG (+ de détails)
+    com.powerme.backend: DEBUG # Tes classes en mode DEBUG (+ de détails)
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG # Logs SQL détaillés
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # Valeurs des paramètres SQL
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # Paramètres SQL
+
+# ====== MODE DEBUG ACTIVÉ ======
+app:
+  debug: true  # Messages d'erreur détaillés
+
