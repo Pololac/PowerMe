@@ -26,9 +26,9 @@ public class SecurityConfig {
     private final UserServiceImpl userService;
 
     public SecurityConfig(
-            AuthenticationConfiguration authenticationConfiguration,
-            JwtAuthenticationFilter jwtFilter,
-            UserServiceImpl userService
+        AuthenticationConfiguration authenticationConfiguration,
+        JwtAuthenticationFilter jwtFilter,
+        UserServiceImpl userService
     ) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtFilter = jwtFilter;
@@ -60,51 +60,48 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain accessControl(HttpSecurity http) throws Exception {
         http
-                // CSRF désactivé car API stateless
-                .csrf(csrf -> csrf.disable())
-                // CORS (règles définies ci-dessous) : désactivable en prod car même origine
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // Filtrage routes publiques & privées
-                .authorizeHttpRequests(auth -> auth
-                        // Authentification
-                        .requestMatchers("/api/auth/**").permitAll()
+            // CSRF désactivé car API stateless
+            .csrf(csrf -> csrf.disable())
+            // CORS (règles définies ci-dessous) : désactivable en prod car même origine
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // Filtrage routes publiques & privées
+            .authorizeHttpRequests(auth -> auth
+                // Authentification
+                .requestMatchers("/api/auth/**").permitAll()
 
-                        // Account
-                        // Public
-                        .requestMatchers(HttpMethod.POST, "/api/account/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/account/validate/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/account/password/**")
-                        .permitAll() // /password/{email}
-                        // Authentifié
-                        .requestMatchers(HttpMethod.PATCH, "/api/account/password").authenticated()
+                // Account
+                // Public
+                .requestMatchers(HttpMethod.POST, "/api/account/register").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/account/activate/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/account/password/**").permitAll()
 
-                        // Landing page
-                        .requestMatchers(
-                                "/public/landing",
-                                "/public/content/**"
-                        ).permitAll()
-                        // HealthCheck
-                        .requestMatchers("/actuator/health").permitAll()
-                        // Carte / bornes consultables sans compte
-                        .requestMatchers(HttpMethod.GET, "/api/charging-station/**").permitAll()
-                        // Routes protégées
-                        .requestMatchers("/api/booking/**").authenticated()
-                        .requestMatchers("/api/owner/**")
-                        .hasAnyRole("OWNER", "ADMIN") // Pas besoin de "ROLE_"
-                        // Par défaut, protégées
-                        .anyRequest().authenticated()
-                )
+                // Landing page
+                .requestMatchers(
+                    "/public/landing",
+                    "/public/content/**"
+                ).permitAll()
+                // HealthCheck
+                .requestMatchers("/actuator/health").permitAll()
+                // Carte / bornes consultables sans compte
+                .requestMatchers(HttpMethod.GET, "/api/charging-station/**").permitAll()
+                // Routes protégées
+                .requestMatchers("/api/booking/**").authenticated()
+                .requestMatchers("/api/owner/**")
+                .hasAnyRole("OWNER", "ADMIN") // Pas besoin de "ROLE_"
+                // Par défaut, protégées
+                .anyRequest().authenticated()
+            )
 
-                // Pas de session serveur car JWT stateless
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+            // Pas de session serveur car JWT stateless
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
 
-                // on indique à Spring comment authentifier email/pwd
-                .authenticationProvider(authenticationProvider())
+            // on indique à Spring comment authentifier email/pwd
+            .authenticationProvider(authenticationProvider())
 
-                // on injecte le filtre JWT (qui lit le Bearer et peuple SecurityContext)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            // on injecte le filtre JWT (qui lit le Bearer et peuple SecurityContext)
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
