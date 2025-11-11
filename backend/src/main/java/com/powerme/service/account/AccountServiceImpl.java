@@ -2,6 +2,7 @@ package com.powerme.service.account;
 
 import com.powerme.entity.User;
 import com.powerme.exception.UserAlreadyExistsException;
+import com.powerme.exception.UserNotFoundException;
 import com.powerme.repository.UserRepository;
 import com.powerme.service.mail.MailService;
 import com.powerme.service.security.JwtService;
@@ -43,7 +44,7 @@ public class AccountServiceImpl implements AccountService {
 
         // Vérifie si le User n'existe pas déjà
         if (optUser.isPresent()) {
-            throw new UserAlreadyExistsException();
+            throw new UserAlreadyExistsException(optUser.get().getEmail());
         }
 
         // Hache le password
@@ -70,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void sendResetEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email " + email));
+                .orElseThrow(() -> new UserNotFoundException(email));
         String token = jwtService.generateToken(user, Instant.now().plusSeconds(3600));
         mailService.sendResetPasswordEmail(user, token);
     }
