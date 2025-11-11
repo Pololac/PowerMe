@@ -50,12 +50,26 @@ server:
     include-stacktrace: never
     include-message: always
 
-# ====== LOGGING (minimal en prod) ======
-logging:
+# ====== LOGGING MINIMAL ======
+logging: # Seulement INFO et plus grave
   level:
     root: WARN
-    com.powerme: INFO
-    org.hibernate.SQL: WARN
+    com.powerme.backend: INFO
     org.springframework.web: WARN
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    org.springframework.security: WARN
+    org.hibernate: WARN
+
+  # Logs sauvegardés en fichiers
+  file:
+    name: /var/log/powerme/application.log
+
+  logback:
+    rolling policy:
+      max-file-size: 50MB                    # Taille max d'un fichier
+      max-history: 30                        # Nombre de fichiers à garder
+      total-size-cap: 1GB                    # Taille totale max
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz  # Pattern de rotation
+
+# ====== MODE DEBUG DÉSACTIVÉ ======
+app:
+  debug: false  # Messages d'erreur génériques (sécurité)
