@@ -5,6 +5,7 @@ import jakarta.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -193,6 +194,22 @@ public class GlobalExceptionHandler {
         pd.setDetail(ex.getMessage());
 
         log.warn("Constraint violation: {}", ex.getMessage());
+        return pd;
+    }
+
+    /**
+     * Problème d'accès à la BDD.
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public ProblemDetail handleDataAccess(DataAccessException ex) {
+
+        var pd = ProblemDetail.forStatusAndDetail(
+            HttpStatus.SERVICE_UNAVAILABLE,
+            "Service temporarily unavailable. Please try again later."
+        );
+        pd.setTitle("Database Error");
+
+        log.error("Database access error: {}", ex.getMessage(), ex);
         return pd;
     }
 
