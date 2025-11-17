@@ -4,7 +4,6 @@ import com.powerme.dto.LoginCredentialsDto;
 import com.powerme.dto.UserDto;
 import com.powerme.entity.User;
 import com.powerme.mapper.UserMapper;
-import com.powerme.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,18 +19,15 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserMapper mapper;
-    private final UserRepository userRepo;
 
     public AuthService(AuthenticationManager authManager,
             JwtService jwtService,
             RefreshTokenService refreshTokenService,
-            UserMapper mapper,
-            UserRepository userRepo) {
+            UserMapper mapper) {
         this.authManager = authManager;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
         this.mapper = mapper;
-        this.userRepo = userRepo;
     }
 
     public record LoginResult(String accessToken, String refreshToken, UserDto user) {
