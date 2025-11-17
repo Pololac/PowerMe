@@ -1,11 +1,126 @@
----
 stages:
-  - analyse
+  - test-backend
+  - test-frontend
+  - analysis
   - build
   - package
   - deploy
 
-test-pipeline:
-  stage: analyse
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+# Cache Maven pour accélérer les builds
+cache:
+  paths:
+    - .m2/repository
+    - frontend/node_modules/
+
+# ========================================
+# BACKEND
+# ========================================
+
+# Tests unitaires : qd changement dans dossier "backend"
+unit-tests-backend:
+  stage: test-backend
+  image: maven:3.9.11-eclipse-temurin-21
   script:
-    - echo "Success"
+    - echo "🧪 Lancement des tests unitaires..."
+    - cd backend
+    - mvn clean test
+  artifacts:
+    reports:
+      junit: backend/target/surefire-reports/TEST-*.xml
+    paths:
+      - backend/target/site/jacoco/
+  only:
+    changes:
+      - backend/**/*
+
+# Tests d'intégration : uniquement sur dev & main, qd dossier "backend" modifié
+integration-tests-backend:
+  stage: test-backend
+  image: maven:3.9.11-eclipse-temurin-21
+  script:
+    - echo "🔗 Lancement des tests d'intégration..."
+    - cd backend
+    - mvn verify -DskipUnitTests
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - backend/target/failsafe-reports/TEST-*.xml
+    paths:
+      - backend/target/failsafe-reports/
+    expire_in: 1 month
+  only:
+    refs:
+      - dev
+      - main
+    changes:
+      - backend/**/*
+
+# SonarCloud pour feature branches (coverage partiel)
+sonarcloud-backend-quick:
+  stage: analysis
+  image: maven:3.9.11-eclipse-temurin-21
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0" # Historique git complet pour avoir metrics sur le nv code
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - echo "Analyse SonarCloud Backend..."
+    - cd backend
+    - mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN}
+  needs:
+    - unit-tests-backend # Pour récupérer le test de coverage jacoco
+  only:
+    changes:
+      - backend/**/*
+  except:
+    - dev
+    - main
+
+# SonarCloud pour feature branches (coverage complet)
+sonarcloud-backend-full:
+  stage: analysis
+  image: maven:3.9.11-eclipse-temurin-21
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0" # Historique git complet pour avoir metrics sur le nv code
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - echo "Analyse SonarCloud Backend..."
+    - cd backend
+    - mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN}
+  needs:
+    - unit-tests-backend
+    - integration-tests-backend
+  only:
+    refs:
+      - dev
+      - main
+    changes:
+      - backend/**/*
+
+# Build JAR : uniquement sur dev & main
+build-jar:
+  stage: build
+  image: maven:3.9.11-eclipse-temurin-21
+  script:
+    - mvn clean package -DskipTests
+  only:
+    - dev
+    - main
+  artifacts:
+    name: "powerme-app-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - target/*.jar
+    expire_in: 1 month
+  dependencies:
+    - sonarqube-analysis
