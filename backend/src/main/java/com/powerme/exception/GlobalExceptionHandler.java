@@ -1,5 +1,6 @@
 package com.powerme.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Value("${app.debug:false}")
     private boolean debugMode;
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler {
         pd.setTitle("Invalid Token");
         pd.setDetail(ex.getMessage());
 
-        log.warn("Invalid token: {}", ex.getMessage());
+        logger.warn("Invalid token: {}", ex.getMessage());
         return pd;
     }
 
@@ -46,12 +47,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentials(BadCredentialsException e) {
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.UNAUTHORIZED,
-            "Wrong email or password. Please try again."
+                HttpStatus.UNAUTHORIZED,
+                "Wrong email or password. Please try again."
         );
         pd.setTitle("Invalid Credentials");
 
-        log.warn("Failed login attempt: Bad credentials");
+        logger.warn("Failed login attempt: Bad credentials");
         return pd;
     }
 
@@ -63,12 +64,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DisabledException.class)
     public ProblemDetail handleDisabled(DisabledException e) {
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.FORBIDDEN,
-            "Your account is not yet activated. Please check your email for the activation link."
+                HttpStatus.FORBIDDEN,
+                "Your account is not yet activated. Please check your email for the activation link."
         );
         pd.setTitle("Account Not Activated");
 
-        log.warn("Login attempt on non-activated account");
+        logger.warn("Login attempt on non-activated account");
         return pd;
     }
 
@@ -81,12 +82,12 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleLocked(LockedException e) {
 
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.FORBIDDEN,
-            "This account has been deleted. Please contact the administrator for assistance."
+                HttpStatus.FORBIDDEN,
+                "This account has been deleted. Please contact the administrator for assistance."
         );
         pd.setTitle("Account Deleted");
 
-        log.warn("Login attempt on deleted account");
+        logger.warn("Login attempt on deleted account");
         return pd;
     }
 
@@ -98,7 +99,7 @@ public class GlobalExceptionHandler {
         pd.setTitle("Access Denied");
         pd.setDetail(ex.getMessage());
 
-        log.warn("Unauthorized access attempt: {}", ex.getMessage());
+        logger.warn("Unauthorized access attempt: {}", ex.getMessage());
         return pd;
     }
 
@@ -110,23 +111,23 @@ public class GlobalExceptionHandler {
         pd.setTitle("User Already Exists");
         pd.setDetail(ex.getMessage());
 
-        log.info("User already exists: {}", ex.getMessage());
+        logger.info("User already exists: {}", ex.getMessage());
         return pd;
     }
 
     // 404 - Not Found (ressources introuvables)
     @ExceptionHandler({
-        UserNotFoundException.class,
-        ChargingStationNotFoundException.class,
-        BookingNotFoundException.class
+            UserNotFoundException.class,
+            ChargingStationNotFoundException.class,
+            BookingNotFoundException.class
     })
     public ProblemDetail handleNotFound(ServiceException ex) {
         var pd = ProblemDetail.forStatus(
-            HttpStatus.NOT_FOUND);
+                HttpStatus.NOT_FOUND);
         pd.setTitle("Resource Not Found");
         pd.setDetail(ex.getMessage());
 
-        log.info("Resource not found: {}", ex.getMessage());
+        logger.info("Resource not found: {}", ex.getMessage());
         return pd;
     }
 
@@ -139,12 +140,12 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleBadRequest(ServiceException ex) {
 
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.BAD_REQUEST,
-            ex.getMessage()
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
         );
         pd.setTitle("Validation Error");
 
-        log.info("Business validation error: {}", ex.getMessage());
+        logger.info("Business validation error: {}", ex.getMessage());
         return pd;
     }
 
@@ -155,12 +156,12 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleServiceException(ServiceException ex) {
 
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.BAD_REQUEST,
-            ex.getMessage()
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage()
         );
         pd.setTitle("Business Error");  // ✅ Titre générique
 
-        log.warn("Service exception: {}", ex.getMessage());
+        logger.warn("Service exception: {}", ex.getMessage());
         return pd;
     }
 
@@ -171,15 +172,15 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
 
         String msg = ex.getBindingResult().getFieldErrors().stream()
-            .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
-            .reduce((a, b) -> a + "; " + b)
-            .orElse("Invalid request");
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .reduce((a, b) -> a + "; " + b)
+                .orElse("Invalid request");
 
         var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         pd.setTitle("Validation Error");
         pd.setDetail(msg);
 
-        log.warn("Validation error: {}", msg);
+        logger.warn("Validation error: {}", msg);
         return pd;
     }
 
@@ -193,7 +194,7 @@ public class GlobalExceptionHandler {
         pd.setTitle("Constraint Violation");
         pd.setDetail(ex.getMessage());
 
-        log.warn("Constraint violation: {}", ex.getMessage());
+        logger.warn("Constraint violation: {}", ex.getMessage());
         return pd;
     }
 
@@ -204,12 +205,34 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleDataAccess(DataAccessException ex) {
 
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.SERVICE_UNAVAILABLE,
-            "Service temporarily unavailable. Please try again later."
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Service temporarily unavailable. Please try again later."
         );
         pd.setTitle("Database Error");
 
-        log.error("Database access error: {}", ex.getMessage(), ex);
+        logger.error("Database access error: {}", ex.getMessage(), ex);
+        return pd;
+    }
+
+    @ExceptionHandler(EmailDeliveryException.class)
+    public ProblemDetail handleEmailDelivery(EmailDeliveryException e,
+            HttpServletRequest request) {
+        // Choix du statut selon la cause (exemple basique)
+        var pd = ProblemDetail.forStatusAndDetail(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "We could not deliver the requested email. Please try again later."
+        );
+        pd.setTitle("Email Delivery Failed");
+        pd.setProperty("recipient", e.getRecipient());
+        pd.setProperty("subject", e.getSubject());
+
+        // ⚠️ Log complet en backend (pour debug)
+        logger.error("Failed to send email to {} with subject '{}'",
+                e.getRecipient(),
+                e.getSubject(),
+                e
+        );
+
         return pd;
     }
 
@@ -235,13 +258,13 @@ public class GlobalExceptionHandler {
         }
 
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.CONFLICT,
-            detail
+                HttpStatus.CONFLICT,
+                detail
         );
         pd.setTitle("Data Integrity Error");
 
         // ⚠️ Log complet en backend (pour debug)
-        log.warn("Data integrity violation: {}", ex.getMessage());
+        logger.warn("Data integrity violation: {}", ex.getMessage());
 
         return pd;
     }
@@ -266,12 +289,12 @@ public class GlobalExceptionHandler {
         }
 
         var pd = ProblemDetail.forStatusAndDetail(
-            HttpStatus.BAD_REQUEST,
-            detail
+                HttpStatus.BAD_REQUEST,
+                detail
         );
         pd.setTitle("Invalid Request Format");
 
-        log.info("Malformed JSON: {}", ex.getMessage());
+        logger.info("Malformed JSON: {}", ex.getMessage());
 
         return pd;
     }
@@ -284,10 +307,10 @@ public class GlobalExceptionHandler {
 
         if (debugMode) {
             pd.setDetail(ex.getMessage());
-            log.error("Unhandled exception in DEBUG mode", ex);
+            logger.error("Unhandled exception in DEBUG mode", ex);
         } else {
             pd.setDetail("An unexpected error occurred. Please try again later.");
-            log.error("Unhandled exception: {}", ex.getMessage(), ex);
+            logger.error("Unhandled exception: {}", ex.getMessage(), ex);
         }
 
         return pd;
