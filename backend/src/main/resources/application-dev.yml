@@ -21,18 +21,6 @@ spring:
     locations: classpath:db/migration
     validate-on-migrate: true
     clean-disabled: true
-  # ====== EMAIL (pour tests locaux) ======
-  #mail:
-  #  host: ${MAIL_HOST:localhost}
-  #  port: ${MAIL_PORT:1025} # Port de MailHog ou MailDev (serveur SMTP local)
-  #  username: ${MAIL_USERNAME:dev@localhost}
-  #  password: ${MAIL_PASSWORD:dev}
-  #  properties:
-  #    mail:
-  #      smtp:
-  #        auth: false  # Pas d'authentification en local
-  #        starttls:
-  #          enable: false
 
 # ====== SERVEUR ======
 server:
