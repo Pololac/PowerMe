@@ -14,7 +14,8 @@ public class UserRegisterDto {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     // PROD : au moins 1 min, 1 maj, 1 chiffre, 1 caractère spécial et > 8 caractères
     // @Pattern(regexp = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$",
-    //          message = "Password must include at least one uppercase letter, one lowercase letter, one number and one special character")
+    //          message = "Password must include at least one uppercase letter,
+    //          one lowercase letter, one number and one special character")
     private String password;
 
     public UserRegisterDto() {
