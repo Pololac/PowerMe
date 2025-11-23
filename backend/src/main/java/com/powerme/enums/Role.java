@@ -1,7 +1,8 @@
 package com.powerme.enums;
 
 /**
- * Rôles possibles des utilisateurs.
+ * Rôles possibles des utilisateurs dans PowerMe. Un utilisateur peut avoir plusieurs rôles
+ * simultanément.
  */
 public enum Role {
     ROLE_USER,
