@@ -125,6 +125,12 @@ public class User implements UserDetails {
         this.roles.add(Role.ROLE_USER);
     }
 
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.roles.add(Role.ROLE_USER);
+    }
+
     // Lifecycle callbacks
     @PrePersist
     protected void onCreate() {
