@@ -133,13 +133,17 @@
       <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- BDD en mémoire pour tests avec @AutoConfigureTestDatabase -->
+    <!-- Testcontainers (Bdd compatible PostgreSQL & Postgis) -->
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
