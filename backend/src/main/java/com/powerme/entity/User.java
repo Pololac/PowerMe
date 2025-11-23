@@ -1,6 +1,6 @@
 package com.powerme.entity;
 
-import com.powerme.entity.enums.Role;
+import com.powerme.enums.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
