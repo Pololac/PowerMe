@@ -1,0 +1,150 @@
+package com.powerme.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import java.time.Instant;
+
+/**
+ * Code d'activation à six chiffres pour la validation d'un compte utilisateur.
+ *
+ * <p>Expire après 24 heures et ne peut être utilisé qu'une seule fois.
+ * Un utilisateur peut avoir plusieurs codes (en cas de renvoi), mais un seul est valide à la fois.
+ * </p>
+ */
+@Entity
+public class UserActivation {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * Code d'activation du compte envoyé par email.
+     *
+     * <p>Format: 6 chiffres (ex: 123 456)
+     * </p>
+     */
+    @Column(nullable = false, unique = true)
+    private Integer activationCode;
+
+    /**
+     * Date limite de validité du code.
+     *
+     * <p>Par défaut : createdAt + 24 heures
+     * </p>
+     */
+    @Column(nullable = false)
+    private Instant expirationDate;
+
+    /**
+     * Indique si le code a déjà été utilisé.
+     *
+     * <p>Un code utilisé ne peut plus être réutilisé, même s'il n'est pas expiré.
+     * </p>
+     */
+    @Column(nullable = false)
+    private boolean isUsed = false;
+
+    @Column(nullable = false, updatable = false, columnDefinition = "timestamptz")
+    private Instant createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    // Constructeur
+    public UserActivation() {
+    }
+
+    // Lifecycle callbacks
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+    }
+
+    // HELPERS
+
+    /**
+     * Vérifie si le code est expiré.
+     *
+     * @return true si la date d'expiration est dépassée
+     */
+    public boolean isExpired() {
+        return Instant.now().isAfter(expirationDate);
+    }
+
+    /**
+     * Vérifie si le code est valide pour activer un compte.
+     *
+     * <p>Un code est valide s'il n'a pas été utilisé et n'est pas expiré.
+     * </p>
+     *
+     * @return true si le code peut être utilisé
+     */
+    public boolean isValid() {
+        return !isUsed && !isExpired();
+    }
+
+    /**
+     * Marque le code comme utilisé après validation du compte.
+     */
+    public void markAsUsed() {
+        this.isUsed = true;
+    }
+
+    // Getters & Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(Integer activationCode) {
+        this.activationCode = activationCode;
+    }
+
+    public Instant getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Instant expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public boolean isUsed() {
+        return isUsed;
+    }
+
+    public void setUsed(boolean used) {
+        this.isUsed = used;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+}
