@@ -15,7 +15,7 @@ jobs:
                   fetch-depth: 0 # Important pour récupérer tout l'historique
 
             - name: Sync to GitLab
-              uses: keninkujovic/gitlab-sync@2.1.0
+              uses: keninkujovic/gitlab-sync@2255578444d23f254d08592bb8434084d29474d5
               with:
                   gitlab_url: ${{ secrets.GITLAB_URL }}
                   username: ${{ secrets.USERNAME }}
