@@ -29,6 +29,15 @@ spring:
     validate-on-migrate: true
     clean-disabled: true
 
+  # ====== MAIL : MailTrap ======
+  mail:
+    protocol: smtp
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: 4f87aafa32de42
+    password: f6f97d0480ef78
+
+
 # ====== SERVEUR ======
 server:
   port: ${SERVER_PORT:8081} # Port du backend
