@@ -99,7 +99,6 @@ public class GlobalExceptionHandler {
         pd.setTitle("Access Denied");
         pd.setDetail(ex.getMessage());
 
-        logger.warn("Unauthorized access attempt: {}", ex.getMessage());
         return pd;
     }
 
@@ -145,7 +144,6 @@ public class GlobalExceptionHandler {
         );
         pd.setTitle("Validation Error");
 
-        logger.info("Business validation error: {}", ex.getMessage());
         return pd;
     }
 
@@ -161,7 +159,6 @@ public class GlobalExceptionHandler {
         );
         pd.setTitle("Business Error");  // ✅ Titre générique
 
-        logger.warn("Service exception: {}", ex.getMessage());
         return pd;
     }
 

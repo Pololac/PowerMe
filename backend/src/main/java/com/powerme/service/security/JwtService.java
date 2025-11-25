@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.powerme.entity.User;
+import com.powerme.exception.InvalidTokenException;
 import com.powerme.exception.UnauthorizedException;
 import com.powerme.exception.UserNotFoundException;
 import java.time.Instant;
@@ -70,18 +71,20 @@ public class JwtService {
      */
     public User validateAndLoadUser(String token) {
         try {
-            // Vérifie le token : pas expiré, valide, pas altéré...
+            // Vérifie le token : pas expiré, valide, pas altéré ;
+            // sinon "throw JWTVerificationException
             DecodedJWT decodedJwt = verifier.verify(token);
 
             // Récupère l'identifiant de l'User dans le payload
             String userIdentifier = decodedJwt.getSubject();
-            // On utilise le service pour récupérer le User en base de données (casté car UserDetails)
 
+            // On utilise le service pour récupérer le User en BDD (casté car UserDetails retourné)
+            // Sinon "throw une UserNotFoundException"
             return (User) userService.loadUserByUsername(userIdentifier);
 
         } catch (JWTVerificationException e) {
             // Token invalide ou expiré → erreur 401
-            throw new UnauthorizedException("Invalid or expired token") {
+            throw new InvalidTokenException("Invalid or expired token") {
             };
         } catch (UserNotFoundException e) {
             // User n'existe pas ou plus → transformation en erreur 401

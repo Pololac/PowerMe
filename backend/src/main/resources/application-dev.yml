@@ -3,7 +3,14 @@
 # ==============================================
 
 spring:
-  # ====== JPA / HIBERNATE avec POSTGIS ======
+  # ====== BASE DE DONNÉES ======
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:powerme_dev}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  # ====== JPA / HIBERNATE ======
   jpa:
     hibernate:
       ddl-auto: validate # Hibernate modifie automatiquement la BDD
@@ -21,6 +28,15 @@ spring:
     locations: classpath:db/migration
     validate-on-migrate: true
     clean-disabled: true
+
+  # ====== MAIL : MailTrap ======
+  mail:
+    protocol: smtp
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: 4f87aafa32de42
+    password: f6f97d0480ef78
+
 
 # ====== SERVEUR ======
 server:
