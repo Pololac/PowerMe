@@ -12,7 +12,8 @@
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
-    "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\""
+    "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
+    "fullfix": "npm run lint:fix && npm run format"
   },
   "prettier": {
     "printWidth": 100,
