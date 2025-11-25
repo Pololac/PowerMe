@@ -1,26 +1,40 @@
+version: '3.8'
+
 services:
-  web:
-    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:${FRONT_TAG:-latest}
+  # ========================================
+  # FRONTEND (Angular + Nginx)
+  # ========================================
+  frontend:
+    image: registry.gitlab.com/pololac/powerme/frontend:latest
+    container_name: powerme-frontend
     restart: unless-stopped
     ports:
-      - "80:80" # Seul port exposé
-    depends_on: [api]
+      - "80:80"
+      - "443:443"
     networks:
       - powerme-network
+    depends_on:
+      - backend
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
-  api:
-    #Utilise FRONT_TAG si défini, sinon "latest"
-    image: ghcr.io/${GITHUB_REPOSITORY}/backend:${BACK_TAG:-latest}
+  # ========================================
+  # BACKEND (Spring Boot)
+  # ========================================
+  backend:
+    image: registry.gitlab.com/pololac/powerme/backend:latest
+    container_name: powerme-backend
     restart: unless-stopped
     environment:
+      - TZ=Europe/Paris
       - SPRING_PROFILES_ACTIVE=prod
-      - DB_URL=jdbc:postgresql://db:5432/${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
-      - SHOW_SQL=false
-      - DDL_AUTO=validate
-      - LOG_LEVEL=WARN
-      - APP_LOG_LEVEL=INFO
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/powerme
+      - SPRING_DATASOURCE_USERNAME=powerme
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASS}  # Via .env
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_JPA_SHOW_SQL=false
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_USERNAME=${MAIL_USERNAME}
       - MAIL_PASSWORD=${MAIL_PASSWORD}
@@ -30,23 +44,36 @@ services:
     networks:
       - powerme-network
     # PAS de ports = accessible uniquement via le réseau Docker
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
 
+  # ========================================
+  # DATABASE (PostgreSQL + PostGIS)
+  # ========================================
   db:
-    image: postgres:${POSTGRES_VERSION}
+    image: postgis/postgis:16-3.4-alpine
+    container_name: powerme-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    networks:
+      - powerme-network
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
+      - TZ=Europe/Paris
+      - POSTGRES_DB=powerme
+      - POSTGRES_USER=powerme
+      - POSTGRES_PASSWORD=${DB_PASSWORD}  # Via .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U powerme"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
   postgres_data:
+    driver: local
 
 networks:
   powerme-network:
