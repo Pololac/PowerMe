@@ -3,7 +3,14 @@
 # ==============================================
 
 spring:
-  # ====== JPA / HIBERNATE avec POSTGIS ======
+  # ====== BASE DE DONNÉES ======
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:powerme_dev}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  # ====== JPA / HIBERNATE ======
   jpa:
     hibernate:
       ddl-auto: validate # Hibernate modifie automatiquement la BDD
