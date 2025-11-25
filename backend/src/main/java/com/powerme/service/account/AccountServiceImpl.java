@@ -76,24 +76,26 @@ public class AccountServiceImpl implements AccountService {
         mailService.sendResetPasswordEmail(user, token);
     }
 
+    @Transactional
     @Override
     public void resetPasswordWithToken(String token, String newPassword) {
-        // Vérifie que le User existe
+        // Vérifie d'abord que le token est OK ; puis que l'user inclus dans le token existe
         User u = jwtService.validateAndLoadUser(token);
         // Encode le nv mdp avant de l'enregistrer
         u.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(u);
+        userRepository.save(u); // Si erreur, GlobalExceptionHandler catche avec DataAccessException
 
         // On supprime tous les refresh tokens de l'User pour le forcer à se reconnecter
         // sur tous ses devices avec le nouveau MdP
         refreshTokenService.deleteByUser(u);
     }
 
-    @Override
     @Transactional
+    @Override
     public void changePasswordAuthenticated(User user, String newPassword) {
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        userRepository.save(
+                user); // Si erreur, GlobalExceptionHandler catche avec DataAccessException
 
         // On supprime tous les refresh tokens de l'User pour le forcer à se reconnecter
         // sur tous ses devices avec le nouveau MdP
