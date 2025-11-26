@@ -5,6 +5,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
@@ -17,15 +18,14 @@ public abstract class AbstractIntegrationTest {
             DockerImageName.parse("postgis/postgis:17-3.5")
                     .asCompatibleSubstituteFor("postgres");
 
+    @SuppressWarnings("resource")
+    @Container
     protected static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>(POSTGIS_IMAGE)
                     .withDatabaseName("testdb")
                     .withUsername("test")
-                    .withPassword("test");
-
-    static {
-        postgres.start();
-    }
+                    .withPassword("test")
+                    .withReuse(true); // Optionnel : réutilise le container entre les tests
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
