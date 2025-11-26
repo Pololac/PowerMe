@@ -21,4 +21,4 @@ jobs:
                   gitlab_url: ${{ secrets.GITLAB_URL }}
                   username: ${{ secrets.USERNAME }}
                   gitlab_pat: ${{ secrets.GITLAB_PAT }}
-                  force: push
+                  force_push: true
