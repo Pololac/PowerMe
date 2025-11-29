@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("SqlNoDataSourceInspection")
 @SpringBootTest
-class PowermeApplicationTests extends AbstractIntegrationTest {
+class PowermeApplicationIT extends AbstractIntegrationTest {
     
     @Autowired
     private JdbcTemplate jdbcTemplate;

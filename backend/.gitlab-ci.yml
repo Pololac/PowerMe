@@ -39,17 +39,17 @@ backend-unit-tests:
   artifacts:
     when: always
     reports:
-      junit: target/surefire-reports/TEST-*.xml
+      junit: backend/target/surefire-reports/TEST-*.xml
       coverage_report:
         coverage_format: jacoco
-        path: target/site/jacoco/jacoco.xml
+        path: backend/target/site/jacoco/jacoco.xml
     paths:
       # Exporter les classes compilées pour SonarCloud
-      - target/classes/
-      - target/test-classes/
+      - backend/target/classes/
+      - backend/target/test-classes/
       # Rapports pour SonarCloud
-      - target/surefire-reports/
-      - target/site/jacoco/
+      - backend/target/surefire-reports/
+      - backend/target/site/jacoco/
     expire_in: 1 week
   allow_failure: false
 
@@ -76,15 +76,19 @@ backend-integration-tests:
       artifacts: true
   script:
     - mvn verify -DskipUnitTests
+  coverage: '/Total.*?([0-9]{1,3})%/'
   artifacts:
     when: always
     reports:
-      junit: target/failsafe-reports/TEST-*.xml
+      junit: backend/target/failsafe-reports/TEST-*.xml
+      coverage_report:
+        coverage_format: jacoco
+        path: backend/target/site/jacoco/jacoco.xml
     paths:
-      - target/classes/
-      - target/test-classes/
-      - target/failsafe-reports/
-      - target/site/jacoco/
+      - backend/target/classes/
+      - backend/target/test-classes/
+      - backend/target/failsafe-reports/
+      - backend/target/site/jacoco/
     expire_in: 1 day
   allow_failure: false
 
