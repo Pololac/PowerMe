@@ -226,6 +226,14 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <!-- Inclut seulement les tests d'intégration -->
+          <includes>
+            <include>**/*IT.java</include>
+            <include>**/*IntegrationTest.java</include>
+          </includes>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -235,12 +243,25 @@
           </execution>
         </executions>
       </plugin>
+
       <!-- JaCoCo (couverture de code) -->
       <plugin>
-        <groupId>org.jacoco</groupId><artifactId>jacoco-maven-plugin</artifactId><version>0.8.11</version>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.11</version>
         <executions>
-          <execution><goals><goal>prepare-agent</goal></goals></execution>
-          <execution><id>report</id><phase>verify</phase><goals><goal>report</goal></goals></execution>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>
