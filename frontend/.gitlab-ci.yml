@@ -1,0 +1,75 @@
+stages:
+  - test
+  - quality
+  - build
+
+variables:
+  NODE_VERSION: 20
+  FRONTEND_IMAGE: $CI_REGISTRY_IMAGE/frontend
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+
+cache:
+  key:
+    files:
+      - package-lock.json   # Cache invalidé si package-lock.json change
+  paths:
+    - .npm/  # Évite de re-télécharger les packages
+
+frontend-tests:
+  stage: test
+  image: trion/ng-cli-karma:latest   # Angular + Chrome inclus
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+  script:
+    - npm ci
+    - npm run test:ci
+  coverage: '/Statements\s*:\s*(\d+\.?\d*)%/'        # Pour UI GitLab
+  artifacts:
+    when: always
+    reports:
+      junit: coverage/junit.xml       # Pour tests JUnit ds GitLab
+      coverage_report:                # Pour SonarCloud
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/                     # Pour SonarCloud
+    expire_in: 1 week
+  allow_failure: false
+
+sonarcloud-frontend:
+  stage: quality
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  image: sonarsource/sonar-scanner-cli:latest
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    key: "sonar-frontend"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner -Dsonar.token=${SONAR_TOKEN}
+  needs:
+    - frontend-tests  # Récupère le coverage
+  allow_failure: true
+
+build-frontend:
+  stage: build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - docker build \
+      --build-arg NODE_VERSION=${NODE_VERSION} \
+      -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
+      -t ${FRONTEND_IMAGE}:latest .
+    - docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
+    - docker push ${FRONTEND_IMAGE}:latest
+
