@@ -53,22 +53,19 @@ variables:
 # RULES
 # ========================================
 .rules-feature-dev: &rules-feature-dev
-  rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*/'
-    - if: '$CI_COMMIT_BRANCH == "dev"'
+  - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*/'
+  - if: '$CI_COMMIT_BRANCH == "dev"'
 
 .rules-quality: &rules-quality # Sonar "gratuit" n'analyse que la branche par défaut ("main")
-  rules:
-    # Merge Request vers main (validation avant merge)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-      when: always
-    # Push direct sur main (référence de qualité)
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
+  # Merge Request vers main (validation avant merge)
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    when: always
+  # Push direct sur main (référence de qualité)
+  - if: '$CI_COMMIT_BRANCH == "main"'
+    when: always
 
 .rules-main-only: &rules-main-only
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+  - if: '$CI_COMMIT_BRANCH == "main"'
 
 
 # ========================================
