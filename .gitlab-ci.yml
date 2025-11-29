@@ -57,11 +57,14 @@ variables:
     - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*/'
     - if: '$CI_COMMIT_BRANCH == "dev"'
 
-.rules-quality: &rules-quality
+.rules-quality: &rules-quality # Sonar "gratuit" n'analyse que la branche par défaut ("main")
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "dev"'
+    # Merge Request vers main (validation avant merge)
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+      when: always
+    # Push direct sur main (référence de qualité)
     - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
 
 .rules-main-only: &rules-main-only
   rules:
@@ -73,7 +76,9 @@ variables:
 # ========================================
 frontend-test:
   stage: test
-  <<: *rules-feature-dev
+  rules:
+    - changes: ["frontend/**/*"]
+    - <<: *rules-feature-dev
   image: trion/ng-cli-karma:latest  # Angular + Chrome inclus
   <<: *cache-npm
   before_script:
@@ -96,7 +101,9 @@ frontend-test:
 
 backend-test:
   stage: test
-  <<: *rules-feature-dev
+  rules:
+    - changes: ["backend/**/*"]
+    - <<: *rules-feature-dev
   image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
   <<: *cache-maven-sonar
   services: # Nécessaire pr BDD tests via Testcontainers en Docker
@@ -137,7 +144,9 @@ backend-test:
 # ========================================
 sonarcloud-frontend:
   stage: quality
-  <<: *rules-quality
+  rules:
+    - changes: [ "frontend/**/*" ]
+    - <<: *rules-quality
   image: sonarsource/sonar-scanner-cli:latest
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
@@ -155,7 +164,9 @@ sonarcloud-frontend:
 
 sonarcloud-backend: # Analyse le code source et lit les tests générés par backend-test
   stage: quality
-  <<: *rules-quality
+  rules:
+    - changes: [ "backend/**/*" ]
+    - <<: *rules-quality
   <<: *cache-maven-sonar
   image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
   variables:
@@ -184,7 +195,9 @@ sonarcloud-backend: # Analyse le code source et lit les tests générés par bac
 # ===========================================
 build-frontend:
   stage: build
-  <<: *rules-main-only
+  rules:
+    - changes: ["frontend/**/*"]
+    - <<: *rules-main-only
   image: docker:24-dind
   services:
     - docker:24-dind
@@ -207,7 +220,9 @@ build-frontend:
 
 build-backend:
   stage: build
-  <<: *rules-main-only
+  rules:
+    - changes: ["backend/**/*"]
+    - <<: *rules-main-only
   image: docker:24-dind
   services:
     - docker:24-dind
@@ -233,7 +248,14 @@ build-backend:
 # ========================================
 deploy-prod:
   stage: deploy
-  <<: *rules-main-only
+  rules:
+    - changes:
+        - frontend/**/*
+        - backend/**/*
+        - docker-compose.yml
+        - .env
+        - .gitlab-ci.yml
+    - <<: *rules-main-only
   image: alpine:latest
   needs:
     - build-frontend
