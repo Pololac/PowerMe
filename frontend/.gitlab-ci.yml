@@ -15,6 +15,10 @@ cache:
   paths:
     - .npm/  # Évite de re-télécharger les packages
 
+default:
+  before_script:
+    - cd frontend
+
 frontend-tests:
   stage: test
   image: trion/ng-cli-karma:latest   # Angular + Chrome inclus

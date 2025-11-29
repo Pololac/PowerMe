@@ -16,6 +16,10 @@ cache:
   paths:
     - .m2/repository
 
+default:
+  before_script:
+    - cd backend
+
 backend-tests:
   stage: test
   rules:
