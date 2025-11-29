@@ -68,6 +68,7 @@ build-frontend:
   services:
     - docker:24-dind
   before_script:
+    - cd frontend
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
     - docker build \
