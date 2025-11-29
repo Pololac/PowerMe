@@ -27,17 +27,14 @@
     <sonar.organization>pololac</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.projectKey>pololac_powerme_back</sonar.projectKey>
-    <!-- Liens GitHub optionnels : juste pour l'interface SonarCloud -->
-    <sonar.links.homepage>https://github.com/Pololac/PowerMe</sonar.links.homepage>
-    <sonar.links.scm>https://github.com/Pololac/PowerMe</sonar.links.scm>
-    <!-- sonar.links.ci sera fourni dynamiquement par GitLab CI -->
-    <!-- Exclure les fichiers générés/config de l'analyse -->
-    <sonar.exclusions>
-      **/config/**,
-      **/dto/**,
-      **/entity/**,
-      **/*Application.java
-    </sonar.exclusions>
+    <!-- Chemins vers les fichiers compilés -->
+    <sonar.java.binaries>target/classes</sonar.java.binaries>
+    <sonar.java.test.binaries>target/test-classes</sonar.java.test.binaries>
+
+    <!-- Rapport JaCoCo -->
+    <sonar.coverage.jacoco.xmlReportPaths>
+      target/site/jacoco/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
 
   </properties>
 
