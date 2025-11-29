@@ -1,0 +1,94 @@
+stages:
+  - test
+  - quality
+  - build
+
+variables:
+  MAVEN_VERSION: 3.9.11
+  JAVA_VERSION: 21
+  BACKEND_IMAGE: $CI_REGISTRY_IMAGE/backend
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+
+cache:
+  key:
+    files:
+      - pom.xml
+  paths:
+    - .m2/repository
+
+backend-tests:
+  stage: test
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+  image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
+  services: # Nécessaire pr BDD tests via Testcontainers en Docker
+    - name: docker:24-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"  # Permet à Testcontainers de communiquer avec Docker-in-Docker
+    DOCKER_TLS_CERTDIR: ""
+    TESTCONTAINERS_RYUK_DISABLED: "true" # Accélère la destruction des containers en CI
+    TESTCONTAINERS_CHECKS_DISABLE: "true" # Accélère encore plus
+  script:
+    - mvn -Dmaven.repo.local=.m2/repository clean verify
+  coverage: '/Total.*?([0-9]{1,3})%/'
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/failsafe-reports/TEST-*.xml   # Pour UI GitLab
+        - target/surefire-reports/TEST-*.xml   # Pour UI GitLab
+      coverage_report:
+        coverage_format: jacoco
+        path: target/site/jacoco/jacoco.xml
+    paths:
+      # Exporter les classes compilées pour SonarCloud
+      - target/classes/
+      - target/test-classes/
+      # Rapports pour SonarCloud
+      - target/surefire-reports/
+      - target/site/jacoco/
+    expire_in: 1 week
+  allow_failure: false
+
+sonarcloud-backend:   # Analyse le code source et lit les tests générés par backend-test
+  stage: quality
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    key: "sonar-backend"
+    paths:
+      - .sonar/cache
+  script:
+    - mvn -Dmaven.repo.local=.m2/repository \
+      sonar:sonar \
+      -Dsonar.token=${SONAR_TOKEN} \
+      -Dsonar.links.ci="${CI_PROJECT_URL}/-/pipelines"
+  needs:
+    - job: backend-tests      # Récupère les artifacts JaCoCo
+      artifacts: true         # Récupère les classes compilées et les rapports JaCoco
+  allow_failure: true
+
+
+build-backend:
+  stage: build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+  script:
+    - docker build \
+      --build-arg JAVA_VERSION=${JAVA_VERSION} \
+      -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
+      -t ${BACKEND_IMAGE}:latest .
+    - docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
+    - docker push ${BACKEND_IMAGE}:latest

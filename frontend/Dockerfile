@@ -24,7 +24,7 @@ RUN npm run build -- --configuration production
 FROM nginx:1.25-alpine
 
 # Copier la configuration Nginx personnalisée
-COPY ../nginx.conf /etc/nginx/nginx.conf
+COPY ../deploy/nginx.conf /etc/nginx/nginx.conf
 
 # Copier les fichiers buildés depuis le stage précédent
 COPY --from=builder /app/dist/powerme/browser /usr/share/nginx/html
