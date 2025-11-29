@@ -36,14 +36,17 @@ variables:
     paths:
       - .npm  # Évite de re-télécharger les packages
 
-.cache-maven: &cache-maven
+.cache-maven-sonar: &cache-maven-sonar
   cache:
-    key:
-      files:
-      - backend/pom.xml
-      prefix: maven-$CI_COMMIT_REF_SLUG
-    paths:
-      - .m2/repository
+    - key:
+        files:
+          - backend/pom.xml
+        prefix: maven-$CI_COMMIT_REF_SLUG
+      paths:
+        - .m2/repository
+    - key: sonar-$CI_COMMIT_REF_SLUG
+      paths:
+        - .sonar/cache
 
 
 # ========================================
@@ -58,6 +61,7 @@ variables:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
 .rules-main-only: &rules-main-only
   rules:
@@ -94,7 +98,7 @@ backend-test:
   stage: test
   <<: *rules-feature-dev
   image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
-  <<: *cache-maven
+  <<: *cache-maven-sonar
   services: # Nécessaire pr BDD tests via Testcontainers en Docker
     - name: docker:24-dind
       alias: docker
@@ -144,22 +148,26 @@ sonarcloud-frontend:
     - frontend-test  # Récupère le coverage
   allow_failure: true
 
-sonarcloud-backend: #Dépend aussi des tests d'intégration
+sonarcloud-backend: # Analyse le code source et lit les tests générés par backend-test
   stage: quality
   <<: *rules-quality
+  <<: *cache-maven-sonar
   image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
-  services:
-    - name: docker:dind
-      alias: docker
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-    GIT_DEPTH: "0" # Historique git complet pour avoir metrics sur le nv code
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_TLS_CERTDIR: ""
-    TESTCONTAINERS_RYUK_DISABLED: "true"
+    GIT_DEPTH: "0"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+      - backend/.m2/repository
   script:
     - cd backend
-    - mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN}
+    # Analyse avec token + lien CI dynamique
+    - |
+      mvn sonar:sonar \
+        -Dsonar.token=${SONAR_TOKEN} \
+        -Dsonar.links.ci=${CI_PROJECT_URL}/-/pipelines
   needs:
     - backend-test # Récupère les artifacts JaCoCo
   allow_failure: true
