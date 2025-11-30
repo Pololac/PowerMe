@@ -16,7 +16,7 @@ sudo apt install -y git
 # Version et configuration
 git config --list
 ```
-
+    
 <!-- - Docker :
 ```bash
 # Script complet : détection OS, installe prérequis, récupère GPG Docker, install docker-ce/docker-ce-cli/ containerd.io, démarrage et activation du service Docker
