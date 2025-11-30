@@ -17,3 +17,4 @@ jobs:
             -F "variables[CI_MERGE_REQUEST_TARGET_BRANCH_NAME]=main" \
             -F "variables[CI_MERGE_REQUEST_SOURCE_BRANCH_NAME]=${{ github.head_ref }}" \
             "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline"
+
