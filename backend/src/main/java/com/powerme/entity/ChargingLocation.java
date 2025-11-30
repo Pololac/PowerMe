@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -39,7 +40,7 @@ public class ChargingLocation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Il est obligatoire de donner un nom à ce lieu")
+    @NotBlank(message = "A name is required")
     @Column(nullable = false)
     private String name;
 
@@ -93,7 +94,7 @@ public class ChargingLocation {
     @OneToMany(mappedBy = "chargingLocation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
 
-    // Constructeur vide
+    // Constructeur JPA
     public ChargingLocation() {
     }
 

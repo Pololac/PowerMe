@@ -52,7 +52,7 @@ public class Photo {
     }
 
 
-    // Constructeur vide
+    // Constructeur JPA
     public Photo() {
     }
 
