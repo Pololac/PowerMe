@@ -23,7 +23,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     @Query("DELETE FROM RefreshToken rt WHERE rt.user = :user")
     void deleteByUser(User user);
 
-
     /**
      * Supprime tous les refresh tokens expirés en une seule requête SQL. Utilisable dans un job
      * planifié (ex : cron)
