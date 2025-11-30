@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -121,14 +122,22 @@ public class User implements UserDetails {
     private List<UserActivation> activations = new ArrayList<>();
 
     // Constructeurs
-    public User() {
-        this.roles.add(Role.ROLE_USER);
+    // Constructeur vide PROTECTED pour JPA
+    protected User() {
     }
 
     public User(String email, String password) {
         this.email = email;
         this.password = password;
         this.roles.add(Role.ROLE_USER);
+    }
+
+    // Méthode appelée après le chargement JPA
+    @PostLoad
+    private void ensureDefaultRole() {
+        if (this.roles.isEmpty()) {
+            this.roles.add(Role.ROLE_USER);
+        }
     }
 
     // Lifecycle callbacks

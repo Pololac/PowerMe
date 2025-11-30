@@ -39,8 +39,8 @@ public class AuthController {
 
     public static final String REFRESH_COOKIE = "refresh-token";
     public static final String REFRESH_COOKIE_PATH = "/api/auth";
-    private final boolean isProd = false;      // TODO: true en prod (HTTPS)
-    private final boolean isCrossSite = false; // TODO: true si front ≠ domaine API
+    private final static boolean isProd = false;      // TODO: true en prod (HTTPS)
+    private final static boolean isCrossSite = false; // TODO: true si front ≠ domaine API
 
     private final AuthService authService;
 

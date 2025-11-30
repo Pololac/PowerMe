@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -38,7 +39,7 @@ public class ChargingStation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Il est obligatoire de donner un nom à la station")
+    @NotBlank(message = "A name is required")
     @Column(nullable = false)
     private String name;
 
@@ -66,7 +67,7 @@ public class ChargingStation {
      *
      * <p>Montant en euros</p>
      */
-    @NotNull(message = "Tarif horaire obligatoire")
+    @NotNull(message = "Hourly rate is required")
     @Column(nullable = false, precision = 8, scale = 2)
     private BigDecimal hourlyRate;
 
@@ -114,6 +115,7 @@ public class ChargingStation {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    // Constructeur JPA
     public ChargingStation() {
     }
 
