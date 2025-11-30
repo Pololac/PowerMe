@@ -59,7 +59,7 @@ public class UserActivation {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Constructeur
+    // Constructeur JPA
     public UserActivation() {
     }
 
