@@ -11,7 +11,7 @@ jobs:
       - name: Trigger GitLab pipeline as merge request event
         run: |
           curl -X POST \
-            -H "JOB-TOKEN: ${{ secrets.GITLAB_JOB_TOKEN }}" \
+            -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_PAT }}" \
             -F ref=main \
             -F "variables[CI_PIPELINE_SOURCE]=merge_request_event" \
             -F "variables[CI_MERGE_REQUEST_TARGET_BRANCH_NAME]=main" \
