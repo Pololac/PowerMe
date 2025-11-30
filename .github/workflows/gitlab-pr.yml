@@ -12,9 +12,14 @@ jobs:
         run: |
           curl -X POST \
             -H "PRIVATE-TOKEN: ${{ secrets.GITLAB_PAT }}" \
-            -F ref=main \
-            -F "variables[CI_PIPELINE_SOURCE]=merge_request_event" \
-            -F "variables[CI_MERGE_REQUEST_TARGET_BRANCH_NAME]=main" \
-            -F "variables[CI_MERGE_REQUEST_SOURCE_BRANCH_NAME]=${{ github.head_ref }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+                  \"ref\": \"main\",
+                  \"variables\": [
+                    {\"key\": \"CI_PIPELINE_SOURCE\", \"value\": \"merge_request_event\"},
+                    {\"key\": \"CI_MERGE_REQUEST_TARGET_BRANCH_NAME\", \"value\": \"main\"},
+                    {\"key\": \"CI_MERGE_REQUEST_SOURCE_BRANCH_NAME\", \"value\": \"${{ github.head_ref }}\"}
+                  ]
+                }" \
             "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline"
-
+    
