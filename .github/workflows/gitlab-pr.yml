@@ -5,15 +5,15 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
-  trigger-gitlab:
+  trigger-gitlab-ci:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger GitLab pipeline as merge request event
         run: |
           curl -X POST \
-            -F token=${{ secrets.GITLAB_TRIGGER_TOKEN }} \
-            -F ref=${{ secrets.GITLAB_TARGET_BRANCH }} \
+            -H "JOB-TOKEN: ${{ secrets.GITLAB_JOB_TOKEN }}" \
+            -F ref=main \
             -F "variables[CI_PIPELINE_SOURCE]=merge_request_event" \
             -F "variables[CI_MERGE_REQUEST_TARGET_BRANCH_NAME]=main" \
             -F "variables[CI_MERGE_REQUEST_SOURCE_BRANCH_NAME]=${{ github.head_ref }}" \
-            "${{ secrets.GITLAB_URL }}/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/trigger/pipeline"
+            "https://gitlab.com/api/v4/projects/${{ secrets.GITLAB_PROJECT_ID }}/pipeline"
