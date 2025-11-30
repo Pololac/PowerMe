@@ -2,6 +2,11 @@ stages:
   - trigger
   - deploy
 
+# Désactive temporaire des pipelines automatiques
+workflow:
+  rules:
+    - when: never  # Désactive automatiquement
+
 frontend-pipeline:
   stage: trigger
   rules:
