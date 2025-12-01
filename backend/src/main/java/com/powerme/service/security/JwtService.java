@@ -83,11 +83,11 @@ public class JwtService {
             return (User) userService.loadUserByUsername(userIdentifier);
 
         } catch (JWTVerificationException e) {
-            // Token invalide ou expiré → erreur 401
+            // Token invalide ou expiré → transformation erreur 401
             throw new InvalidTokenException("Invalid or expired token") {
             };
         } catch (UserNotFoundException e) {
-            // User n'existe pas ou plus → transformation en erreur 401
+            // User n'existe pas ou plus → Transformation en erreur 401 ds le cadre de l'Authentication
             throw new UnauthorizedException("User not found");
         }
     }
