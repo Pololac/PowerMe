@@ -39,7 +39,6 @@ public class GlobalExceptionHandler {
     }
 
     // 401 - Unauthorized
-
     /**
      * Gère les erreurs d'authentification de Spring Security (email inexistant ou mot de passe
      * incorrect).
