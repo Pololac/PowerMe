@@ -15,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -25,13 +24,9 @@ import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Utilisateur de la plateforme PowerMe.
@@ -42,7 +37,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +63,7 @@ public class User implements UserDetails {
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    @Column(name = "role", nullable = false, columnDefinition = "user_role")
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
@@ -130,14 +125,6 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.roles.add(Role.ROLE_USER);
-    }
-
-    // Méthode appelée après le chargement JPA
-    @PostLoad
-    private void ensureDefaultRole() {
-        if (this.roles.isEmpty()) {
-            this.roles.add(Role.ROLE_USER);
-        }
     }
 
     // Lifecycle callbacks
@@ -355,25 +342,4 @@ public class User implements UserDetails {
         this.bookings = bookings;
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
-                .toList();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return isActivated;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !isDeleted();
-    }
 }

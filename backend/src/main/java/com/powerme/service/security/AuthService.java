@@ -2,11 +2,12 @@ package com.powerme.service.security;
 
 import com.powerme.dto.LoginCredentialsDto;
 import com.powerme.dto.UserDto;
-import com.powerme.entity.User;
 import com.powerme.mapper.UserMapper;
+import java.util.stream.Collectors;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,16 +54,22 @@ public class AuthService {
                 )
         );
 
-        // Récupère le User authentifié et le "caste" en User
-        User user = (User) auth.getPrincipal();
+        // Récupère le UserPrincipal
+        UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
 
         // Génère un JWT pour ce user
-        String accessToken = jwtService.generateJwt(user);
+        String accessToken = jwtService.generateJwt(principal);
         // Génère et stocke en BDD un refresh token lié à ce user
-        String refreshToken = refreshTokenService.create(user);
+        String refreshToken = refreshTokenService.create(principal.getId());
 
-        // Mappe l'utilisateur vers un DTO safe
-        UserDto userDto = mapper.toDto(user);
+        // Crée un UserDto local pour LOGIN
+        UserDto userDto = new UserDto(
+                principal.getId(),
+                principal.getEmail(),
+                principal.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toSet())
+        );
 
         // Retourne les tokens et le userDto (email, roles)
         return new LoginResult(accessToken, refreshToken, userDto);
@@ -74,9 +81,14 @@ public class AuthService {
      * nouveaux refresh/access tokens que l'on retourne.
      */
     public RefreshResult refreshTokens(String refreshToken) {
-        User user = refreshTokenService.validateAndGetUser(refreshToken);
-        String newAccess = jwtService.generateJwt(user);
+        // Valide le refresh token et récupère le UserPrincipal
+        UserPrincipal principal = refreshTokenService.validateAndGetPrincipal(refreshToken);
+        // Génère un nouveau JWT
+        String newAccess = jwtService.generateJwt(principal);
+
+        // Rotate le refresh token (invalide l'ancien, crée un nouveau)
         String newRefresh = refreshTokenService.rotate(refreshToken);
+
         return new RefreshResult(newAccess, newRefresh);
     }
 

@@ -6,6 +6,7 @@ import com.powerme.dto.UserRegisterDto;
 import com.powerme.entity.User;
 import com.powerme.mapper.UserMapper;
 import com.powerme.service.account.AccountService;
+import com.powerme.service.security.UserPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,7 +74,6 @@ public class AccountController {
     /**
      * Finalisation de la réinitialisation du mdp avec token.
      */
-    @ResponseStatus(HttpStatus.OK)
     @PostMapping("/password/reset")
     public ResponseEntity<SimpleMessageDto> resetPassword(
             @RequestBody @Valid ResetPasswordDto dto) {
@@ -87,8 +87,8 @@ public class AccountController {
     @PostMapping("/password/change")
     public ResponseEntity<SimpleMessageDto> changePassword(
             @RequestBody @Valid ResetPasswordDto dto,
-            @AuthenticationPrincipal User user) {
-        accountService.changePasswordAuthenticated(user, dto.getNewPassword());
+            @AuthenticationPrincipal UserPrincipal principal) {
+        accountService.changePasswordAuthenticated(principal.getId(), dto.getNewPassword());
         return ResponseEntity.ok(new SimpleMessageDto("Password changed successfully"));
     }
 }
