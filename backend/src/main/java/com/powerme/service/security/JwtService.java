@@ -5,13 +5,13 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.powerme.entity.User;
 import com.powerme.exception.InvalidTokenException;
-import com.powerme.exception.UnauthorizedException;
-import com.powerme.exception.UserNotFoundException;
 import java.time.Instant;
+import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
  * Génère le JWT à partie des données de l'User. Retourne le UserDetails après validation du token.
@@ -19,76 +19,80 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
-    private final UserServiceImpl userService;
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
     private final JwtProperties props;
 
-    public JwtService(UserServiceImpl userService, JwtProperties props) {
-        this.userService = userService;
+    public JwtService(JwtProperties props) {
         this.props = props;
         this.algorithm = Algorithm.HMAC512(props.getSecret());
         this.verifier = JWT.require(this.algorithm).build();
     }
 
     /**
-     * Génère un token contenant l'identifiant de l'utilisateur et sa date d'expiration.
+     * Génère un token simple pour activation ou reset MdP (sans rôles)
      *
-     * @param user       le User pour lequel on souhaite créer le token
-     * @param expiration durée d'expiration
+     * @param email      Email de l'user pour lequel on souhaite créer le token
+     * @param expiration Date d'expiration
      * @return le token généré avec le temps d'expiration défini
      */
-    public String generateToken(User user, Instant expiration) {
+    public String generateToken(String email, Instant expiration) {
         return JWT.create()
-                .withSubject(
-                        user.getUsername())  // username = email du user en subject dans le payload
+                .withSubject(email)
                 .withExpiresAt(expiration)
-                .withClaim("roles",
-                        user.getRoles().stream()
-                                .map(Enum::name)
-                                .collect(Collectors.toList())
-                )
                 .sign(algorithm);
     }
 
     /**
-     * Génère un JWT contenant l'identifiant de l'utilisateur passé en paramètre.
+     * Génère un JWT complet pour l'authentification (avec userId + rôles)
+     * Utilise l'expiration définie dans les properties.
      *
-     * @param user le User pour lequel on souhaite créer le JWT
+     * @param principal Le UserPrincipal authentifié
      * @return le JWT généré avec un temps d'expiration défini dans les props
      */
-    public String generateJwt(User user) {
+    public String generateJwt(UserPrincipal principal) {
         Instant expiration = Instant.now().plusSeconds(props.getAccessTokenExpiration());
+        List<String> roles = principal.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
-        return generateToken(user, expiration);
+        return JWT.create()
+                .withSubject(principal.getUsername())
+                .withClaim("userId", principal.getId())
+                .withClaim("roles", roles)
+                .withIssuedAt(Instant.now())
+                .withExpiresAt(expiration)
+                .sign(algorithm);
     }
 
     /**
-     * Vérifie la validité du token reçu et retourne le UserDetails correspondant.
+     * Retourne le UserPrincipal à partir du JWT récupéré dans la requête.
      *
      * @param token le token en chaîne de caractères
      * @return le User lié au token
      */
-    public User validateAndLoadUser(String token) {
+    public UserPrincipal validateAndLoadUser(String token) {
         try {
             // Vérifie le token : pas expiré, valide, pas altéré ;
             // sinon "throw JWTVerificationException
             DecodedJWT decodedJwt = verifier.verify(token);
 
-            // Récupère l'identifiant de l'User dans le payload
-            String userIdentifier = decodedJwt.getSubject();
+            // Reconstruit UserPrincipal depuis le payload du JWT (sans DB)
+            String email = decodedJwt.getSubject();
+            Long userId = decodedJwt.getClaim("userId").asLong();
+            List<String> roles = decodedJwt.getClaim("roles").asList(String.class);
 
-            // On utilise le service pour récupérer le User en BDD (casté car UserDetails retourné)
-            // Sinon "throw une UserNotFoundException"
-            return (User) userService.loadUserByUsername(userIdentifier);
+            List<GrantedAuthority> authorities = roles.stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+
+            return UserPrincipal.fromJwtClaims(userId, email, null, authorities);
 
         } catch (JWTVerificationException e) {
             // Token invalide ou expiré → transformation erreur 401
             throw new InvalidTokenException("Invalid or expired token") {
             };
-        } catch (UserNotFoundException e) {
-            // User n'existe pas ou plus → Transformation en erreur 401 ds le cadre de l'Authentication
-            throw new UnauthorizedException("User not found");
         }
     }
 }

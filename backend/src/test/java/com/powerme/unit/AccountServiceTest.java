@@ -49,15 +49,16 @@ class AccountServiceTest {
         // GIVEN
         User user = new User("john@test.com", "12345678");
         when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(user.getPassword())).thenReturn("hashed");
+        when(passwordEncoder.encode(user.getPassword())).thenReturn("hashedPassword");
+        when(userRepo.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // WHEN
         accountService.register(user);
 
         // THEN
         verify(userRepo, times(1)).save(assertArg(savedUser -> {
-            assertEquals("john@test.com", savedUser.getUsername());
-            assertEquals("hashed", savedUser.getPassword());
+            assertEquals("john@test.com", savedUser.getEmail());
+            assertEquals("hashedPassword", savedUser.getPassword());
             assertTrue(savedUser.hasRole(ROLE_USER));
         }));
     }
@@ -67,6 +68,7 @@ class AccountServiceTest {
         User user = new User("john@test.com", "12345678");
         when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(user.getPassword())).thenReturn("hashed");
+        when(userRepo.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         accountService.register(user);
 
@@ -79,17 +81,18 @@ class AccountServiceTest {
         User user = new User("john@test.com", "12345678");
         when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(user.getPassword())).thenReturn("hashed");
-        when(jwtService.generateToken(eq(user), any())).thenReturn("TOKEN123");
+        when(userRepo.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(jwtService.generateToken(eq("john@test.com"), any())).thenReturn("access.token");
 
         // WHEN
         accountService.register(user);
 
         //THEN
         // Vérifie que le token a bien été généré
-        verify(jwtService).generateToken(eq(user), any());
+        verify(jwtService).generateToken(eq("john@test.com"), any());
 
         // Vérifie que l’email a été envoyé avec le token exact
-        verify(mailService).sendActivationEmail(user, "TOKEN123");
+        verify(mailService).sendActivationEmail(any(User.class), eq("access.token"));
     }
 
     @Test
