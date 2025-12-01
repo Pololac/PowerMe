@@ -23,12 +23,12 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtAuthenticationFilter jwtFilter;
-    private final UserServiceImpl userService;
+    private final CustomUserDetailsService userService;
 
     public SecurityConfig(
         AuthenticationConfiguration authenticationConfiguration,
         JwtAuthenticationFilter jwtFilter,
-        UserServiceImpl userService
+        CustomUserDetailsService userService
     ) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtFilter = jwtFilter;
