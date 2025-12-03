@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +24,7 @@ import com.powerme.repository.UserRepository;
 import com.powerme.service.mail.MailService;
 import com.powerme.service.security.JwtService;
 import com.powerme.service.security.RefreshTokenService;
+import com.powerme.service.security.UserPrincipal;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +34,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -66,11 +69,11 @@ public class RegisterIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void registerShouldCreateNewUser() throws Exception {
+    void registerShouldSaveNewUserAndSendEmail() throws Exception {
         // GIVEN
         userRepo.save(new User("john@test.com", "hashedPassword"));
         userRepo.flush();
-        when(jwtService.generateToken(any(User.class), any(Instant.class)))
+        when(jwtService.generateToken(eq("james@test.com"), any(Instant.class)))
                 .thenReturn("fakeToken");
 
         // WHEN & THEN
@@ -89,7 +92,7 @@ public class RegisterIT extends AbstractIntegrationTest {
         // Le nouvel user doit être en base
         assertTrue(userRepo.findByEmail("james@test.com").isPresent());
 
-        // un email est envoyé
+        // Un email est envoyé
         verify(mailService, times(1))
                 .sendActivationEmail(any(User.class), any(String.class));
     }
@@ -114,8 +117,8 @@ public class RegisterIT extends AbstractIntegrationTest {
                                     }
                                 """))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.title").value("User Already Exists"))
-                .andExpect(jsonPath("$.detail").value("User with email john@test.com already exists"));
+                .andExpect(jsonPath("$.title").value("Utilisateur déjà existant"))
+                .andExpect(jsonPath("$.detail").value("Un utilisateur avec l'email john@test.com existe déjà"));
 
         // THEN
         // Aucun user ajouté à la base
@@ -139,11 +142,18 @@ public class RegisterIT extends AbstractIntegrationTest {
         assertFalse(existing.isActivated(), "User should not be activated initially");
 
         String token = "valid.token";
-        when(jwtService.validateAndLoadUser(token)).thenReturn(existing);
+        // Mock retourne UserPrincipal avec l'ID de l'user
+        UserPrincipal mockPrincipal = UserPrincipal.fromToken(
+                existing.getId(),
+                existing.getEmail()
+        );
+        when(jwtService.validateAndLoadUser(token)).thenReturn(mockPrincipal);
 
-        // WHEN
+        // WHEN & THEN
         mvc.perform(get("/api/account/activate/" + token))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Compte activé."));
 
         // THEN
         User activated = userRepo.findByEmail(existing.getEmail()).orElseThrow();
@@ -155,13 +165,13 @@ public class RegisterIT extends AbstractIntegrationTest {
         // GIVEN
         String expiredToken = "expired.token";
         when(jwtService.validateAndLoadUser(expiredToken))
-                .thenThrow(new InvalidTokenException("Token expired"));
+                .thenThrow(new InvalidTokenException("Token invalide ou expiré"));
 
         // WHEN & THEN
         mvc.perform(get("/api/account/activate/" + expiredToken))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.title").value("Invalid Token"))
-                .andExpect(jsonPath("$.detail").value("Token expired"));
+                .andExpect(jsonPath("$.title").value("Token Invalide"))
+                .andExpect(jsonPath("$.detail").value("Token invalide ou expiré"));
     }
 
     @Test
@@ -171,7 +181,8 @@ public class RegisterIT extends AbstractIntegrationTest {
         userRepo.save(user);
         userRepo.flush();
         // Un token valide renverra ce user
-        when(jwtService.validateAndLoadUser("valid.token")).thenReturn(user);
+        UserPrincipal mockPrincipal = UserPrincipal.fromUser(user);
+        when(jwtService.validateAndLoadUser("valid.token")).thenReturn(mockPrincipal);
         String newPassword = "12345678";
 
         // WHEN & THEN
@@ -199,18 +210,21 @@ public class RegisterIT extends AbstractIntegrationTest {
         assertTrue(passwordEncoder.matches(newPassword, updated.getPassword()));
 
         // Vérifie que la méthode delete du RefreshTokenService est bien appelée
-        verify(refreshTokenService, times(1)).deleteByUser(user);
+        verify(refreshTokenService, times(1)).deleteByUserId(user.getId());
     }
 
     @Test
-    @WithMockUser(username = "john@test.com")  // Simule un user connecté
     void changePasswordShouldWorkWhenAuthenticated() throws Exception {
         User user = new User("john@test.com", "oldPassword");
         userRepo.save(user);
         userRepo.flush();
 
+        Long userId = user.getId();
+        UserPrincipal principal = UserPrincipal.fromToken(userId, "john@test.com");
+
         mvc.perform(post("/api/account/password/change")
                         .with(csrf())
+                        .with(user(principal))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                   {
@@ -224,7 +238,6 @@ public class RegisterIT extends AbstractIntegrationTest {
     @Test
     void changePasswordShouldReturn401WhenNotAuthenticated() throws Exception {
         mvc.perform(post("/api/account/password/change")
-                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                   {
