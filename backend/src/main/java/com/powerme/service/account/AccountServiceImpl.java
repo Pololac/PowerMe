@@ -8,6 +8,7 @@ import com.powerme.service.mail.MailService;
 import com.powerme.service.security.JwtService;
 import com.powerme.service.security.RefreshTokenService;
 import com.powerme.service.security.UserPrincipal;
+import com.powerme.utils.Sanitizer;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -68,7 +69,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void activateAccount(String token) {
-        logger.info("Activating account for user with token {}", token);
+        String sanitizedToken = Sanitizer.sanitizeInput(token);
+        logger.info("Activating account with token {}", sanitizedToken);
 
         // Valide le token envoyé puis extrait le UserPrincipal
         // casté car le validateToken renvoie un UserDetails
@@ -84,7 +86,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void sendResetEmail(String email) {
-        logger.info("Sending reset password email to user with email {}", email);
+        String sanitizedEmail = Sanitizer.sanitizeInput(email);
+        logger.info("Sending reset password email to user with email {}", sanitizedEmail);
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
@@ -99,7 +102,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public void resetPasswordWithToken(String token, String newPassword) {
-        logger.info("Resetting password for user with token {}", token);
+        String sanitizedToken = Sanitizer.sanitizeInput(token);
+        logger.info("Resetting password for user with token {}", sanitizedToken);
 
         // Vérifie d'abord que le token est OK ; puis que l'user inclus dans le token existe
         UserPrincipal principal = jwtService.validateAndLoadUser(token);
@@ -120,7 +124,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public void changePasswordAuthenticated(Long userId, String newPassword) {
-        logger.info("Changing password for user with id {}", userId);
+        String sanitizedId = Sanitizer.sanitizeInput("userId");
+        logger.info("Changing password for user with id {}", sanitizedId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
