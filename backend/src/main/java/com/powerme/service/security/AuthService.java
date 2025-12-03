@@ -3,6 +3,7 @@ package com.powerme.service.security;
 import com.powerme.dto.LoginRequestDto;
 import com.powerme.dto.UserDto;
 import com.powerme.mapper.UserMapper;
+import com.powerme.utils.Sanitizer;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class AuthService {
      *
      * @param request crédentials de login
      * @return LoginResult avec access token, refresh token et les infos du user
-     * @throws InvalidCredentialsException si credentials invalides
+     * @throws BadCredentialsException si credentials invalides
      */
     public LoginResult login(LoginRequestDto request) {
         logger.info("Login attempt for user {}", request.email());
