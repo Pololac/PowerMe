@@ -1,20 +1,24 @@
 package com.powerme.controller;
 
-import com.powerme.dto.LoginCredentialsDto;
+import com.powerme.dto.ErrorResponseDto;
+import com.powerme.dto.LoginRequestDto;
 import com.powerme.dto.LoginResponseDto;
 import com.powerme.dto.RefreshResponseDto;
+import com.powerme.dto.UserDto;
 import com.powerme.exception.InvalidTokenException;
 import com.powerme.service.security.AuthService;
 import com.powerme.service.security.AuthService.LoginResult;
 import com.powerme.service.security.AuthService.RefreshResult;
+import com.powerme.service.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.time.Duration;
-import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,19 +57,35 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
-            @RequestBody @Valid LoginCredentialsDto credentials) {
+            @RequestBody @Valid LoginRequestDto request) {
         // Retourne access, refresh, user
-        LoginResult res = authService.login(credentials);
+        LoginResult result = authService.login(request);
 
         // On crée un cookie dans lequel on stocke le refresh token
         // (voir méthode en bas de la classe).
-        ResponseCookie refreshCookie = generateCookie(res.refreshToken());
+        ResponseCookie refreshCookie = generateCookie(result.refreshToken());
+
         // Dans la réponse, on envoie le refresh-token dans le cookie et le jwt dans le body.
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(new LoginResponseDto(res.accessToken(), res.user()));
+                .body(new LoginResponseDto(result.accessToken(), result.user()));
     }
+
+    /**
+     * GET /auth/me : retourne les infos de l'utilisateur connecté.
+     */
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser(
+            @AuthenticationPrincipal UserPrincipal principal) {
+
+        UserDto userDto = new UserDto(
+                principal.getId(),
+                principal.getEmail(),
+                principal.getRoles()
+        );
+
+        return ResponseEntity.ok(userDto);    }
 
     /**
      * POST /auth/refresh : lit le refresh en cookie et renvoie une nouvelle paire de tokens.
@@ -75,28 +95,24 @@ public class AuthController {
             @CookieValue(name = REFRESH_COOKIE, required = false) String refreshCookie) {
         if (refreshCookie == null || refreshCookie.isBlank()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of(
-                            "error", "Unauthorized",
-                            "message", "Refresh token is missing"
-                    ));
+                    .body(new ErrorResponseDto("MISSING_REFRESH_TOKEN", "Le refresh token est manquant"));
         }
+
         try {
-            RefreshResult res = authService.refreshTokens(refreshCookie);
-            ResponseCookie cookie = generateCookie(res.refreshToken());
+            RefreshResult result = authService.refreshTokens(refreshCookie);
+            ResponseCookie cookie = generateCookie(result.refreshToken());
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(new RefreshResponseDto(res.accessToken()));
+                    .body(new RefreshResponseDto(result.accessToken()));
 
         } catch (InvalidTokenException e) {
             // refresh invalide/expiré/révoqué → on supprime le cookie
             ResponseCookie clear = clearRefreshCookie();
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .header(HttpHeaders.SET_COOKIE, clear.toString())
-                    .body(Map.of(
-                            "error", "Unauthorized",
-                            "message", e.getMessage()
-                    ));
+                    .body(new ErrorResponseDto("INVALID_REFRESH_TOKEN", e.getMessage()));
         }
     }
 
@@ -109,7 +125,9 @@ public class AuthController {
         if (refreshCookie != null && !refreshCookie.isBlank()) {
             authService.deleteRefresh(refreshCookie);
         }
+
         ResponseCookie clear = clearRefreshCookie();
+
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, clear.toString())
                 .build();

@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AccountServiceImpl implements AccountService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -41,6 +45,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void register(User user) {
+        logger.info("Registering user {}", user.getEmail());
+
         Optional<User> optUser = userRepository.findByEmail(user.getEmail());
 
         // Vérifie si le User n'existe pas déjà
@@ -62,6 +68,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void activateAccount(String token) {
+        logger.info("Activating account for user with token {}", token);
+
         // Valide le token envoyé puis extrait le UserPrincipal
         // casté car le validateToken renvoie un UserDetails
         UserPrincipal principal = jwtService.validateAndLoadUser(token);
@@ -76,6 +84,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void sendResetEmail(String email) {
+        logger.info("Sending reset password email to user with email {}", email);
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
 
@@ -89,6 +99,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public void resetPasswordWithToken(String token, String newPassword) {
+        logger.info("Resetting password for user with token {}", token);
+
         // Vérifie d'abord que le token est OK ; puis que l'user inclus dans le token existe
         UserPrincipal principal = jwtService.validateAndLoadUser(token);
 
@@ -108,6 +120,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     @Override
     public void changePasswordAuthenticated(Long userId, String newPassword) {
+        logger.info("Changing password for user with id {}", userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -127,6 +141,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void deleteAccount(Long userId) {
+        logger.info("Deleting account for user with id {}", userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
