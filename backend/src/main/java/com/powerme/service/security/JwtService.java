@@ -91,7 +91,7 @@ public class JwtService {
 
         } catch (JWTVerificationException e) {
             // Token invalide ou expiré → transformation erreur 401
-            throw new InvalidTokenException("Invalid or expired token") {
+            throw new InvalidTokenException("Token invalide ou expiré") {
             };
         }
     }
