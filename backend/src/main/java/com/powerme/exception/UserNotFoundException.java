@@ -3,14 +3,14 @@ package com.powerme.exception;
 public class UserNotFoundException extends ServiceException {
 
     public UserNotFoundException() {
-        super("User not found");
+        super("Utilisateur non trouvé");
     }
 
     public UserNotFoundException(Long userId) {
-        super("User with id " + userId + " not found");
+        super("Utilisateur avec l'ID " + userId + " non trouvé");
     }
 
     public UserNotFoundException(String identifier) {
-        super("User with identifier " + identifier + " not found");
+        super("Utilisateur avec l'identifiant " + identifier + " non trouvé");
     }
 }
