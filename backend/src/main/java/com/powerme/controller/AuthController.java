@@ -43,8 +43,8 @@ public class AuthController {
 
     public static final String REFRESH_COOKIE = "refresh-token";
     public static final String REFRESH_COOKIE_PATH = "/api/auth";
-    private final static boolean isProd = false;      // TODO: true en prod (HTTPS)
-    private final static boolean isCrossSite = false; // TODO: true si front ≠ domaine API
+    private final static boolean IS_PROD = false;      // TODO: true en prod (HTTPS)
+    private final static boolean IS_CROSS_SITE = false; // TODO: true si front ≠ domaine API
 
     private final AuthService authService;
 
@@ -136,12 +136,12 @@ public class AuthController {
     // --- Helpers cookie ---
     private ResponseCookie generateCookie(String refreshToken) {
         Duration maxAge = Duration.ofDays(30);    // aligné avec props.refreshTokenExpiration
-        String sameSite = isCrossSite ? "None" : "Lax";
+        String sameSite = IS_CROSS_SITE ? "None" : "Lax";
 
         return ResponseCookie.from(REFRESH_COOKIE, refreshToken)
                 .httpOnly(
                         true) // Refresh token pas manipulable par le JS.
-                .secure(isProd || isCrossSite)  // En ppe "true" → envoyé qu'en HTTPS.
+                .secure(IS_PROD || IS_CROSS_SITE)  // En ppe "true" → envoyé qu'en HTTPS.
                 .sameSite(sameSite) // Cadre d'utilisation :
                 .path(REFRESH_COOKIE_PATH) // Indique le chemin où envoyer le token.
                 .maxAge(maxAge)
@@ -149,10 +149,10 @@ public class AuthController {
     }
 
     private ResponseCookie clearRefreshCookie() {
-        String sameSite = isCrossSite ? "None" : "Lax";
+        String sameSite = IS_CROSS_SITE ? "None" : "Lax";
         return ResponseCookie.from(REFRESH_COOKIE, "")
                 .httpOnly(true)
-                .secure(isProd || isCrossSite)
+                .secure(IS_PROD || IS_CROSS_SITE)
                 .sameSite(sameSite)
                 .path(REFRESH_COOKIE_PATH)
                 .maxAge(0)
