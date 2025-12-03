@@ -1,14 +1,17 @@
 package com.powerme.service.security;
 
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,38 +61,60 @@ public class SecurityConfig {
 
     // Chaîne de filtrage et règles de sécurité
     @Bean
-    public SecurityFilterChain accessControl(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // CSRF désactivé car API stateless
-            .csrf(csrf -> csrf.disable())
+            .csrf(AbstractHttpConfigurer::disable)
+
             // CORS (règles définies ci-dessous) : désactivable en prod car même origine
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
             // Filtrage routes publiques & privées
             .authorizeHttpRequests(auth -> auth
                 // Authentification
                 .requestMatchers("/api/auth/**").permitAll()
 
                 // Account
-                // Public
-                .requestMatchers(HttpMethod.POST, "/api/account/register").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/account/activate/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/account/password/**").permitAll()
+                .requestMatchers("/api/account/register").permitAll()
+                .requestMatchers("/api/account/activate/**").permitAll()
+                .requestMatchers("/api/account/password/reset").permitAll()
+                .requestMatchers("/api/account/password/change").authenticated()
+                .requestMatchers("/api/account/**").authenticated()
 
                 // Landing page
                 .requestMatchers(
                     "/public/landing",
                     "/public/content/**"
                 ).permitAll()
+
                 // HealthCheck
                 .requestMatchers("/actuator/health").permitAll()
+
                 // Carte / bornes consultables sans compte
                 .requestMatchers(HttpMethod.GET, "/api/charging-station/**").permitAll()
+
                 // Routes protégées
                 .requestMatchers("/api/booking/**").authenticated()
                 .requestMatchers("/api/owner/**")
                 .hasAnyRole("OWNER", "ADMIN") // Pas besoin de "ROLE_"
+
                 // Par défaut, protégées
                 .anyRequest().authenticated()
+            )
+
+            // Gère les 401 quand pas de token valide
+            .exceptionHandling(exception -> exception
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                        response.getWriter().write("""
+                            {
+                                "title": "Authentication Required",
+                                "status": 401,
+                                "detail": "Full authentication is required to access this resource"
+                            }
+                            """);
+                    })
             )
 
             // Pas de session serveur car JWT stateless
@@ -97,10 +122,10 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
 
-            // on indique à Spring comment authentifier email/pwd
+            // Indique à Spring comment authentifier email/pwd
             .authenticationProvider(authenticationProvider())
 
-            // on injecte le filtre JWT (qui lit le Bearer et peuple SecurityContext)
+            // Injecte le filtre JWT (qui lit le Bearer et peuple SecurityContext)
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
