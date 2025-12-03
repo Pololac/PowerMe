@@ -14,6 +14,7 @@ public interface UserMapper {
 
     UserDto toDto(User entity);
 
+    // Pour l'inscription
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)

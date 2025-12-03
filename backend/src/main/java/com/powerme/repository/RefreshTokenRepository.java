@@ -14,14 +14,14 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByToken(String token);
 
     /**
-     * Supprime tous les refresh tokens d'un utilisateur donné. Peut servir pour un logout global ou
-     * lorsqu'un compte est supprimé.
+     * Supprime tous les refresh tokens d'un utilisateur donné.
+     * Peut servir pour un logout global ou lorsqu'un compte est supprimé.
      *
-     * @param user utilisateur ciblé.
+     * @param userId ID de l'utilisateur ciblé.
      */
     @Modifying
-    @Query("DELETE FROM RefreshToken rt WHERE rt.user = :user")
-    void deleteByUser(User user);
+    @Query("DELETE FROM RefreshToken rt WHERE rt.user = :userId")
+    void deleteByUserId(Long userId);
 
 
     /**

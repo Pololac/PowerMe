@@ -33,11 +33,11 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "L'heure de début est obligatoire")
+    @NotNull(message = "Start time is required")
     @Column(nullable = false)
     private Instant startTime;
 
-    @NotNull(message = "L'heure de fin est obligatoire")
+    @NotNull(message = "End time is required")
     @Column(nullable = false)
     private Instant endTime;
 

@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,19 +23,19 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "L'adresse est obligatoire")
+    @NotBlank(message = "Street address is required")
     @Column(nullable = false)
     private String streetAddress;
 
-    @NotNull(message = "La ville est obligatoire")
+    @NotBlank(message = "Town is required")
     @Column(nullable = false)
     private String city;
 
-    @NotNull(message = "Le code postal est obligatoire")
+    @NotBlank(message = "Postal code is required")
     @Column(nullable = false)
     private String postalCode;
 
-    @NotNull(message = "Le pays est obligatoire")
+    @NotBlank(message = "Country is required")
     @Column(nullable = false)
     private String country;
 
@@ -55,7 +55,7 @@ public class Address {
     @OneToMany(mappedBy = "address")
     private List<ChargingLocation> chargingLocations = new ArrayList<>();
 
-    // Constructeur vide
+    // Constructeur JPA
     public Address() {
     }
 

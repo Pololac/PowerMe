@@ -33,12 +33,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // On récupère le contenu du header Authorization où peut se trouver le token
         String authHeader = request.getHeader("Authorization");
 
-        // Si routes liées à l'authentification / pas de header / pas de Bearer
-        // alors on laisse passer sans rien faire
+        // Si routes publiques (liées à l'authentification) / pas de header / pas de Bearer
+        // On laisse passer sans rien faire (pas de traitement sur JWT)
         if (request.getRequestURI().startsWith("/api/auth")
                 || request.getRequestURI().startsWith("/api/account/register")
                 || request.getRequestURI().startsWith("/api/account/activate")
-                || request.getRequestURI().equals("/api/account/password/.*")
+                || request.getRequestURI().startsWith("/api/account/password/reset")
                 || request.getRequestURI().startsWith("/api/charging-station")
                 || request.getRequestURI().startsWith("/actuator/health")
                 || authHeader == null
@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Valide le token et charge l'utilisateur
             UserDetails user = jwtService.validateAndLoadUser(token);
 
-            // Place l'utilisateur dans le contexte de sécurité
+            // ⚠️ Place l'utilisateur dans le contexte de sécurité
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             user,

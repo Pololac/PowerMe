@@ -24,13 +24,9 @@ import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * Utilisateur de la plateforme PowerMe.
@@ -41,7 +37,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,7 +63,7 @@ public class User implements UserDetails {
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    @Column(name = "role", nullable = false, columnDefinition = "user_role")
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
@@ -121,8 +117,8 @@ public class User implements UserDetails {
     private List<UserActivation> activations = new ArrayList<>();
 
     // Constructeurs
-    public User() {
-        this.roles.add(Role.ROLE_USER);
+    // Constructeur vide PROTECTED pour JPA
+    protected User() {
     }
 
     public User(String email, String password) {
@@ -346,25 +342,4 @@ public class User implements UserDetails {
         this.bookings = bookings;
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.name()))
-                .toList();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return isActivated;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !isDeleted();
-    }
 }

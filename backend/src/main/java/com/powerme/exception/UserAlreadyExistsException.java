@@ -3,10 +3,10 @@ package com.powerme.exception;
 public class UserAlreadyExistsException extends RuntimeException {
 
     public UserAlreadyExistsException() {
-        super("User already exists");
+        super("Utilisateur déjà existant");
     }
 
     public UserAlreadyExistsException(String email) {
-        super("User with email " + email + " already exists");
+        super("Un utilisateur avec l'email " + email + " existe déjà");
     }
 }

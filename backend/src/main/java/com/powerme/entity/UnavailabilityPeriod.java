@@ -23,11 +23,11 @@ public class UnavailabilityPeriod {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Le jour de début est obligatoire")
+    @NotNull(message = "Start date is required")
     @Column(nullable = false)
     private LocalDate startDate;
 
-    @NotNull(message = "Le jour de fin est obligatoire")
+    @NotNull(message = "End date is required")
     @Column(nullable = false)
     private LocalDate endDate;
 
@@ -40,7 +40,7 @@ public class UnavailabilityPeriod {
     private ChargingStation chargingStation;
 
 
-    // Constructeur
+    // Constructeur JPA
     public UnavailabilityPeriod() {
     }
 

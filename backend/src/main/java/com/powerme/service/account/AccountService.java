@@ -37,15 +37,15 @@ public interface AccountService {
     /**
      * Reset le mot de passe d’un user authentifié.
      *
-     * @param user        Le User souhaitant modifier son mot de passe
+     * @param userId      Id de l'user, récupéré depuis le "principal"
      * @param newPassword Le nouveau mot de passe du User
      */
-    void changePasswordAuthenticated(User user, String newPassword);
+    void changePasswordAuthenticated(Long userId, String newPassword);
 
     /**
      * Suppression (soft delete) du compte utilisateur (RGPD).
      *
-     * @param user Le User souhaitant supprimer son compte
+     * @param userId      Id de l'user, récupéré depuis le "principal"
      */
-    void deleteAccount(User user);
+    void deleteAccount(Long userId);
 }

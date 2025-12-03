@@ -30,6 +30,7 @@ public class RefreshToken {
     @Column(nullable = false)
     private Instant expiresAt;
 
+    // Constructeur JPA
     public RefreshToken() {
     }
 
