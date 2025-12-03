@@ -6,7 +6,7 @@ package com.powerme.exception;
 public class UnauthorizedAccessException extends ServiceException {
 
     public UnauthorizedAccessException() {
-        super("Access denied to this resource");
+        super("Accès à cette ressource interdit");
     }
 
     public UnauthorizedAccessException(String message) {
