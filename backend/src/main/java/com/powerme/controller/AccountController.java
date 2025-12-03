@@ -1,6 +1,6 @@
 package com.powerme.controller;
 
-import com.powerme.dto.ResetPasswordDto;
+import com.powerme.dto.ResetPasswordRequestDto;
 import com.powerme.dto.SimpleMessageDto;
 import com.powerme.dto.UserRegisterDto;
 import com.powerme.entity.User;
@@ -51,14 +51,14 @@ public class AccountController {
         User user = userMapper.toEntity(dto);
         accountService.register(user);
         return new SimpleMessageDto(
-                "Registration successful. Check your email to validate your account.");
+                "Enregistrement réussi. Vérifier votre email pour valider le compte.");
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/activate/{token}")
     public SimpleMessageDto activate(@PathVariable String token) {
         accountService.activateAccount(token);
-        return new SimpleMessageDto("Account activated.");
+        return new SimpleMessageDto("Compte activé.");
     }
 
     /**
@@ -68,7 +68,7 @@ public class AccountController {
     @PostMapping("/password/forgot/{email}")
     public SimpleMessageDto forgotPassword(@PathVariable String email) {
         accountService.sendResetEmail(email);
-        return new SimpleMessageDto("If the email exists, a reset link has been sent.");
+        return new SimpleMessageDto("Si l'email existe, un lien de renouvellement a été envoyé.");
     }
 
     /**
@@ -76,9 +76,9 @@ public class AccountController {
      */
     @PostMapping("/password/reset")
     public ResponseEntity<SimpleMessageDto> resetPassword(
-            @RequestBody @Valid ResetPasswordDto dto) {
-        accountService.resetPasswordWithToken(dto.getToken(), dto.getNewPassword());
-        return ResponseEntity.ok(new SimpleMessageDto("Password reset successfully"));
+            @RequestBody @Valid ResetPasswordRequestDto dto) {
+        accountService.resetPasswordWithToken(dto.token(), dto.newPassword());
+        return ResponseEntity.ok(new SimpleMessageDto("Mot de passe réinitialisé avec succès."));
     }
 
     /**
@@ -86,9 +86,9 @@ public class AccountController {
      */
     @PostMapping("/password/change")
     public ResponseEntity<SimpleMessageDto> changePassword(
-            @RequestBody @Valid ResetPasswordDto dto,
+            @RequestBody @Valid ResetPasswordRequestDto dto,
             @AuthenticationPrincipal UserPrincipal principal) {
-        accountService.changePasswordAuthenticated(principal.getId(), dto.getNewPassword());
-        return ResponseEntity.ok(new SimpleMessageDto("Password changed successfully"));
+        accountService.changePasswordAuthenticated(principal.getId(), dto.newPassword());
+        return ResponseEntity.ok(new SimpleMessageDto("Mot de passe changé avec succès."));
     }
 }
