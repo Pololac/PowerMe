@@ -65,7 +65,7 @@ jobs:
         run: npm ci
 
       - name: Run frontend tests with coverage
-        run: npm test -- --watch=false --code-coverage
+        run: npm run test:ci
 
       - name: SonarCloud Scan (Frontend)
         uses: SonarSource/sonarcloud-github-action@master
