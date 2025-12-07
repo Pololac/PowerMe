@@ -1,0 +1,24 @@
+<nav
+  class="navbar navbar--landing fixed inset-x-0 top-0 z-50 transition-all duration-300"
+  [class.bg-white]="scrolled()"
+  [class.border-b]="scrolled()"
+  [class.shadow-sm]="scrolled()"
+  [class.bg-transparent]="!scrolled()"
+  [class.border-transparent]="!scrolled()"
+>
+  <!-- Logo -->
+  <div class="flex items-center gap-2 cursor-pointer">
+    <img src="assets/icons/logo_long.svg" alt="Logo PowerMe" class="h-14 w-auto" />
+  </div>
+
+  <!-- Links -->
+  <div class="flex items-center gap-6">
+    <!-- Carte des bornes -->
+    <button class="pm-btn pm-btn--secondary-outline" (click)="goToMap()">Carte des bornes</button>
+
+    <!-- Ajouter une borne -->
+    <button class="pm-btn pm-btn--secondary" (click)="addStationClicked()">
+      Ajouter une borne
+    </button>
+  </div>
+</nav>
