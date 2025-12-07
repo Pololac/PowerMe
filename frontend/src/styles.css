@@ -107,6 +107,7 @@
   --border-width: 1px;
   --border-color: color-mix(in oklab, var(--fg) 12%, transparent);
   --header-height: 64px;
+  --header-height-landing: 110px;
   --sidebar-width: 280px;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -277,7 +278,7 @@
 
   /* ========== SECONDARY FILLED ========== */
   .pm-btn--secondary {
-    @apply text-white;
+    @apply text-black;
     background: var(--color-mint-300);
   }
 
@@ -293,7 +294,7 @@
   /* ========== SECONDARY OUTLINED ========== */
   .pm-btn--secondary-outline {
     background: transparent;
-    color: var(--color-mint-400);
+    color: var(--color-mint-500);
     border: 2px solid var(--color-mint-400);
   }
 
@@ -388,6 +389,15 @@
     padding: 0 var(--spacing-lg);
     background: var(--bg-primary);
     border-bottom: var(--border-width) solid var(--border-color);
+  }
+
+  /* NAVBAR — version Landing */
+  .navbar--landing {
+    height: var(--header-height-landing);
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 
   /* ========== SIDEBAR ========== */
