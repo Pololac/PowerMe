@@ -26,7 +26,6 @@
     <!-- SonarCloud config de base -->
     <sonar.organization>pololac</sonar.organization>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.projectKey>pololac_powerme_back</sonar.projectKey>
     <!-- Permet la décoration des PR -->
     <sonar.pullrequest.provider>github</sonar.pullrequest.provider>
 
