@@ -1,0 +1,27 @@
+<div class="relative w-full md:px-20">
+  <button
+    (click)="scrollLeft()"
+    class="hidden md:block absolute left-[20px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/40 border border-white/50 shadow-sm flex items-center justify-center opacity-70 hover:bg-white/80 hover:border-white/70 hover:shadow-md hover:opacity-100 transition-all"
+  >
+    <span class="text-gray-700 text-xl leading-none">‹</span>
+  </button>
+
+  <button
+    (click)="scrollRight()"
+    class="hidden md:block absolute right-[20px] top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/40 border border-white/50 shadow-sm flex items-center justify-center opacity-70 hover:bg-white/80 hover:border-white/70 hover:shadow-md hover:opacity-100 transition-all"
+  >
+    <span class="text-gray-700 text-xl leading-none">›</span>
+  </button>
+
+  <!-- Slider container -->
+  <div #container class="flex overflow-x-auto gap-8 scroll-smooth py-6 no-scrollbar">
+    <app-review-card
+      *ngFor="let r of reviews"
+      [author]="r.author"
+      [city]="r.city"
+      [rating]="r.rating"
+      [text]="r.text"
+      [avatarUrl]="r.avatarUrl"
+    ></app-review-card>
+  </div>
+</div>
