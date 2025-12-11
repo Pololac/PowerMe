@@ -93,6 +93,7 @@
 
   /* ===== Gradient ===== */
   --gradient-brand: linear-gradient(337.586deg, #85ffc7cc 0%, #001dc2ff 100%);
+  --gradient-hero: linear-gradient(90deg, rgba(0, 29, 194, 0.5) 0%, rgba(133, 255, 199, 0.4) 100%);
 }
 
 /* ===== THÈME CLAIR / SOMBRE ===== */
@@ -106,8 +107,7 @@
   --bg-secondary: color-mix(in oklab, var(--fg) 6%, var(--bg));
   --border-width: 1px;
   --border-color: color-mix(in oklab, var(--fg) 12%, transparent);
-  --header-height: 64px;
-  --header-height-landing: 110px;
+  --header-height: 110px;
   --sidebar-width: 280px;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
@@ -158,6 +158,13 @@
     font-size: var(--text-display-size);
     line-height: var(--text-display-lh);
     @apply font-bold;
+  }
+
+  .subtitle {
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: var(--text-h4-size);
+    line-height: var(--text-h3-lh);
   }
 
   h1 {
@@ -262,7 +269,7 @@
 
   /* ========== PRIMARY OUTLINED ========== */
   .pm-btn--primary-outline {
-    background: transparent;
+    background: white;
     color: var(--color-blue-800);
     border: 2px solid var(--color-blue-800);
   }
@@ -293,7 +300,7 @@
 
   /* ========== SECONDARY OUTLINED ========== */
   .pm-btn--secondary-outline {
-    background: transparent;
+    background: white;
     color: var(--color-mint-500);
     border: 2px solid var(--color-mint-400);
   }
@@ -629,33 +636,6 @@
 
   .pm-switch[aria-checked='true']::after {
     @apply translate-x-[1.15rem];
-  }
-
-  /* ========== FEATURES ========== */
-  .pm-feature {
-    @apply backdrop-blur-sm;
-    padding: 1.25rem;
-    border-radius: var(--radius-card);
-    border: 1px solid color-mix(in oklab, var(--fg) 10%, transparent);
-    background: color-mix(in oklab, white 80%, transparent);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .pm-feature__icon {
-    @apply inline-grid place-items-center rounded-full text-white;
-    width: 3rem;
-    height: 3rem;
-    background: var(--primary);
-    box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.25);
-  }
-
-  .pm-feature__title {
-    @apply mt-3 text-lg font-semibold;
-  }
-
-  .pm-feature__desc {
-    @apply mt-1 text-sm;
-    color: color-mix(in oklab, var(--fg) 75%, transparent);
   }
 }
 
