@@ -2,7 +2,7 @@
 
 <main class="overflow-x-hidden">
   <!-- HERO -->
-  <section class="hero-landing reveal">
+  <section class="hero-landing">
     <div class="container mx-auto px-4">
       <div class="hero-text-container reveal stagger">
         <h1 class="display-hero text-white">Chargez chez les particuliers</h1>
@@ -18,11 +18,11 @@
         </p>
 
         <div class="flex flex-wrap md:gap-4 gap-6 md:justify-start justify-center">
-          <button class="pm-btn pm-btn--primary" (click)="onFindStation()">
+          <button class="pm-btn pm-btn--primary pm-btn--md-lg" (click)="onFindStation()">
             Trouver une borne
           </button>
 
-          <button class="pm-btn pm-btn--primary-outline" (click)="onRentStation()">
+          <button class="pm-btn pm-btn--primary-outline pm-btn--md-lg" (click)="onRentStation()">
             Louez votre borne
           </button>
         </div>
@@ -107,7 +107,9 @@
             téléphone.
           </p>
 
-          <button class="pm-btn pm-btn--secondary-outline pm-btn--md">Comment l’installer ?</button>
+          <button class="pm-btn pm-btn--secondary-outline pm-btn--md-lg">
+            Comment l’installer ?
+          </button>
         </div>
       </div>
     </div>
@@ -158,7 +160,9 @@
       <h2 class="mb-8 md:hidden">Envie de recharger votre voiture</h2>
 
       <!-- Bouton -->
-      <button class="pm-btn pm-btn--primary pm-cta reveal">Trouver une borne</button>
+      <button class="pm-btn pm-btn--primary pm-btn--lg pm-cta font-semibold reveal">
+        Trouver une borne
+      </button>
 
       <!-- Image mockup desktop -->
       <div class="absolute left-1/2 -translate-x-1/2" style="bottom: -10px">
@@ -181,7 +185,7 @@
   </section>
 
   <!-- FOOTER -->
-  <section class="relative overflow-hidden bg-blue-50">
+  <section role="contentinfo" class="relative overflow-hidden bg-blue-50">
     <app-footer />
   </section>
 </main>
