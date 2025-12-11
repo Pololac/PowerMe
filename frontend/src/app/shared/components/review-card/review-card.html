@@ -1,0 +1,42 @@
+<div
+  class="bg-white rounded-2xl shadow-md w-[300px] md:w-[350px] p-5 flex flex-col flex-shrink-0 md:hover:scale-[1.02] md:hover:shadow-lg transition-all duration-300 ease-out"
+>
+  <!-- HEADER -->
+  <div
+    class="flex flex-col items-center text-center gap-2 md:flex-row md:items-start md:justify-between md:text-left"
+  >
+    <!-- Avatar + nom + ville -->
+    <div class="flex flex-col items-center gap-1 md:flex-row md:items-center md:gap-3">
+      <img
+        [src]="avatarUrl"
+        alt="Portrait de l'auteur de l'avis"
+        class="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover"
+      />
+
+      <div class="flex flex-col">
+        <p class="font-semibold leading-tight">
+          {{ author }}
+        </p>
+        <p class="text-gray-500 leading-tight">
+          {{ city }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Étoiles -->
+    <div class="text-yellow-400 text-base leading-none mt-1 md:mt-0">
+      <ng-container *ngFor="let i of starsArray; let index = index">
+        <span>
+          {{ index < rating ? '★' : '☆' }}
+        </span>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- TEXTE DE L’AVIS -->
+  <p
+    class="mt-4 text-[var(--text-body2-size)] leading-[var(--text-body2-lh) text-center md:text-left"
+  >
+    {{ text }}
+  </p>
+</div>

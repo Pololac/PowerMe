@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* =====================================
-   🎨 POWERME DESIGN SYSTEM
+   POWERME DESIGN SYSTEM
    Tailwind 4
    ===================================== */
 
@@ -93,6 +93,7 @@
 
   /* ===== Gradient ===== */
   --gradient-brand: linear-gradient(337.586deg, #85ffc7cc 0%, #001dc2ff 100%);
+  --gradient-hero: linear-gradient(90deg, rgba(0, 29, 194, 0.5) 0%, rgba(133, 255, 199, 0.4) 100%);
 }
 
 /* ===== THÈME CLAIR / SOMBRE ===== */
@@ -106,12 +107,14 @@
   --bg-secondary: color-mix(in oklab, var(--fg) 6%, var(--bg));
   --border-width: 1px;
   --border-color: color-mix(in oklab, var(--fg) 12%, transparent);
-  --header-height: 64px;
+  --container-width: 1280px;
+  --header-height: 96px;
   --sidebar-width: 280px;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 0.75rem;
   --spacing-lg: 1rem;
+  --spacing-xl: 1.25rem;
   --success: var(--color-alert-success);
   --success-light: var(--color-alert-success-light);
   --warning: var(--color-alert-warning);
@@ -157,6 +160,13 @@
     font-size: var(--text-display-size);
     line-height: var(--text-display-lh);
     @apply font-bold;
+  }
+
+  .subtitle {
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: var(--text-h4-size);
+    line-height: var(--text-h3-lh);
   }
 
   h1 {
@@ -210,38 +220,53 @@
 
 @layer components {
   /* ========== BOUTONS ========== */
-
-  /* ========== BASE ========== */
+  /* ========== Base ========== */
   .pm-btn {
-    @apply inline-flex items-center justify-center gap-2;
-    @apply font-semibold transition-all duration-200;
-    @apply cursor-pointer select-none;
+    @apply inline-flex items-center justify-center font-medium cursor-pointer whitespace-nowrap;
+    @apply transition-colors duration-200;
     border-radius: var(--radius-button);
-    white-space: nowrap;
-    /* Typographie */
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 24px;
-
-    /* Dimensions (Large par défaut) */
-    height: 3rem;
-    padding-inline: 1.5rem;
   }
 
   /* ========== SIZES ========== */
-  .pm-btn--md {
-    height: 2.5rem;
-    padding-inline: 1.25rem;
+
+  .pm-btn--sm-md {
+    height: 2rem; /* 32px */
+    padding-inline: 1rem; /* 16px */
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  @media (min-width: 768px) {
+    .pm-btn--sm-md {
+      height: 2.5rem; /* 40px */
+      padding-inline: 1.25rem; /* 20px */
+      font-size: 16px;
+      line-height: 20px;
+    }
+  }
+
+  /* MD → LG */
+  .pm-btn--md-lg {
+    height: 2.5rem; /* 40px */
+    padding-inline: 1.25rem; /* 20px */
     font-size: 16px;
     line-height: 20px;
   }
 
-  .pm-btn--sm {
-    height: 2rem;
-    padding-inline: 1rem;
-    font-size: 14px;
-    line-height: 16px;
+  @media (min-width: 768px) {
+    .pm-btn--md-lg {
+      height: 3rem; /* 48px */
+      padding-inline: 1.5rem; /* 24px */
+      font-size: 18px;
+      line-height: 22px;
+    }
+  }
+
+  .pm-btn--lg {
+    height: 3rem; /* 48px */
+    padding-inline: 1.5rem; /* 24px */
+    font-size: 18px;
+    line-height: 22px;
   }
 
   /* ========== PRIMARY FILLED ========== */
@@ -261,7 +286,7 @@
 
   /* ========== PRIMARY OUTLINED ========== */
   .pm-btn--primary-outline {
-    background: transparent;
+    background: white;
     color: var(--color-blue-800);
     border: 2px solid var(--color-blue-800);
   }
@@ -277,7 +302,7 @@
 
   /* ========== SECONDARY FILLED ========== */
   .pm-btn--secondary {
-    @apply text-white;
+    @apply text-black;
     background: var(--color-mint-300);
   }
 
@@ -292,8 +317,8 @@
 
   /* ========== SECONDARY OUTLINED ========== */
   .pm-btn--secondary-outline {
-    background: transparent;
-    color: var(--color-mint-400);
+    background: white;
+    color: var(--color-mint-500);
     border: 2px solid var(--color-mint-400);
   }
 
@@ -385,7 +410,7 @@
   .navbar {
     @apply flex items-center justify-between;
     height: var(--header-height);
-    padding: 0 var(--spacing-lg);
+    padding: 0 var(--spacing-xl);
     background: var(--bg-primary);
     border-bottom: var(--border-width) solid var(--border-color);
   }
@@ -619,33 +644,6 @@
 
   .pm-switch[aria-checked='true']::after {
     @apply translate-x-[1.15rem];
-  }
-
-  /* ========== FEATURES ========== */
-  .pm-feature {
-    @apply backdrop-blur-sm;
-    padding: 1.25rem;
-    border-radius: var(--radius-card);
-    border: 1px solid color-mix(in oklab, var(--fg) 10%, transparent);
-    background: color-mix(in oklab, white 80%, transparent);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .pm-feature__icon {
-    @apply inline-grid place-items-center rounded-full text-white;
-    width: 3rem;
-    height: 3rem;
-    background: var(--primary);
-    box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.25);
-  }
-
-  .pm-feature__title {
-    @apply mt-3 text-lg font-semibold;
-  }
-
-  .pm-feature__desc {
-    @apply mt-1 text-sm;
-    color: color-mix(in oklab, var(--fg) 75%, transparent);
   }
 }
 

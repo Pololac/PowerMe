@@ -5,10 +5,22 @@
   "projects": {
     "frontend": {
       "projectType": "application",
-      "schematics": {},
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "standalone": true,
+          "style": "css",
+          "changeDetection": "OnPush"
+        },
+        "@schematics/angular:directive": {
+          "standalone": true
+        },
+        "@schematics/angular:pipe": {
+          "standalone": true
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",
@@ -19,6 +31,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "/assets/"
               }
             ],
             "styles": ["src/styles.css"]
