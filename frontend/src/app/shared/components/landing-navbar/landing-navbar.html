@@ -1,5 +1,5 @@
 <nav
-  class="navbar navbar--landing fixed inset-x-0 top-0 z-50 transition-all duration-300"
+  class="navbar fixed inset-x-0 top-0 z-50 transition-all duration-300"
   [class.bg-white]="scrolled()"
   [class.border-b]="scrolled()"
   [class.shadow-sm]="scrolled()"
@@ -7,18 +7,27 @@
   [class.border-transparent]="!scrolled()"
 >
   <!-- Logo -->
-  <div class="flex items-center gap-2 cursor-pointer">
+  <div class="hidden md:block items-center gap-2 cursor-pointer">
     <img src="assets/icons/logo_long.svg" alt="Logo PowerMe" class="h-14 w-auto" />
+  </div>
+
+  <!-- Logo version mobile -->
+  <div class="md:hidden items-center gap-2 cursor-pointer">
+    <img src="assets/icons/logo_short.svg" alt="Logo PowerMe" class="h-14 w-auto" />
   </div>
 
   <!-- Links -->
   <div class="flex items-center gap-6">
-    <!-- Carte des bornes -->
-    <button class="pm-btn pm-btn--secondary-outline" (click)="goToMap()">Carte des bornes</button>
-
     <!-- Ajouter une borne -->
-    <button class="pm-btn pm-btn--secondary" (click)="addStationClicked()">
+    <button
+      class="hidden md:block pm-btn pm-btn--secondary-outline pm-btn--md-lg"
+      (click)="addStationClicked()"
+    >
       Ajouter une borne
+    </button>
+    <!-- Carte des bornes -->
+    <button class="pm-btn pm-btn--secondary pm-btn--md-lg" (click)="goToMap()">
+      Carte des bornes
     </button>
   </div>
 </nav>

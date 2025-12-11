@@ -21,30 +21,6 @@
   gap: 35px;
 }
 
-.stagger > * {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.6s ease-out;
-}
-
-.stagger.show > * {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.stagger.show > *:nth-child(1) {
-  transition-delay: 0s;
-}
-.stagger.show > *:nth-child(2) {
-  transition-delay: 0.1s;
-}
-.stagger.show > *:nth-child(3) {
-  transition-delay: 0.2s;
-}
-.stagger.show > *:nth-child(4) {
-  transition-delay: 0.3s;
-}
-
 .pm-feature {
   border-radius: var(--radius-card);
   border: 1px solid color-mix(in oklab, var(--fg) 10%, transparent);
@@ -104,6 +80,30 @@
   opacity: 1;
   transform: translateY(0);
   transition: all 0.7s ease-out;
+}
+
+.stagger > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.6s ease-out;
+}
+
+.stagger.show > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stagger.show > *:nth-child(1) {
+  transition-delay: 0s;
+}
+.stagger.show > *:nth-child(2) {
+  transition-delay: 0.1s;
+}
+.stagger.show > *:nth-child(3) {
+  transition-delay: 0.2s;
+}
+.stagger.show > *:nth-child(4) {
+  transition-delay: 0.3s;
 }
 
 @media (max-width: 639px) {

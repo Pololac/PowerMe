@@ -107,12 +107,14 @@
   --bg-secondary: color-mix(in oklab, var(--fg) 6%, var(--bg));
   --border-width: 1px;
   --border-color: color-mix(in oklab, var(--fg) 12%, transparent);
-  --header-height: 110px;
+  --container-width: 1280px;
+  --header-height: 96px;
   --sidebar-width: 280px;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 0.75rem;
   --spacing-lg: 1rem;
+  --spacing-xl: 1.25rem;
   --success: var(--color-alert-success);
   --success-light: var(--color-alert-success-light);
   --warning: var(--color-alert-warning);
@@ -218,38 +220,53 @@
 
 @layer components {
   /* ========== BOUTONS ========== */
-
-  /* ========== BASE ========== */
+  /* ========== Base ========== */
   .pm-btn {
-    @apply inline-flex items-center justify-center gap-2;
-    @apply font-semibold transition-all duration-200;
-    @apply cursor-pointer select-none;
+    @apply inline-flex items-center justify-center font-medium cursor-pointer whitespace-nowrap;
+    @apply transition-colors duration-200;
     border-radius: var(--radius-button);
-    white-space: nowrap;
-    /* Typographie */
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 24px;
-
-    /* Dimensions (Large par défaut) */
-    height: 3rem;
-    padding-inline: 1.5rem;
   }
 
   /* ========== SIZES ========== */
-  .pm-btn--md {
-    height: 2.5rem;
-    padding-inline: 1.25rem;
+
+  .pm-btn--sm-md {
+    height: 2rem; /* 32px */
+    padding-inline: 1rem; /* 16px */
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  @media (min-width: 768px) {
+    .pm-btn--sm-md {
+      height: 2.5rem; /* 40px */
+      padding-inline: 1.25rem; /* 20px */
+      font-size: 16px;
+      line-height: 20px;
+    }
+  }
+
+  /* MD → LG */
+  .pm-btn--md-lg {
+    height: 2.5rem; /* 40px */
+    padding-inline: 1.25rem; /* 20px */
     font-size: 16px;
     line-height: 20px;
   }
 
-  .pm-btn--sm {
-    height: 2rem;
-    padding-inline: 1rem;
-    font-size: 14px;
-    line-height: 16px;
+  @media (min-width: 768px) {
+    .pm-btn--md-lg {
+      height: 3rem; /* 48px */
+      padding-inline: 1.5rem; /* 24px */
+      font-size: 18px;
+      line-height: 22px;
+    }
+  }
+
+  .pm-btn--lg {
+    height: 3rem; /* 48px */
+    padding-inline: 1.5rem; /* 24px */
+    font-size: 18px;
+    line-height: 22px;
   }
 
   /* ========== PRIMARY FILLED ========== */
@@ -393,18 +410,9 @@
   .navbar {
     @apply flex items-center justify-between;
     height: var(--header-height);
-    padding: 0 var(--spacing-lg);
+    padding: 0 var(--spacing-xl);
     background: var(--bg-primary);
     border-bottom: var(--border-width) solid var(--border-color);
-  }
-
-  /* NAVBAR — version Landing */
-  .navbar--landing {
-    height: var(--header-height-landing);
-    padding-left: 2rem;
-    padding-right: 2rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
   }
 
   /* ========== SIDEBAR ========== */
