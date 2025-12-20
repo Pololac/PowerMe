@@ -55,4 +55,6 @@ logging:
 # ====== MODE DEBUG ACTIVÉ ======
 app:
   debug: true  # Messages d'erreur détaillés
+  frontend-url: http://localhost:4200
+
 
