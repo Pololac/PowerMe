@@ -1,7 +1,6 @@
 package com.powerme.repository;
 
 import com.powerme.entity.RefreshToken;
-import com.powerme.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,13 +13,13 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByToken(String token);
 
     /**
-     * Supprime tous les refresh tokens d'un utilisateur donné.
-     * Peut servir pour un logout global ou lorsqu'un compte est supprimé.
+     * Supprime tous les refresh tokens d'un utilisateur donné. Peut servir pour un logout global ou
+     * lorsqu'un compte est supprimé.
      *
      * @param userId ID de l'utilisateur ciblé.
      */
     @Modifying
-    @Query("DELETE FROM RefreshToken rt WHERE rt.user = :userId")
+    @Query("DELETE FROM RefreshToken rt WHERE rt.user.id = :userId")
     void deleteByUserId(Long userId);
 
 
