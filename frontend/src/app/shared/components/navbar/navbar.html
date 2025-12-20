@@ -1,1 +1,28 @@
-<p>navbar works!</p>
+<nav class="navbar sticky top-0 z-50 transition-all duration-300">
+  <!-- Logo -->
+  <div class="hidden md:block cursor-pointer">
+    <img src="/assets/icons/logo_long.svg" alt="Logo PowerMe" routerLink="/" class="h-14 w-auto" />
+  </div>
+
+  <!-- Logo version mobile -->
+  <div class="md:hidden cursor-pointer">
+    <img src="/assets/icons/logo_short.svg" alt="Logo PowerMe" routerLink="/" class="h-14 w-auto" />
+  </div>
+
+  @if (!isLogged()) {
+    <!-- Links -->
+    <div class="flex items-center gap-6">
+      <!-- Ajouter une borne -->
+      <button
+        class="hidden md:block pm-btn pm-btn--secondary-outline pm-btn--md-lg"
+        routerLink="/register"
+      >
+        Inscription
+      </button>
+      <!-- Carte des bornes -->
+      <button class="pm-btn pm-btn--secondary pm-btn--md-lg" routerLink="/login">Connexion</button>
+    </div>
+  } @else {
+    <app-user-menu></app-user-menu>
+  }
+</nav>

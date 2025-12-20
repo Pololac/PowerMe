@@ -1,5 +1,15 @@
-<div class="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] px-4">
-  <div class="w-full max-w-md">
-    <router-outlet></router-outlet>
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="card card--form w-full max-w-2xl relative p-6">
+    <!-- Croix -->
+    <button
+      type="button"
+      aria-label="Fermer"
+      (click)="close()"
+      class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center text-2xl text-neutral-grey2 hover:text-neutral-dark hover:bg-neutral-grey5 rounded-full"
+    >
+      ✕
+    </button>
+
+    <ng-content />
   </div>
 </div>

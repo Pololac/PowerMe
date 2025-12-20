@@ -5,14 +5,13 @@ import {
   ElementRef,
   inject,
 } from '@angular/core';
-import { LandingNavbar } from '../../shared/components/landing-navbar/landing-navbar';
 import { Router } from '@angular/router';
 import { Footer } from '../../shared/components/footer/footer';
 import { ReviewSlider } from '../../shared/components/review-slider/review-slider';
 
 @Component({
   selector: 'app-landing',
-  imports: [LandingNavbar, ReviewSlider, Footer],
+  imports: [ReviewSlider, Footer],
   templateUrl: './landing.html',
   styleUrl: './landing.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,7 +68,6 @@ export class Landing implements AfterViewInit {
   }
 
   onRentStation() {
-    // Plus tard : ouvrir la modale de connexion
-    console.log('TODO: ouvrir modale login pour louer une borne');
+    this.router.navigate(['/login']);
   }
 }
