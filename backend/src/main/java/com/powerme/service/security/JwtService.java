@@ -10,8 +10,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
 
 /**
  * Génère le JWT à partie des données de l'User. Retourne le UserDetails après validation du token.
@@ -44,8 +44,8 @@ public class JwtService {
     }
 
     /**
-     * Génère un JWT complet pour l'authentification (avec userId + rôles)
-     * Utilise l'expiration définie dans les properties.
+     * Génère un JWT complet pour l'authentification (avec userId + rôles) Utilise l'expiration
+     * définie dans les properties.
      *
      * @param principal Le UserPrincipal authentifié
      * @return le JWT généré avec un temps d'expiration défini dans les props
@@ -69,10 +69,10 @@ public class JwtService {
     /**
      * Retourne le UserPrincipal à partir du JWT récupéré dans la requête.
      *
-     * @param token le token en chaîne de caractères
+     * @param token le JWT avec toutes les infos
      * @return le User lié au token
      */
-    public UserPrincipal validateAndLoadUser(String token) {
+    public UserPrincipal validateAuthToken(String token) {
         try {
             // Vérifie le token : pas expiré, valide, pas altéré ;
             // sinon "throw JWTVerificationException
@@ -94,6 +94,20 @@ public class JwtService {
             throw new InvalidTokenException("Token invalide ou expiré") {
             };
         }
+    }
+
+    /**
+     * Retourne le UserPrincipal à partir du JWT récupéré dans la requête.
+     *
+     * @param token le activationToken avec seulement l'email
+     * @return le User lié au token
+     */
+    public UserPrincipal validateActivationToken(String token) {
+        DecodedJWT jwt = verifier.verify(token);
+
+        String email = jwt.getSubject();
+
+        return UserPrincipal.fromActivationToken(email);
     }
 }
 

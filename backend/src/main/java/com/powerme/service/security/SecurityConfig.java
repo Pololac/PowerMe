@@ -29,9 +29,9 @@ public class SecurityConfig {
     private final CustomUserDetailsService userService;
 
     public SecurityConfig(
-        AuthenticationConfiguration authenticationConfiguration,
-        JwtAuthenticationFilter jwtFilter,
-        CustomUserDetailsService userService
+            AuthenticationConfiguration authenticationConfiguration,
+            JwtAuthenticationFilter jwtFilter,
+            CustomUserDetailsService userService
     ) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtFilter = jwtFilter;
@@ -63,70 +63,71 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // CSRF désactivé car API stateless
-            .csrf(AbstractHttpConfigurer::disable)
+                // CSRF désactivé car API stateless
+                .csrf(AbstractHttpConfigurer::disable)
 
-            // CORS (règles définies ci-dessous) : désactivable en prod car même origine
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // CORS (règles définies ci-dessous) : désactivable en prod car même origine
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // Filtrage routes publiques & privées
-            .authorizeHttpRequests(auth -> auth
-                // Authentification
-                .requestMatchers("/api/auth/**").permitAll()
+                // Filtrage routes publiques & privées
+                .authorizeHttpRequests(auth -> auth
+                        // Authentification
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                // Account
-                .requestMatchers("/api/account/register").permitAll()
-                .requestMatchers("/api/account/activate/**").permitAll()
-                .requestMatchers("/api/account/password/reset").permitAll()
-                .requestMatchers("/api/account/password/change").authenticated()
-                .requestMatchers("/api/account/**").authenticated()
+                        // Account
+                        .requestMatchers("/api/account/register").permitAll()
+                        .requestMatchers("/api/account/activate/**").permitAll()
+                        .requestMatchers("/api/account/password/forgot/**").permitAll()
+                        .requestMatchers("/api/account/password/reset").permitAll()
+                        .requestMatchers("/api/account/password/change").authenticated()
+                        .requestMatchers("/api/account/**").authenticated()
 
-                // Landing page
-                .requestMatchers(
-                    "/public/landing",
-                    "/public/content/**"
-                ).permitAll()
+                        // Landing page
+                        .requestMatchers(
+                                "/public/landing",
+                                "/public/content/**"
+                        ).permitAll()
 
-                // HealthCheck
-                .requestMatchers("/actuator/health").permitAll()
+                        // HealthCheck
+                        .requestMatchers("/actuator/health").permitAll()
 
-                // Carte / bornes consultables sans compte
-                .requestMatchers(HttpMethod.GET, "/api/charging-station/**").permitAll()
+                        // Carte / bornes consultables sans compte
+                        .requestMatchers(HttpMethod.GET, "/api/charging-station/**").permitAll()
 
-                // Routes protégées
-                .requestMatchers("/api/booking/**").authenticated()
-                .requestMatchers("/api/owner/**")
-                .hasAnyRole("OWNER", "ADMIN") // Pas besoin de "ROLE_"
+                        // Routes protégées
+                        .requestMatchers("/api/booking/**").authenticated()
+                        .requestMatchers("/api/owner/**")
+                        .hasAnyRole("OWNER", "ADMIN") // Pas besoin de "ROLE_"
 
-                // Par défaut, protégées
-                .anyRequest().authenticated()
-            )
+                        // Par défaut, protégées
+                        .anyRequest().authenticated()
+                )
 
-            // Gère les 401 quand pas de token valide
-            .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint((request, response, authException) -> {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                        response.getWriter().write("""
-                            {
-                                "title": "Authentication Required",
-                                "status": 401,
-                                "detail": "Full authentication is required to access this resource"
-                            }
-                            """);
-                    })
-            )
+                // Gère les 401 quand pas de token valide
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                            response.getWriter().write("""
+                                    {
+                                        "title": "Authentication Required",
+                                        "status": 401,
+                                        "detail": "Full authentication is required to access this resource"
+                                    }
+                                    """);
+                        })
+                )
 
-            // Pas de session serveur car JWT stateless
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+                // Pas de session serveur car JWT stateless
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
-            // Indique à Spring comment authentifier email/pwd
-            .authenticationProvider(authenticationProvider())
+                // Indique à Spring comment authentifier email/pwd
+                .authenticationProvider(authenticationProvider())
 
-            // Injecte le filtre JWT (qui lit le Bearer et peuple SecurityContext)
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                // Injecte le filtre JWT (qui lit le Bearer et peuple SecurityContext)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

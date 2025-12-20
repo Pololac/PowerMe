@@ -61,7 +61,8 @@ public class AccountServiceImpl implements AccountService {
         User savedUser = userRepository.save(user);
 
         // Génère un token d'activation (valable 7j).
-        String token = jwtService.generateToken(savedUser.getEmail(), Instant.now().plus(7, ChronoUnit.DAYS));
+        String token = jwtService.generateToken(savedUser.getEmail(),
+                Instant.now().plus(7, ChronoUnit.DAYS));
 
         // Envoie ce token dans un lien cliquable au mail indiqué pour le User qu'on a persisté
         mailService.sendActivationEmail(savedUser, token);
@@ -74,10 +75,10 @@ public class AccountServiceImpl implements AccountService {
 
         // Valide le token envoyé puis extrait le UserPrincipal
         // casté car le validateToken renvoie un UserDetails
-        UserPrincipal principal = jwtService.validateAndLoadUser(token);
+        UserPrincipal principal = jwtService.validateActivationToken(token);
 
         // Charge l'utilisateur depuis la DB
-        User user = userRepository.findById(principal.getId())
+        User user = userRepository.findByEmail(principal.getEmail())
                 .orElseThrow(UserNotFoundException::new);
 
         user.setActivated(true);
@@ -106,15 +107,16 @@ public class AccountServiceImpl implements AccountService {
         logger.info("Resetting password for user with token {}", sanitizedToken);
 
         // Vérifie d'abord que le token est OK ; puis que l'user inclus dans le token existe
-        UserPrincipal principal = jwtService.validateAndLoadUser(token);
+        UserPrincipal principal = jwtService.validateActivationToken(token);
 
         // Charge l'utilisateur
-        User user = userRepository.findById(principal.getId())
+        User user = userRepository.findByEmail(principal.getEmail())
                 .orElseThrow(UserNotFoundException::new);
 
         // Encode le nv mdp avant de l'enregistrer
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user); // Si erreur, GlobalExceptionHandler catche avec DataAccessException
+        userRepository.save(
+                user); // Si erreur, GlobalExceptionHandler catche avec DataAccessException
 
         // On supprime tous les refresh tokens de l'User pour le forcer à se reconnecter
         // sur tous ses devices avec le nouveau MdP
