@@ -1,6 +1,4 @@
-<app-landing-navbar></app-landing-navbar>
-
-<main class="overflow-x-hidden">
+<main>
   <!-- HERO -->
   <section class="hero-landing">
     <div class="container mx-auto px-4">
@@ -160,7 +158,10 @@
       <h2 class="mb-8 md:hidden">Envie de recharger votre voiture</h2>
 
       <!-- Bouton -->
-      <button class="pm-btn pm-btn--primary pm-btn--lg pm-cta font-semibold reveal">
+      <button
+        class="pm-btn pm-btn--primary pm-btn--lg pm-cta font-semibold reveal"
+        (click)="onFindStation()"
+      >
         Trouver une borne
       </button>
 

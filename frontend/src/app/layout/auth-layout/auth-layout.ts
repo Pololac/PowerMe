@@ -1,11 +1,17 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Location } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 @Component({
   selector: 'app-auth-layout',
-  imports: [RouterOutlet],
+  imports: [],
   templateUrl: './auth-layout.html',
   styleUrl: './auth-layout.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuthLayout {}
+export class AuthLayout {
+  private location = inject(Location);
+
+  close(): void {
+    this.location.back();
+  }
+}
