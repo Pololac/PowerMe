@@ -1,15 +1,15 @@
 package com.powerme.service.security;
 
 import com.powerme.entity.User;
+import com.powerme.enums.Role;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.List;
 
 public class UserPrincipal implements UserDetails {
 
@@ -35,13 +35,16 @@ public class UserPrincipal implements UserDetails {
     // ═══════════════════════════════════════════════════════════
 
     /**
-     * Crée un UserPrincipal depuis une entité User (utilisé au LOGIN)
-     * Utilisé par CustomUserDetailsService
+     * Crée un UserPrincipal depuis une entité User (utilisé au LOGIN) Utilisé par
+     * CustomUserDetailsService
      */
     public static UserPrincipal fromUser(User user) {
         // Conversion des rôles
-        List<SimpleGrantedAuthority> authorities = user.getRoles()
-                .stream()
+        Set<Role> roles = user.getRoles() != null
+                ? user.getRoles()
+                : Set.of();
+
+        List<SimpleGrantedAuthority> authorities = roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
 
@@ -54,8 +57,8 @@ public class UserPrincipal implements UserDetails {
     }
 
     /**
-     * Crée un UserPrincipal depuis les claims JWT (utilisé à CHAQUE requête)
-     * Utilisé par JwtService.validateAndLoadUser()
+     * Crée un UserPrincipal depuis les claims JWT (utilisé à CHAQUE requête) Utilisé par
+     * JwtService.validateAndLoadUser()
      */
     public static UserPrincipal fromJwtClaims(
             Long id,
@@ -67,15 +70,14 @@ public class UserPrincipal implements UserDetails {
     }
 
     /**
-     * Pour les tests d'intégration
-     * Crée un UserPrincipal minimal sans rôles
+     * Pour les tests d'intégration Crée un UserPrincipal minimal sans rôles
      */
-    public static UserPrincipal fromToken(Long userId, String email) {
+    public static UserPrincipal fromActivationToken(String email) {
         return new UserPrincipal(
-                userId,
+                null,                // id volontairement null
                 email,
-                null,  // Pas de password dans le JWT
-                Collections.emptyList()  // Pas de rôles en test
+                null,          // pas de password
+                Collections.emptyList() // pas de rôles
         );
     }
 

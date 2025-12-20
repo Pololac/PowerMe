@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7); // après "Bearer "
         try {
             // Valide le token et charge l'utilisateur
-            UserDetails user = jwtService.validateAndLoadUser(token);
+            UserDetails user = jwtService.validateAuthToken(token);
 
             // ⚠️ Place l'utilisateur dans le contexte de sécurité
             UsernamePasswordAuthenticationToken authentication =
