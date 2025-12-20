@@ -69,3 +69,5 @@ logging: # Seulement INFO et plus grave
 # ====== MODE DEBUG DÉSACTIVÉ ======
 app:
   debug: false  # Messages d'erreur génériques (sécurité)
+  frontend-url: https://powerme-app.placoste.dev
+

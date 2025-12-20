@@ -58,3 +58,4 @@ logging:
 # ====== CONFIGURATION CUSTOM ======
 app:
   debug: false  # Valeur par défaut (surchargée par les profils)
+  frontend-url: https://mon-app.com
