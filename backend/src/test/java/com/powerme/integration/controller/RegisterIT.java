@@ -11,8 +11,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -118,7 +118,8 @@ public class RegisterIT extends AbstractIntegrationTest {
                                 """))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.title").value("Utilisateur déjà existant"))
-                .andExpect(jsonPath("$.detail").value("Un utilisateur avec l'email john@test.com existe déjà"));
+                .andExpect(jsonPath("$.detail").value(
+                        "Un utilisateur avec l'email john@test.com existe déjà"));
 
         // THEN
         // Aucun user ajouté à la base
@@ -141,13 +142,12 @@ public class RegisterIT extends AbstractIntegrationTest {
         // Vérification de l'état initial
         assertFalse(existing.isActivated(), "User should not be activated initially");
 
-        String token = "valid.token";
+        String token = "validation.token";
         // Mock retourne UserPrincipal avec l'ID de l'user
-        UserPrincipal mockPrincipal = UserPrincipal.fromToken(
-                existing.getId(),
+        UserPrincipal mockPrincipal = UserPrincipal.fromActivationToken(
                 existing.getEmail()
         );
-        when(jwtService.validateAndLoadUser(token)).thenReturn(mockPrincipal);
+        when(jwtService.validateActivationToken(token)).thenReturn(mockPrincipal);
 
         // WHEN & THEN
         mvc.perform(get("/api/account/activate/" + token))
@@ -164,7 +164,7 @@ public class RegisterIT extends AbstractIntegrationTest {
     void activateLinkShouldReturnErrorWhenTokenExpired() throws Exception {
         // GIVEN
         String expiredToken = "expired.token";
-        when(jwtService.validateAndLoadUser(expiredToken))
+        when(jwtService.validateActivationToken(expiredToken))
                 .thenThrow(new InvalidTokenException("Token invalide ou expiré"));
 
         // WHEN & THEN
@@ -182,7 +182,7 @@ public class RegisterIT extends AbstractIntegrationTest {
         userRepo.flush();
         // Un token valide renverra ce user
         UserPrincipal mockPrincipal = UserPrincipal.fromUser(user);
-        when(jwtService.validateAndLoadUser("valid.token")).thenReturn(mockPrincipal);
+        when(jwtService.validateActivationToken("valid.token")).thenReturn(mockPrincipal);
         String newPassword = "12345678";
 
         // WHEN & THEN
@@ -190,11 +190,11 @@ public class RegisterIT extends AbstractIntegrationTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                    {
-                                      "token":"valid.token",
-                                      "newPassword":"12345678"
-                                    }
-                                 """))
+                                   {
+                                     "token":"valid.token",
+                                     "newPassword":"12345678"
+                                   }
+                                """))
                 .andExpect(status().isOk());
 
         // THEN
@@ -219,19 +219,18 @@ public class RegisterIT extends AbstractIntegrationTest {
         userRepo.save(user);
         userRepo.flush();
 
-        Long userId = user.getId();
-        UserPrincipal principal = UserPrincipal.fromToken(userId, "john@test.com");
+        UserPrincipal principal = UserPrincipal.fromUser(user);
 
         mvc.perform(post("/api/account/password/change")
                         .with(csrf())
                         .with(user(principal))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                  {
-                                   "token":"ignored",
-                                   "newPassword":"12345678"
-                                   }
-                                  """))
+                                {
+                                 "token":"ignored",
+                                 "newPassword":"12345678"
+                                 }
+                                """))
                 .andExpect(status().isOk());
     }
 
@@ -240,11 +239,11 @@ public class RegisterIT extends AbstractIntegrationTest {
         mvc.perform(post("/api/account/password/change")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                  {
-                                   "token":"ignored",
-                                   "newPassword":"12345678"
-                                   }
-                                  """))
+                                {
+                                 "token":"ignored",
+                                 "newPassword":"12345678"
+                                 }
+                                """))
                 .andExpect(status().isUnauthorized());
     }
 
