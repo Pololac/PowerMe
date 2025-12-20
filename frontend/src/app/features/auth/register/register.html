@@ -1,1 +1,28 @@
-<p>register works!</p>
+<app-auth-layout>
+  <h1 class="text-center mb-10">Créer un compte</h1>
+  <div class="mx-auto w-full md:px-18">
+    <!-- Message succès -->
+    @if (successMessage()) {
+      <div class="alert alert-success mb-6 text-center" role="status">
+        {{ successMessage() }}
+      </div>
+    }
+
+    <!-- Message erreur -->
+    @if (errorMessage()) {
+      <div class="alert alert-danger mb-6" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <app-register-form
+      [loading]="loading()"
+      (formSubmit)="handleSubmit($event)"
+      (formChange)="clearError()"
+    ></app-register-form>
+
+    <p class="text-center mt-6 text-md font-semibold">
+      <a routerLink="/login" class="text-blue-400 hover:text-blue-500">Déjà un compte ?</a>
+    </p>
+  </div>
+</app-auth-layout>
