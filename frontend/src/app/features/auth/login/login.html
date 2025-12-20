@@ -1,1 +1,20 @@
-<p>login works!</p>
+<app-auth-layout>
+  <h1 class="text-center mb-10">Connexion</h1>
+
+  <div class="mx-auto w-full md:px-18">
+    @if (errorMessage()) {
+      <div class="alert alert-danger mt-6" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <app-login-form
+      (formSubmit)="handleSubmit($event)"
+      (formChange)="clearError()"
+    ></app-login-form>
+
+    <p class="text-center mt-6 text-md font-semibold">
+      <a routerLink="/register" class="text-blue-400 hover:text-blue-500">Créer un compte</a>
+    </p>
+  </div>
+</app-auth-layout>
