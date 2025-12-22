@@ -2,16 +2,27 @@ import { Routes } from '@angular/router';
 import { Landing } from './features/landing/landing';
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
-import { Dashboard } from './features/dashboard/dashboard';
 import { Booking } from './features/booking/booking';
 import { authGuard } from './core/guards/auth-guard';
 import { Map } from './features/map/map';
 import { ResetPasswordConfirm } from './features/auth/reset-password-confirm/reset-password-confirm';
 import { ResetPasswordRequest } from './features/auth/reset-password-request/reset-password-request';
+import { Vehicles } from './features/dashboard/pages/vehicles/vehicles';
+import { FavoriteStations } from './features/dashboard/pages/favorite-stations/favorite-stations';
+import { Charges } from './features/dashboard/pages/charges/charges';
+import { Balance } from './features/dashboard/pages/balance/balance';
+import { PaymentMethods } from './features/dashboard/pages/payment-methods/payment-methods';
+import { Support } from './features/dashboard/pages/support/support';
+import { Invoices } from './features/dashboard/pages/invoices/invoices';
+import { Faq } from './features/faq/faq';
+import { DashboardLayout } from './features/dashboard/layout/dashboard-layout';
+import { Profile } from './features/dashboard/pages/profile/profile';
+import { Bookings } from './features/dashboard/pages/bookings/bookings';
 
 export const routes: Routes = [
   { path: '', component: Landing },
   { path: 'map', component: Map },
+  { path: 'faq', component: Faq },
 
   // Auth = pages avec wrapper visuel
   { path: 'login', component: Login },
@@ -20,6 +31,25 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordRequest },
   { path: 'reset-password/:token', component: ResetPasswordConfirm },
 
-  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },
   { path: 'booking', component: Booking, canActivate: [authGuard] },
+
+  {
+    path: 'dashboard',
+    component: DashboardLayout,
+    canActivate: [authGuard],
+    children: [
+      // page par défaut du dashboard
+      { path: '', pathMatch: 'full', redirectTo: 'profile' },
+
+      { path: 'profile', component: Profile },
+      { path: 'bookings', component: Bookings },
+      { path: 'vehicles', component: Vehicles },
+      { path: 'favorite-stations', component: FavoriteStations },
+      { path: 'charges', component: Charges },
+      { path: 'balance', component: Balance },
+      { path: 'payment-methods', component: PaymentMethods },
+      { path: 'invoices', component: Invoices },
+      { path: 'support', component: Support },
+    ],
+  },
 ];
