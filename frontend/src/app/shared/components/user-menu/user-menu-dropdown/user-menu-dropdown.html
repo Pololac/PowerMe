@@ -1,0 +1,21 @@
+<div class="absolute right-0 mt-2 pm-menu z-50" role="menu">
+  @for (item of items; track item.label) {
+    <button
+      type="button"
+      role="menuitem"
+      class="pm-menu__item w-full flex items-center gap-3"
+      [class.text-danger]="item.danger"
+      [class.hover:bg-danger-light]="item.danger"
+      (click)="onItemClick(item)"
+    >
+      <img
+        [src]="'/assets/icons/' + item.icon + '.svg'"
+        alt=""
+        class="w-6 h-6"
+        aria-hidden="true"
+      />
+
+      <span>{{ item.label }}</span>
+    </button>
+  }
+</div>

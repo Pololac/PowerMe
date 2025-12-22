@@ -1,0 +1,8 @@
+.text-danger {
+  color: var(--color-neutral-grey2);
+}
+
+.hover\:bg-danger-light:hover {
+  color: var(--color-neutral-grey1);
+  background: var(--color-neutral-grey5);
+}

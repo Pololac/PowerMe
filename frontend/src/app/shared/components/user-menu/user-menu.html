@@ -1,0 +1,9 @@
+@if (auth.user(); as user) {
+  <div class="relative">
+    <app-user-menu-trigger [user]="user" [open]="open()" (toggleMenu)="toggle()" />
+
+    @if (open()) {
+      <app-user-menu-dropdown (close)="close()" />
+    }
+  </div>
+}
