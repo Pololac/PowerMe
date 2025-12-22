@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'app-booking',
+  selector: 'app-bookings',
   imports: [],
-  templateUrl: './booking.html',
-  styleUrl: './booking.css',
+  templateUrl: './bookings.html',
+  styleUrl: './bookings.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Booking {
+export class Bookings {
 
 }
