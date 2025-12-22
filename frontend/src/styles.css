@@ -81,6 +81,10 @@
   --text-h3-lh: 40px;
   --text-h4-size: 28px;
   --text-h4-lh: 36px;
+  --text-sub1-size: 24px;
+  --text-sub1-lh: 32px;
+  --text-sub2-size: 18px;
+  --text-sub2-lh: 28px;
   --text-body1-size: 22px;
   --text-body1-lh: 28px;
   --text-body2-size: 18px;
@@ -162,11 +166,18 @@
     @apply font-bold;
   }
 
-  .subtitle {
+  .subtitle1 {
     font-family: var(--font-title);
-    font-weight: 400;
-    font-size: var(--text-h4-size);
-    line-height: var(--text-h3-lh);
+    font-weight: 500;
+    font-size: var(--text-sub1-size);
+    line-height: var(--text-sub1-lh);
+  }
+
+  .subtitle2 {
+    font-family: var(--font-title);
+    font-weight: 500;
+    font-size: var(--text-sub2-size);
+    line-height: var(--text-sub2-lh);
   }
 
   h1 {
@@ -219,6 +230,24 @@
 /* ===== COMPOSANTS ===== */
 
 @layer components {
+  /* ========== NAVBAR LINK ========== */
+  .navbar-link {
+    font-family: var(--font-title);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 20px;
+    color: color-mix(in oklab, var(--fg) 85%, transparent);
+    transition: color 0.2s ease;
+  }
+
+  .navbar-link:hover {
+    color: var(--primary);
+  }
+
+  .navbar-link--active {
+    color: var(--primary);
+  }
+
   /* ========== BOUTONS ========== */
   /* ========== Base ========== */
   .pm-btn {
@@ -379,6 +408,37 @@
     to {
       transform: rotate(360deg);
     }
+  }
+
+  /* ========== CTA ========== */
+  .pm-cta {
+    transition:
+      transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pm-cta:hover {
+    transform: translateY(-6px) scale(1.045);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  }
+
+  .pm-btn--cta-ghost {
+    @apply inline-flex items-center gap-2;
+    height: 2.25rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 8%, transparent);
+    transition: transform 0.15s ease;
+  }
+
+  .pm-btn--cta-ghost:hover {
+    background: color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
+  .pm-btn--cta-ghost:active {
+    transform: scale(0.97);
   }
 
   /* ========== CARDS ========== */
@@ -624,10 +684,10 @@
     @apply backdrop-blur-sm;
     padding: 0.25rem 0;
     min-width: 12rem;
-    border-radius: 0.75rem;
+    border-radius: var(--radius-button);
     background: color-mix(in oklab, var(--bg) 92%, transparent);
     border: 1px solid color-mix(in oklab, var(--fg) 10%, transparent);
-    box-shadow: var(--shadow-card);
+    box-shadow: var(--shadow-sm);
   }
 
   .pm-menu__item {
