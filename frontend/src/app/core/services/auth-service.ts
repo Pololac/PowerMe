@@ -75,7 +75,7 @@ export class AuthService {
   logout() {
     this.clearSession();
 
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/');
   }
 
   setSession(token: string, user: User, rememberMe: boolean) {
