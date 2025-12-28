@@ -2,9 +2,7 @@ import { Routes } from '@angular/router';
 import { Landing } from './features/landing/landing';
 import { Login } from './features/auth/login/login';
 import { Register } from './features/auth/register/register';
-import { Booking } from './features/booking/booking';
 import { authGuard } from './core/guards/auth-guard';
-import { Map } from './features/map/map';
 import { ResetPasswordConfirm } from './features/auth/reset-password-confirm/reset-password-confirm';
 import { ResetPasswordRequest } from './features/auth/reset-password-request/reset-password-request';
 import { Vehicles } from './features/dashboard/pages/vehicles/vehicles';
@@ -18,10 +16,12 @@ import { Faq } from './features/faq/faq';
 import { DashboardLayout } from './features/dashboard/layout/dashboard-layout';
 import { Profile } from './features/dashboard/pages/profile/profile';
 import { Bookings } from './features/dashboard/pages/bookings/bookings';
+import { Booking } from './features/booking/booking';
+import { MapPage } from './features/map/map-page/map-page';
 
 export const routes: Routes = [
   { path: '', component: Landing },
-  { path: 'map', component: Map },
+  { path: 'map', component: MapPage },
   { path: 'faq', component: Faq },
 
   // Auth = pages avec wrapper visuel
