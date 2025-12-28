@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { LoginForm } from '../login-form/login-form';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LoginFormSubmit } from '../login-form/login-form-submit';
-import { AuthService } from '../../../core/services/auth-service';
 import { AuthLayout } from '../../../layout/auth-layout/auth-layout';
+import { AuthService } from '../../../core/services/auth/auth-service';
 
 @Component({
   selector: 'app-login',

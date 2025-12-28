@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
-import { AuthService } from '../../../../core/services/auth-service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth/auth-service';
 
 interface UserMenuItem {
   label: string;

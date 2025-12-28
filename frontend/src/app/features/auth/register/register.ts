@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { AuthLayout } from '../../../layout/auth-layout/auth-layout';
-import { AuthService } from '../../../core/services/auth-service';
 import { Router, RouterLink } from '@angular/router';
 import { RegisterFormSubmit } from '../register-form/register-form-submit';
 import { RegisterRequest } from '../../../core/models/requests/register.request';
 import { RegisterForm } from '../register-form/register-form';
+import { AuthService } from '../../../core/services/auth/auth-service';
 
 @Component({
   selector: 'app-register',

@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { User } from '../models/domain/user.model';
 import { map, Observable } from 'rxjs';
 import { Router } from '@angular/router';
-import { LoginRequest } from '../models/requests/login.request';
-import { LoginResponseDto } from '../models/dto/login.response.dto';
-import { RegisterRequest } from '../models/requests/register.request';
-import { MessageResponseDto } from '../models/dto/message.response.dto';
+import { User } from '../../models/domain/user.model';
+import { LoginRequest } from '../../models/requests/login.request';
+import { LoginResponseDto } from '../../models/dto/login.response.dto';
+import { MessageResponseDto } from '../../models/dto/message.response.dto';
+import { RegisterRequest } from '../../models/requests/register.request';
 
 @Injectable({
   providedIn: 'root',

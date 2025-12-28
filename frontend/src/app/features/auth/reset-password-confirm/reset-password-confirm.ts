@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ResetPasswordForm } from '../reset-password-form/reset-password-form';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth-service';
 import { AuthLayout } from '../../../layout/auth-layout/auth-layout';
+import { AuthService } from '../../../core/services/auth/auth-service';
 
 @Component({
   selector: 'app-reset-password-confirm',
