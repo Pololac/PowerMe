@@ -1,7 +1,9 @@
 package com.powerme.entity;
 
+import com.powerme.enums.BookingStatus;
 import com.powerme.enums.ChargingPower;
 import com.powerme.enums.SocketType;
+import com.powerme.enums.StationStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +18,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -48,8 +51,8 @@ public class ChargingStation {
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false,
-            columnDefinition = "connector_type")   // Type PostgreSQL ENUM
-    private SocketType connectorType;
+            columnDefinition = "socket_type")
+    private SocketType socketType;
 
     /**
      * Puissance de la borne en kilowatts (kW).
@@ -59,8 +62,8 @@ public class ChargingStation {
      * </p>
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "max_power", nullable = false)
-    private ChargingPower maxPower;
+    @Column(name = "power", nullable = false)
+    private ChargingPower power;
 
     /**
      * Tarif horaire de la borne défini par le propriétaire.
@@ -72,10 +75,10 @@ public class ChargingStation {
     private BigDecimal hourlyRate;
 
     /**
-     * Indique si la borne est actuellement disponible à la réservation.
+     * Indique si la borne est actuellement disponible à la réservation. True by default
      */
     @Column(nullable = false)
-    private boolean isActive = true;
+    private boolean active = true;
 
     /**
      * Heure de début de disponibilité quotidienne (ex : "08:00"). Si null, disponible 24h/24.
@@ -137,28 +140,51 @@ public class ChargingStation {
      * Permet d'obtenir la valeur numérique en kW.
      */
     public double getPowerInKilowatts() {
-        return maxPower != null ? maxPower.getKilowatts() : 0.0;
+        return power != null ? power.getKilowatts() : 0.0;
+    }
+
+    /**
+     * Permet de savoir si une borne est utilisée en ce moment.
+     */
+    @Transient
+    public boolean isReservedAt(Instant now) {
+        return bookings.stream()
+                .anyMatch(booking ->
+                        booking.getBookingStatus() == BookingStatus.ACCEPTED
+                                && !booking.getStartTime().isAfter(now)
+                                && booking.getEndTime().isAfter(now)
+                );
+    }
+
+    /**
+     * Permet d'obtenir le status "réservable" de la borne en ce moment.
+     */
+    @Transient
+    public StationStatus getStatus(Instant now) {
+
+        if (!active) {
+            return StationStatus.UNAVAILABLE;
+        }
+
+        if (isReservedAt(now)) {
+            return StationStatus.OCCUPIED;
+        }
+
+        return StationStatus.AVAILABLE;
     }
 
     /**
      * Réactive la borne (car activée par défaut).
      */
     public void activate() {
-        this.isActive = true;
+        this.active = true;
     }
 
     /**
      * Désactive la borne.
      */
     public void deactivate() {
-        this.isActive = false;
-    }
-
-    /**
-     * Vérifie la dispo (dans le sens "est-elle en location").
-     */
-    public boolean isAvailable() {
-        return isActive;
+        this.active = false;
     }
 
     /**
@@ -195,7 +221,6 @@ public class ChargingStation {
         photo.setChargingStation(null);
     }
 
-
     // Getters et Setters
     public Long getId() {
         return id;
@@ -213,20 +238,20 @@ public class ChargingStation {
         this.name = name;
     }
 
-    public SocketType getConnectorType() {
-        return connectorType;
+    public SocketType getSocketType() {
+        return socketType;
     }
 
-    public void setConnectorType(SocketType connectorType) {
-        this.connectorType = connectorType;
+    public void setSocketType(SocketType socketType) {
+        this.socketType = socketType;
     }
 
-    public ChargingPower getMaxPower() {
-        return maxPower;
+    public ChargingPower getPower() {
+        return power;
     }
 
-    public void setMaxPower(ChargingPower maxPower) {
-        this.maxPower = maxPower;
+    public void setPower(ChargingPower power) {
+        this.power = power;
     }
 
     public BigDecimal getHourlyRate() {
@@ -238,11 +263,11 @@ public class ChargingStation {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        this.isActive = active;
+        this.active = active;
     }
 
     public LocalTime getAvailableFrom() {

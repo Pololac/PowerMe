@@ -148,13 +148,13 @@ CREATE TABLE charging_station
     updated_at           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
 
     name                 VARCHAR(255)  NOT NULL,
-    connector_type       VARCHAR(20)   NOT NULL
-        CHECK (connector_type IN ('TYPE_2S', 'TYPE_2', 'CCS', 'CHADEMO')),
-    max_power            VARCHAR(20)   NOT NULL
-        CHECK (max_power IN ('POWER_3_7', 'POWER_7_4', 'POWER_11', 'POWER_22',
-                             'POWER_50', 'POWER_100', 'POWER_150', 'POWER_350')),
+    socket_type          VARCHAR(20)   NOT NULL
+        CHECK (socket_type IN ('TYPE_2S', 'TYPE_2', 'CCS', 'CHADEMO')),
+    power                VARCHAR(20)   NOT NULL
+        CHECK (power IN ('POWER_3_7', 'POWER_7_4', 'POWER_11', 'POWER_22',
+                         'POWER_50', 'POWER_100', 'POWER_150', 'POWER_350')),
     hourly_rate          NUMERIC(8, 2) NOT NULL,
-    is_active            BOOLEAN       NOT NULL DEFAULT TRUE,
+    active               BOOLEAN       NOT NULL DEFAULT TRUE,
     available_from       TIME,
     available_to         TIME,
 
