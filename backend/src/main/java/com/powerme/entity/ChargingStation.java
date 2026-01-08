@@ -46,6 +46,8 @@ public class ChargingStation {
     @Column(nullable = false)
     private String name;
 
+    private String imagePath;
+
     /**
      * Type de prise de la borne.
      */
@@ -108,9 +110,6 @@ public class ChargingStation {
     @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UnavailabilityPeriod> unavailabilityPeriods = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Photo> photos = new ArrayList<>();
-
     // Timestamps
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -118,8 +117,8 @@ public class ChargingStation {
     @Column(nullable = false)
     private Instant updatedAt;
 
-    // Constructeur JPA
-    public ChargingStation() {
+    public ChargingStation() {     // Constructeur JPA
+
     }
 
     // Lifecycle callbacks
@@ -205,22 +204,6 @@ public class ChargingStation {
         period.setChargingStation(null);
     }
 
-    /**
-     * Ajoute une photo.
-     */
-    public void addPhoto(Photo photo) {
-        photos.add(photo);
-        photo.setChargingStation(this);
-    }
-
-    /**
-     * Supprime une photo.
-     */
-    public void removePhoto(Photo photo) {
-        photos.remove(photo);
-        photo.setChargingStation(null);
-    }
-
     // Getters et Setters
     public Long getId() {
         return id;
@@ -294,12 +277,12 @@ public class ChargingStation {
         this.chargingLocation = chargingLocation;
     }
 
-    public List<Photo> getPhotos() {
-        return photos;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public List<UnavailabilityPeriod> getUnavailabilityPeriods() {

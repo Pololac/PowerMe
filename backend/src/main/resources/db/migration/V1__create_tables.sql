@@ -123,6 +123,8 @@ CREATE TABLE charging_location
 
     name        VARCHAR(255)           NOT NULL,
     description TEXT,
+    image_path  VARCHAR(500),
+
     latitude    NUMERIC(10, 8)         NOT NULL,
     longitude   NUMERIC(11, 8)         NOT NULL,
     location    GEOGRAPHY(Point, 4326) NOT NULL,
@@ -148,6 +150,8 @@ CREATE TABLE charging_station
     updated_at           TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
 
     name                 VARCHAR(255)  NOT NULL,
+    image_path           VARCHAR(500),
+
     socket_type          VARCHAR(20)   NOT NULL
         CHECK (socket_type IN ('TYPE_2S', 'TYPE_2', 'CCS', 'CHADEMO')),
     power                VARCHAR(20)   NOT NULL
@@ -215,25 +219,4 @@ CREATE TABLE booking
 );
 
 COMMENT ON TABLE booking IS 'Réservations de bornes de recharge';
-
-
--- Table: photo
-CREATE TABLE photo
-(
-    id                   BIGSERIAL PRIMARY KEY,
-    created_at           TIMESTAMPTZ  NOT NULL,
-
-    filename             VARCHAR(255) NOT NULL,
-
-    charging_location_id BIGINT,
-    charging_station_id  BIGINT,
-
-    CONSTRAINT uk_photo_filename UNIQUE (filename),
-    CONSTRAINT fk_photo_location FOREIGN KEY (charging_location_id)
-        REFERENCES charging_location (id) ON DELETE CASCADE,
-    CONSTRAINT fk_photo_station FOREIGN KEY (charging_station_id)
-        REFERENCES charging_station (id) ON DELETE CASCADE
-);
-
-COMMENT ON TABLE photo IS 'Photos des lieux et/ou des bornes de recharge';
 
