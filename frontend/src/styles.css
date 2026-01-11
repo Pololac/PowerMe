@@ -80,12 +80,12 @@
   --text-h2-lh: 48px;
   --text-h3-size: 32px;
   --text-h3-lh: 40px;
-  --text-h4-size: 28px;
+  --text-h4-size: 26px;
   --text-h4-lh: 36px;
   --text-sub1-size: 24px;
   --text-sub1-lh: 32px;
-  --text-sub2-size: 18px;
-  --text-sub2-lh: 28px;
+  --text-sub2-size: 16px;
+  --text-sub2-lh: 24px;
   --text-body1-size: 22px;
   --text-body1-lh: 28px;
   --text-body2-size: 18px;
@@ -176,7 +176,7 @@
 
   .subtitle2 {
     font-family: var(--font-title);
-    font-weight: 500;
+    font-weight: 400;
     font-size: var(--text-sub2-size);
     line-height: var(--text-sub2-lh);
   }
