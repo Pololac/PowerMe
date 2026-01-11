@@ -13,7 +13,7 @@ spring:
   # ====== JPA / HIBERNATE ======
   jpa:
     hibernate:
-      ddl-auto: validate # Hibernate modifie automatiquement la BDD
+      ddl-auto: validate # Flyway gère la structure, pas Hibernate
     show-sql: true # Affiche les requêtes SQL dans les logs
     properties:
       hibernate:
@@ -28,6 +28,12 @@ spring:
     locations: classpath:db/migration
     validate-on-migrate: true
     clean-disabled: true
+
+  # ====== DATAS Dev ======
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/seed/seed_dev_charging_data.sql
 
   # ====== MAIL : MailTrap ======
   mail:

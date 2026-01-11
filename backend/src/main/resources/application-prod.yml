@@ -8,7 +8,7 @@ spring:
   # ====== JPA / HIBERNATE ======
   jpa:
     hibernate:
-      ddl-auto: validate # Ne modifie PAS le schéma (sécurité)
+      ddl-auto: validate # Flyway gère la structure, pas Hibernate
     show-sql: false
     properties:
       hibernate:
