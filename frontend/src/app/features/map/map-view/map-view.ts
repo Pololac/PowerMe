@@ -122,14 +122,13 @@ export class MapView implements AfterViewInit {
           .setLngLat([loc.longitude, loc.latitude])
           .addTo(this.map);
 
-        // ✅ rendre cliquable
+        // Rend cliquable les stations
         const el = marker.getElement();
         el.style.cursor = 'pointer';
 
-        // ✅ ouvrir la modale via chargement du détail location
+        // Ouvre la modale de la station
         el.addEventListener('click', (event) => {
           event.stopPropagation(); // évite les effets de bord (ex: click map / overlay)
-          console.log('marker clicked', loc.id);
           this.locationService.loadLocationDetail(loc.id);
         });
 
