@@ -5,30 +5,31 @@ package com.powerme.enums;
  */
 public enum ChargingPower {
     // Puissances pour Type 2S et Type 2 (AC - Courant Alternatif)
-    POWER_3_7(3.7, "3,7 kW - Prise domestique renforcée"),
-    POWER_7_4(7.4, "7,4 kW - Wallbox standard"),
-    POWER_11(11.0, "11 kW - Wallbox triphasée"),
-    POWER_22(22.0, "22 kW - Borne publique AC"),
+    AC_3_7(3.7),
+    AC_7_4(7.4),
+    AC_11(11.0),
+    AC_22(22.0),
 
     // Puissances pour CCS et CHAdeMO (DC - Courant Continu)
-    POWER_50(50.0, "50 kW - Charge rapide DC"),
-    POWER_100(100.0, "100 kW - Charge ultra-rapide"),
-    POWER_150(150.0, "150 kW - Superchargeur"),
-    POWER_350(350.0, "350 kW - Hyperchargeur");
+    DC_50(50.0),
+    DC_100(100.0),
+    DC_150(150.0),
+    DC_350(350.0);
 
     private final double kilowatts;
-    private final String displayName;
 
-    ChargingPower(double kilowatts, String displayName) {
+    ChargingPower(double kilowatts) {
         this.kilowatts = kilowatts;
-        this.displayName = displayName;
     }
 
     public double getKilowatts() {
         return kilowatts;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public boolean isCompatibleWith(SocketType socket) {
+        return switch (socket) {
+            case TYPE_2, TYPE_2S -> this.name().startsWith("AC_");
+            case CCS, CHADEMO -> this.name().startsWith("DC_");
+        };
     }
 }

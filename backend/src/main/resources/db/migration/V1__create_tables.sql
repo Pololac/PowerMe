@@ -154,8 +154,7 @@ CREATE TABLE charging_station
     socket_type          VARCHAR(20)   NOT NULL
         CHECK (socket_type IN ('TYPE_2S', 'TYPE_2', 'CCS', 'CHADEMO')),
     power                VARCHAR(20)   NOT NULL
-        CHECK (power IN ('POWER_3_7', 'POWER_7_4', 'POWER_11', 'POWER_22',
-                         'POWER_50', 'POWER_100', 'POWER_150', 'POWER_350')),
+        CHECK (power IN ('AC_3_7','AC_7_4','AC_11','AC_22','DC_50','DC_100','DC_150','DC_350')),
     hourly_rate          NUMERIC(8, 2) NOT NULL,
     active               BOOLEAN       NOT NULL DEFAULT TRUE,
     available_from       TIME,
