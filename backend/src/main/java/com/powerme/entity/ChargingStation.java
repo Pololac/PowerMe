@@ -1,9 +1,7 @@
 package com.powerme.entity;
 
-import com.powerme.enums.BookingStatus;
 import com.powerme.enums.ChargingPower;
 import com.powerme.enums.SocketType;
-import com.powerme.enums.StationStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +16,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -140,36 +137,6 @@ public class ChargingStation {
      */
     public double getPowerInKilowatts() {
         return power != null ? power.getKilowatts() : 0.0;
-    }
-
-    /**
-     * Permet de savoir si une borne est utilisée en ce moment.
-     */
-    @Transient
-    public boolean isReservedAt(Instant now) {
-        return bookings.stream()
-                .anyMatch(booking ->
-                        booking.getBookingStatus() == BookingStatus.ACCEPTED
-                                && !booking.getStartTime().isAfter(now)
-                                && booking.getEndTime().isAfter(now)
-                );
-    }
-
-    /**
-     * Permet d'obtenir le status "réservable" de la borne en ce moment.
-     */
-    @Transient
-    public StationStatus getStatus(Instant now) {
-
-        if (!active) {
-            return StationStatus.UNAVAILABLE;
-        }
-
-        if (isReservedAt(now)) {
-            return StationStatus.OCCUPIED;
-        }
-
-        return StationStatus.AVAILABLE;
     }
 
     /**
