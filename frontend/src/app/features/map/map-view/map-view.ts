@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { MapService } from '../services/map-service';
 import maplibregl from 'maplibre-gl';
-import { ChargingLocation } from '../../../core/services/charging-location';
+import { ChargingLocationStore } from '../../../core/services/charging-location/charging-location.store';
 
 @Component({
   selector: 'app-map-view',
@@ -11,11 +11,11 @@ import { ChargingLocation } from '../../../core/services/charging-location';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapView implements AfterViewInit {
-  private mapService = inject(MapService);
-  private locationService = inject(ChargingLocation);
+  private readonly mapService = inject(MapService);
+  private readonly locationStore = inject(ChargingLocationStore);
 
   private map!: maplibregl.Map;
-  private markers = new Map<number, maplibregl.Marker>();
+  private readonly markers = new Map<number, maplibregl.Marker>();
   private searchMarker?: maplibregl.Marker;
 
   constructor() {
@@ -129,7 +129,7 @@ export class MapView implements AfterViewInit {
         // Ouvre la modale de la station
         el.addEventListener('click', (event) => {
           event.stopPropagation(); // évite les effets de bord (ex: click map / overlay)
-          this.locationService.loadLocationDetail(loc.id);
+          this.locationStore.loadLocationDetail(loc.id);
         });
 
         this.markers.set(loc.id, marker);
