@@ -2,6 +2,7 @@ package com.powerme.mapper;
 
 import com.powerme.dto.ChargingLocationDetailDto;
 import com.powerme.dto.ChargingLocationMapDto;
+import com.powerme.dto.ChargingLocationSummaryDto;
 import com.powerme.entity.Address;
 import com.powerme.entity.ChargingLocation;
 import java.math.BigDecimal;
@@ -39,6 +40,14 @@ public interface ChargingLocationMapper {
             expression = "java(toFullAddress(location.getAddress()))"
     )
     ChargingLocationDetailDto toDetailDto(
+            ChargingLocation location
+    );
+
+    @Mapping(
+            target = "address",
+            expression = "java(toFullAddress(location.getAddress()))"
+    )
+    ChargingLocationSummaryDto toSummaryDto(
             ChargingLocation location
     );
 

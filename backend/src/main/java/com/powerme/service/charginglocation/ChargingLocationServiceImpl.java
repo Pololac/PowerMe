@@ -3,18 +3,13 @@ package com.powerme.service.charginglocation;
 import com.powerme.dto.ChargingLocationCreateUpdateDto;
 import com.powerme.entity.Address;
 import com.powerme.entity.ChargingLocation;
-import com.powerme.entity.ChargingStation;
 import com.powerme.entity.User;
-import com.powerme.enums.StationStatus;
 import com.powerme.exception.ChargingLocationNotFoundException;
 import com.powerme.repository.AddressRepository;
-import com.powerme.repository.BookingRepository;
 import com.powerme.repository.ChargingLocationRepository;
-import com.powerme.repository.ChargingStationRepository;
 import com.powerme.repository.UserRepository;
 import com.powerme.service.security.UserPrincipal;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,21 +25,15 @@ public class ChargingLocationServiceImpl implements ChargingLocationService {
 
     private final UserRepository userRepository;
     private final ChargingLocationRepository locationRepository;
-    private final ChargingStationRepository stationRepository;
-    private final BookingRepository bookingRepository;
     private final AddressRepository addressRepository;
 
     public ChargingLocationServiceImpl(
             UserRepository userRepository,
             ChargingLocationRepository locationRepository,
-            ChargingStationRepository stationRepository,
-            BookingRepository bookingRepository,
             AddressRepository addressRepository
     ) {
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
-        this.stationRepository = stationRepository;
-        this.bookingRepository = bookingRepository;
         this.addressRepository = addressRepository;
     }
 
@@ -83,26 +72,6 @@ public class ChargingLocationServiceImpl implements ChargingLocationService {
     public ChargingLocation getByIdWithStations(Long id) {
         return locationRepository.findByIdWithAddressAndStations(id)
                 .orElseThrow(() -> new ChargingLocationNotFoundException(id));
-    }
-
-    @Override
-    public int countStations(Long locationId) {
-        return stationRepository.countByLocationId(locationId);
-    }
-
-    @Override
-    public StationStatus computeStatus(ChargingStation station, Instant now){
-        boolean isBooked = bookingRepository.existsActiveBookingAt(station.getId(), now);
-
-        if (isBooked) {
-            return StationStatus.OCCUPIED;
-        }
-
-        if (!station.isActive()) {
-            return StationStatus.UNAVAILABLE;
-        }
-
-        return StationStatus.AVAILABLE;
     }
 
     @Override
@@ -145,8 +114,7 @@ public class ChargingLocationServiceImpl implements ChargingLocationService {
                 principal.getId()
         );
 
-        ChargingLocation location = locationRepository.findById(id)
-                .orElseThrow(() -> new ChargingLocationNotFoundException(id));
+        ChargingLocation location = getById(id);
 
         checkOwnership(location, principal);
         applyDto(location, dto);
@@ -163,10 +131,10 @@ public class ChargingLocationServiceImpl implements ChargingLocationService {
                 principal.getId()
         );
 
-        ChargingLocation location = locationRepository.findById(id)
-                .orElseThrow(() -> new ChargingLocationNotFoundException(id));
+        ChargingLocation location = getById(id);
 
         checkOwnership(location, principal);
+
         locationRepository.delete(location);
     }
 

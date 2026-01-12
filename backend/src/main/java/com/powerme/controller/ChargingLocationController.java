@@ -9,6 +9,7 @@ import com.powerme.enums.StationStatus;
 import com.powerme.mapper.ChargingLocationMapper;
 import com.powerme.mapper.ChargingStationMapper;
 import com.powerme.service.charginglocation.ChargingLocationService;
+import com.powerme.service.chargingstation.ChargingStationService;
 import com.powerme.service.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.time.Instant;
@@ -32,15 +33,18 @@ public class ChargingLocationController {
 
     private final ChargingLocationService locationService;
     private final ChargingLocationMapper locationMapper;
+    private final ChargingStationService stationService;
     private final ChargingStationMapper stationMapper;
 
     public ChargingLocationController(
             ChargingLocationService locationService,
             ChargingLocationMapper locationMapper,
+            ChargingStationService stationService,
             ChargingStationMapper stationMapper
     ) {
         this.locationService = locationService;
         this.locationMapper = locationMapper;
+        this.stationService = stationService;
         this.stationMapper = stationMapper;
     }
 
@@ -68,7 +72,7 @@ public class ChargingLocationController {
         List<ChargingStationDto> stationDtos = location.getChargingStations().stream()
                 .map(station -> {
                     StationStatus status =
-                            locationService.computeStatus(station, now);
+                            stationService.computeStatus(station, now);
                     return stationMapper.toDto(station, status);
                 })
                 .toList();
