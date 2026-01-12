@@ -7,7 +7,7 @@ public class ChargingLocationNotFoundException extends ServiceException {
     }
     
     public ChargingLocationNotFoundException(Long id) {
-        super("Charging location not found with id " + id);
+        super("Station de recharge non trouvée avec l'id " + id);
     }
 }
 
