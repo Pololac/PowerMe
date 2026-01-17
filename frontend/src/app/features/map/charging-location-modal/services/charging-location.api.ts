@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { ChargingLocationDetailDto } from '../../models/dto/charging-location-detail.dto';
+import { ChargingLocationDetailDto } from '../../../../core/models/dto/charging-location-detail.dto';
 
 @Injectable({
   providedIn: 'root',

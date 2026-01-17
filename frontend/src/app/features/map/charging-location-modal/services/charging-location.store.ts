@@ -1,7 +1,6 @@
 
 import { inject, Injectable, signal } from '@angular/core';
-import { ChargingLocationDetailDto } from '../../models/dto/charging-location-detail.dto';
-import { ChargingStationSummaryDto } from '../../models/dto/charging-station-summary.dto';
+import { ChargingLocationDetailDto } from '../../../../core/models/dto/charging-location-detail.dto';
 import { ChargingLocationApi } from './charging-location.api';
 
 @Injectable({
@@ -11,7 +10,6 @@ export class ChargingLocationStore {
   private readonly api = inject(ChargingLocationApi);
 
   readonly selectedLocation = signal<ChargingLocationDetailDto | null>(null);
-  readonly selectedStation = signal<ChargingStationSummaryDto | null>(null);
   readonly loading = signal(false);
 
   loadLocationDetail(id: number) {
@@ -24,16 +22,7 @@ export class ChargingLocationStore {
     });
   }
 
-  selectStation(station: ChargingStationSummaryDto) {
-    this.selectedStation.set(station);
-  }
-
-  clearStation() {
-    this.selectedStation.set(null);
-  }
-
-  clear() {
+  clearLocation() {
     this.selectedLocation.set(null);
-    this.clearStation();
   }
 }

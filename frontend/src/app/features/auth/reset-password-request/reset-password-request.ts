@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { AuthLayout } from '../../../layout/auth-layout/auth-layout';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../core/services/auth/auth-service';
+import { AuthService } from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-reset-password-request',

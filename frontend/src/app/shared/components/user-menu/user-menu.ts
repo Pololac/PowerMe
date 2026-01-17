@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { UserMenuTrigger } from './user-menu-trigger/user-menu-trigger';
 import { UserMenuDropdown } from './user-menu-dropdown/user-menu-dropdown';
-import { AuthService } from '../../../core/services/auth/auth-service';
+import { AuthService } from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-user-menu',

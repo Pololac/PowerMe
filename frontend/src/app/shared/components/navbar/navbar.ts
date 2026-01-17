@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserMenu } from '../user-menu/user-menu';
-import { AuthService } from '../../../core/services/auth/auth-service';
+import { AuthService } from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-navbar',
