@@ -30,6 +30,7 @@ spring:
     clean-disabled: true
 
   # ====== DATAS Dev ======
+  # Réinstalle les datas à chaque démarrage de l'application
   sql:
     init:
       mode: always

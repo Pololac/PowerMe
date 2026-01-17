@@ -2,7 +2,7 @@
 -- DEV SEED - POWERME
 -- Charging Locations & Stations
 -- ============================================
-
+DELETE FROM booking;
 DELETE FROM charging_station;
 DELETE FROM charging_location;
 DELETE FROM address;
@@ -135,3 +135,35 @@ VALUES
 -- ChargingLocation 8 (1 borne)
 -- =========================
 (11, 'Borne H1', 'TYPE_2',  'AC_22',  4.50, true, 8);
+
+
+-- =========================
+-- BOOKING
+-- =========================
+
+INSERT INTO booking (
+    start_time,
+    end_time,
+    booking_status,
+    total_price,
+    created_at,
+    updated_at,
+    user_id,
+    charging_station_id,
+    station_name_snapshot,
+    station_address_snapshot,
+    hourly_rate_snapshot
+)
+VALUES (
+           '2026-01-18T09:00:00Z',
+           '2026-01-18T10:00:00Z',
+           'ACCEPTED',
+           10.00,
+           now(),
+           now(),
+           1,
+           10,
+           'Station Test',
+           'Adresse Test',
+           5.00
+       );
