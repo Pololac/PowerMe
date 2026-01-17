@@ -23,24 +23,12 @@
       </div>
     } @else {
       <!-- Image location (sans bord) -->
-      <picture class="block w-full">
-        @if (location()?.imagePath) {
-          <source [attr.srcset]="location()!.imagePath" type="image/webp" />
-          <img
-            [src]="location()!.imagePath"
-            alt="Lieu de recharge"
-            class="w-full h-44 object-cover"
-            (error)="$event.target.src = 'assets/images/location-desktop.jpg'"
-          />
-        } @else {
-          <source srcset="assets/images/location-desktop.webp" type="image/webp" />
-          <img
-            src="assets/images/location-desktop.jpg"
-            alt="Lieu de recharge"
-            class="w-full h-44 object-cover"
-          />
-        }
-      </picture>
+      <img
+        [src]="location()?.imagePath ?? 'assets/images/location-desktop.webp'"
+        alt="Lieu de recharge"
+        class="w-full h-44 object-cover"
+        (error)="onImageError($event)"
+      />
 
       <!-- Infos location -->
       <div class="p-4 space-y-1 bg-white">
@@ -59,6 +47,8 @@
           <button
             type="button"
             class="group w-full flex items-center bg-neutral-100 rounded-lg text-left hover:scale-[1.03] transition"
+            [class.ring-3]="isSelected(station)"
+            [class.ring-mint-500]="isSelected(station)"
             (click)="openStation(station)"
             aria-label="Voir le détail de la borne"
           >

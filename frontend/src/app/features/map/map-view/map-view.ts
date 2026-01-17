@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { MapService } from '../services/map-service';
 import maplibregl from 'maplibre-gl';
-import { ChargingLocationStore } from '../../../core/services/charging-location/charging-location.store';
+import { ChargingLocationStore } from '../charging-location-modal/services/charging-location.store';
 
 @Component({
   selector: 'app-map-view',
