@@ -1,4 +1,12 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
 import { MapService } from '../services/map-service';
 import maplibregl from 'maplibre-gl';
 import { ChargingLocationStore } from '../charging-location-modal/services/charging-location.store';
@@ -14,8 +22,11 @@ export class MapView implements AfterViewInit {
   private readonly mapService = inject(MapService);
   private readonly locationStore = inject(ChargingLocationStore);
 
+  readonly locationSelected = output<number>();
+
   private map!: maplibregl.Map;
   private readonly markers = new Map<number, maplibregl.Marker>();
+  private readonly mapReady = signal(false);
   private searchMarker?: maplibregl.Marker;
 
   constructor() {
@@ -79,6 +90,7 @@ export class MapView implements AfterViewInit {
     // Lance la géolocalisation de l'utilisateur au chargement de la page (évènement)
     this.map.on('load', () => {
       geolocate.trigger();
+      this.mapReady.set(true);
     });
 
     // Qd user localisé, lance ces actions
@@ -99,6 +111,8 @@ export class MapView implements AfterViewInit {
   private bindState() {
     // Centre la carte
     effect(() => {
+      if (!this.mapReady()) return;
+
       const center = this.mapService.center();
       const zoom = this.mapService.zoom();
 
@@ -112,6 +126,8 @@ export class MapView implements AfterViewInit {
 
     // Ajoute les stations de recharge
     effect(() => {
+      if (!this.mapReady()) return;
+
       const locations = this.mapService.locations();
 
       this.markers.forEach((m) => m.remove());
@@ -130,6 +146,7 @@ export class MapView implements AfterViewInit {
         el.addEventListener('click', (event) => {
           event.stopPropagation(); // évite les effets de bord (ex: click map / overlay)
           this.locationStore.loadLocationDetail(loc.id);
+          this.locationSelected.emit(loc.id);
         });
 
         this.markers.set(loc.id, marker);
@@ -138,6 +155,8 @@ export class MapView implements AfterViewInit {
 
     // Ajoute un marqueur de recherche
     effect(() => {
+      if (!this.mapReady()) return;
+
       const coords = this.mapService.searchPosition();
       if (!coords) return;
 
