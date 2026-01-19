@@ -15,14 +15,21 @@ DELETE FROM users;
 INSERT INTO users (id, email, password, firstname, lastname, is_activated)
 VALUES (1,
         'owner@powerme.dev',
-        '$2a$10$devpasswordhashxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        '$2a$10$N27.myA0wYPJmbFC37Y9dOa.YbpAC0IBNsbsii39M01zyTgHH7TRS',
         'Dev',
         'Owner',
+        true),
+       (2,
+        'user@test.com',
+        '$2a$10$N27.myA0wYPJmbFC37Y9dOa.YbpAC0IBNsbsii39M01zyTgHH7TRS',
+        'Dev',
+        'user',
         true);
 
 INSERT INTO user_roles (user_id, role)
 VALUES (1, 'ROLE_USER'),
-       (1, 'ROLE_OWNER');
+       (1, 'ROLE_OWNER'),
+        (2, 'ROLE_USER');
 
 -- =========================
 -- ADDRESSES
@@ -155,8 +162,8 @@ INSERT INTO booking (
     hourly_rate_snapshot
 )
 VALUES (
-           '2026-01-18T09:00:00Z',
-           '2026-01-18T10:00:00Z',
+           '2026-01-20T09:00:00Z',
+           '2026-01-20T10:00:00Z',
            'ACCEPTED',
            10.00,
            now(),
