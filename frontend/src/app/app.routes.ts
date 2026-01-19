@@ -16,7 +16,7 @@ import { Faq } from './features/faq/faq';
 import { DashboardLayout } from './features/dashboard/layout/dashboard-layout';
 import { Profile } from './features/dashboard/pages/profile/profile';
 import { Bookings } from './features/dashboard/pages/bookings/bookings';
-import { Booking } from './features/booking/booking';
+import { BookingFlow } from './features/booking/booking-flow';
 import { MapPage } from './features/map/map-page/map-page';
 
 export const routes: Routes = [
@@ -31,7 +31,7 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordRequest },
   { path: 'reset-password/:token', component: ResetPasswordConfirm },
 
-  { path: 'booking', component: Booking, canActivate: [authGuard] },
+  { path: 'booking', component: BookingFlow, canActivate: [authGuard] },
 
   {
     path: 'dashboard',

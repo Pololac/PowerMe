@@ -11,7 +11,7 @@ import { AuthService } from '../../../core/services/auth-service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Navbar {
-  readonly auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
 
-  readonly isLogged = this.auth.isLogged;
+  readonly isAuthenticated = this.auth.isAuthenticated;
 }

@@ -22,7 +22,7 @@ export class MapService {
 
   readonly locations = signal<ChargingLocationMapDto[]>([]);
 
-  private http = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
   setCenter(coords: LngLat, zoom?: number) {
     this.center.set(coords);

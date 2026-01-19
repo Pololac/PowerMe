@@ -23,7 +23,7 @@
     <div class="flex items-center gap-10">
       <a routerLink="/map" routerLinkActive="navbar-link--active" class="navbar-link"> Carte </a>
 
-      @if (isLogged()) {
+      @if (isAuthenticated()) {
         <a
           routerLink="/faq"
           routerLinkActive="navbar-link--active"
@@ -56,7 +56,7 @@
 
     <!-- CONNEXION -->
     <div class="flex items-center gap-4">
-      @if (!isLogged()) {
+      @if (!isAuthenticated()) {
         <button
           routerLink="/register"
           class="pm-btn pm-btn--secondary-outline pm-btn--sm-md hidden md:inline-flex"

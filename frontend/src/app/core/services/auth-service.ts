@@ -12,12 +12,12 @@ import { RegisterRequest } from '../models/requests/register.request';
   providedIn: 'root',
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
   readonly user = signal<User | null>(null);
-  readonly isLogged = computed(() => {
-    console.log('isLogged recomputed', this.user());
+  readonly isAuthenticated = computed(() => {
+    console.log('isAuthenticated recomputed', this.user());
     return this.user() !== null;
   });
 
