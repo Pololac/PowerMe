@@ -1,8 +1,9 @@
 # --- Secrets & Config (IMPORTANT) ---
+.env*
+.env.dev
 .env
 *.local
-.env.*.local
-!.env.dev
+
 !.env.template
 
 # --- Global ---
