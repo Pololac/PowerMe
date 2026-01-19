@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # ========================================
@@ -16,7 +16,7 @@ services:
     depends_on:
       - backend
     environment:
-      - TZ=Europe/Paris
+      - TZ=${TZ:-Europe/Paris}
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
@@ -28,11 +28,11 @@ services:
     container_name: powerme-backend
     restart: unless-stopped
     environment:
-      - TZ=Europe/Paris
+      - TZ=${TZ:-Europe/Paris}
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/powerme
-      - SPRING_DATASOURCE_USERNAME=powerme
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASS}  # Via .env
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASS}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
       - SPRING_JPA_SHOW_SQL=false
       - MAIL_HOST=${MAIL_HOST}
@@ -55,18 +55,18 @@ services:
     container_name: powerme-db
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     networks:
       - powerme-network
     environment:
-      - TZ=Europe/Paris
-      - POSTGRES_DB=powerme
-      - POSTGRES_USER=powerme
-      - POSTGRES_PASSWORD=${DB_PASSWORD}  # Via .env
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - TZ=${TZ:-Europe/Paris}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U powerme"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
