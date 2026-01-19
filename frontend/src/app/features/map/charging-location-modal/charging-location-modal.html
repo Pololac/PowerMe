@@ -49,7 +49,7 @@
             class="group w-full flex items-center bg-neutral-100 rounded-lg text-left hover:scale-[1.03] transition"
             [class.ring-3]="isSelected(station)"
             [class.ring-mint-500]="isSelected(station)"
-            (click)="openStation(station)"
+            (click)="stationSelected.emit(station.id)"
             aria-label="Voir le détail de la borne"
           >
             <div

@@ -27,7 +27,7 @@ export class ChargingStationStore {
 
   closeStation() {
     this.station.set(null);
-    this.reset();
+    this.resetSelection();
   }
 
   /* ========= Availability ========= */
@@ -87,6 +87,7 @@ export class ChargingStationStore {
 
   /* ========= Slot selection ========= */
   readonly selectedSlots = signal<ChargingStationTimeSlotDto[]>([]);
+  readonly selectedSlotsCount = computed(() => this.selectedSlots().length);
 
   selectSlot(slot: ChargingStationTimeSlotDto) {
     if (!slot.available) return;
@@ -108,7 +109,7 @@ export class ChargingStationStore {
   );
 
   // Réinitialise toutes les valeurs qu'on vient de set
-  private reset() {
+  resetSelection() {
     this.date.set(null);
     this.availability.set(null);
     this.selectedSlots.set([]);

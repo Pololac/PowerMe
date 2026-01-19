@@ -29,12 +29,9 @@
 
         </div>
         <!-- Tarifs -->
-        <div class="relative px-4 py-3 bg-white rounded-lg">
-          <div class="flex items-center gap-2">
-            <h4>Tarifs :</h4>
-            <p>2,50 € / charge</p>
-            <p class="font-semibold">+  {{ station()!.hourlyRate }} € / heure de charge</p>
-          </div>
+        <div class="relative px-4 py-3 bg-white rounded-lg flex flex-col items-center gap">
+          <h4 class="self-start">Tarifs</h4>
+          <p class="text-body1-size font-semibold">{{ station()!.hourlyRate }} € / heure de charge</p>
         </div>
 
 
@@ -72,6 +69,7 @@
             <div class="flex justify-center mt-2">
               <button
                 class="pm-btn pm-btn--secondary pm-btn--secondary:hover px-4 py-2"
+                (click)="confirmReservation()"
               >
                 Suivant
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

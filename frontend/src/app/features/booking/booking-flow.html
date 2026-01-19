@@ -1,0 +1,16 @@
+@if (step() === 'station') {
+  <app-charging-station-modal
+    (confirm)="onStationConfirmed($event)"
+    (closeModal)="closeFlow()"
+  />
+}
+
+@if (step() === 'payment') {
+  <app-payment-modal
+    [summary]="bookingSummary()!"
+    (confirm)="onConfirmPayment()"
+    [loading]="paymentLoading()"
+    [success]="paymentSuccess()"
+    (back)="onBackToStation()"
+  />
+}

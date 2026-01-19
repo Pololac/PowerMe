@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, output} from '@angular/core';
 import { Icon } from '../../../shared/components/icon/icon';
 import { CommonModule } from '@angular/common';
 import { ChargingStationSummaryDto } from '../../../core/models/dto/charging-station-summary.dto';
@@ -22,6 +22,7 @@ export class ChargingLocationModal {
   // Références à des signaux définis dans le service
   readonly location = this.locationStore.selectedLocation;
   readonly loading = this.locationStore.loading;
+  readonly stationSelected = output<number>();
 
   readonly SOCKET_TYPE_ICON = SOCKET_TYPE_ICON;
   readonly SOCKET_TYPE_LABEL = SOCKET_TYPE_LABEL;
