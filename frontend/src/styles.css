@@ -209,11 +209,6 @@
     @apply font-medium;
   }
 
-  p {
-    font-size: var(--text-body2-size);
-    line-height: var(--text-body2-lh);
-  }
-
   :is(input, textarea, select, button):focus-visible {
     @apply outline-none;
     box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.35);
@@ -233,7 +228,7 @@
 @layer components {
   /* ========== NAVBAR LINK ========== */
   .navbar-link {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-size: 18px;
     font-weight: 600;
     line-height: 20px;
@@ -303,7 +298,7 @@
     height: 3.25rem;
     padding-inline: 1.5rem; /* 24px */
     font-size: 24px;
-    font-weight: semibold;
+    font-weight: bold;
     line-height: 22px;
   }
 
@@ -467,13 +462,17 @@
     border-bottom-width: var(--border-width);
   }
 
+  .card-footer {
+    border-top-width: var(--border-width);
+  }
+
+  .card-body {
+    padding: var(--spacing-lg);
+  }
+
   /* Variante card formulaire */
   .card--form .card-body {
     padding: 2.5rem;
-  }
-
-  .card-footer {
-    border-top-width: var(--border-width);
   }
 
   /* ========== FORMS ========== */
@@ -491,7 +490,7 @@
   .form-select,
   .form-textarea {
     @apply w-full transition-all;
-    font-family: var(--font-body);
+    font-family: var(--font-body), sans-serif;
     font-size: 1.125rem;
     padding: 0.875rem 1rem;
     height: 3rem;
