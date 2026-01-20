@@ -4,6 +4,8 @@
 .env
 *.local
 
+frontend/src/assets/env.js
+
 !.env.template
 
 # --- Global ---

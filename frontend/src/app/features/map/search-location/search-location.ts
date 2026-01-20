@@ -12,8 +12,8 @@ import { GeocodingResult } from './geocoding-result.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchLocation {
-  private mapService = inject(MapService);
-  private geocoding = inject(GeocodingService);
+  private readonly mapService = inject(MapService);
+  private readonly geocoding = inject(GeocodingService);
 
   readonly query = signal('');
   readonly results = signal<GeocodingResult[]>([]);

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { ChargingLocationMapDto } from '../../../core/models/dto/charging-location-map.dto';
+import { runtimeEnv } from '../../../core/config/runtime-env';
 
 export type LngLat = [number, number];
 export interface Bounds {
@@ -23,6 +24,15 @@ export class MapService {
   readonly locations = signal<ChargingLocationMapDto[]>([]);
 
   private readonly http = inject(HttpClient);
+
+  readonly mapTilerKey = runtimeEnv.MAPTILER_KEY;
+
+  getMapTilerKey(): string {
+    if (!this.mapTilerKey) {
+      throw new Error('MAPTILER_KEY manquante');
+    }
+    return this.mapTilerKey;
+  }
 
   setCenter(coords: LngLat, zoom?: number) {
     this.center.set(coords);

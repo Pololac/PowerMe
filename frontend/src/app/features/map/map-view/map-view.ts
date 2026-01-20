@@ -29,6 +29,8 @@ export class MapView implements AfterViewInit {
   private readonly mapReady = signal(false);
   private searchMarker?: maplibregl.Marker;
 
+  private readonly mapTilerKey = this.mapService.getMapTilerKey();
+
   constructor() {
     this.bindState();
   }
@@ -52,7 +54,7 @@ export class MapView implements AfterViewInit {
           osm: {
             type: 'raster',
             tiles: [
-              'https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}.png?key=xcQOHHgXyI5fUgSQrZ70',
+              `https://api.maptiler.com/maps/streets-v2/256/{z}/{x}/{y}.png?key=${this.mapTilerKey}`,
             ],
             tileSize: 256,
           },
