@@ -13,9 +13,9 @@ import { AuthService } from '../../../core/services/auth-service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
-  private auth = inject(AuthService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly errorMessage = signal<string | null>(null);
   readonly loading = signal(false);
@@ -31,7 +31,7 @@ export class Login {
         console.log('Auth user signal', this.auth.user());
 
         // Redirection
-        const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl') ?? '/';
+        const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl') || '/dashboard';
 
         this.router.navigateByUrl(redirectUrl);
       },

@@ -64,7 +64,10 @@
           Inscription
         </button>
 
-        <button routerLink="/login" class="pm-btn pm-btn--secondary pm-btn--sm-md">
+        <button
+          routerLink="/login"
+          [queryParams]="{ redirectUrl: currentUrl() }"
+          class="pm-btn pm-btn--secondary pm-btn--sm-md">
           Connexion
         </button>
       } @else {
