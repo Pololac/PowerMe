@@ -209,6 +209,30 @@ public class Booking {
         this.chargingStation = chargingStation;
     }
 
+    public String getStationNameSnapshot() {
+        return stationNameSnapshot;
+    }
+
+    public void setStationNameSnapshot(String stationNameSnapshot) {
+        this.stationNameSnapshot = stationNameSnapshot;
+    }
+
+    public String getStationAddressSnapshot() {
+        return stationAddressSnapshot;
+    }
+
+    public void setStationAddressSnapshot(String stationAddressSnapshot) {
+        this.stationAddressSnapshot = stationAddressSnapshot;
+    }
+
+    public BigDecimal getHourlyRateSnapshot() {
+        return hourlyRateSnapshot;
+    }
+
+    public void setHourlyRateSnapshot(BigDecimal hourlyRateSnapshot) {
+        this.hourlyRateSnapshot = hourlyRateSnapshot;
+    }
+
     public Instant getCreatedAt() {
         return createdAt;
     }

@@ -3,6 +3,7 @@ package com.powerme.repository;
 import com.powerme.entity.Booking;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
+    Optional<Booking> findByIdAndUserId(Long bookingId, Long userId);
+
+    List<Booking> findByUserIdOrderByStartTimeDesc(Long userId);
+
+    /**
+     * Détermine si une borne est réservée à un instant donné.
+     * Utilisé pour l'affichage UI
+     */
     @Query("""
         select count(b) > 0
         from Booking b
@@ -22,6 +31,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("now") Instant now
     );
 
+    /**
+     * Retourne les réservations "actives" ("PENDING" ou "ACCEPTED") pour un jour donné.
+     */
     @Query("""
     SELECT b FROM Booking b
     WHERE b.chargingStation.id = :stationId
@@ -33,5 +45,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("stationId") Long stationId,
             @Param("startOfDay") Instant startOfDay,
             @Param("endOfDay") Instant endOfDay
+    );
+
+    /**
+     * Détecte un chevauchement temporel sur une borne donnée.
+     */
+    @Query("""
+        SELECT COUNT(b) > 0
+        FROM Booking b
+        WHERE b.chargingStation.id = :stationId
+          AND b.startTime < :end
+          AND b.endTime > :start
+    """)
+    boolean existsOverlap(
+            @Param("stationId") Long stationId,
+            @Param("start") Instant start,
+            @Param("end") Instant end
     );
 }

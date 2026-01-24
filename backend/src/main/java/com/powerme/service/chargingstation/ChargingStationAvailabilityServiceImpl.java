@@ -89,12 +89,20 @@ public class ChargingStationAvailabilityServiceImpl implements ChargingStationAv
             LocalTime slotStart = from.plusMinutes(minutes);
             LocalTime slotEnd = slotStart.plusMinutes(30);
 
+            int slotIndex = (int) (
+                    java.time.Duration.between(
+                            LocalTime.MIDNIGHT,
+                            slotStart
+                    ).toMinutes() / 30
+            );
+
             // Définit pour le slot si y'a un booking : retourne "true" si dispo
             boolean available = bookings.stream().noneMatch(
                     booking -> overlapsBooking(date, slotStart, slotEnd, booking, zone)
             );
 
             slots.add(new TimeSlotDto(
+                    slotIndex,
                     slotStart.toString(),
                     slotEnd.toString(),
                     available
