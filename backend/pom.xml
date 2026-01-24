@@ -8,17 +8,18 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.5.8</version>
-    <relativePath/> <!-- lookup parent from repository -->
+    <relativePath/> <!-- cherche artifact parent ds dépôts publics -->
   </parent>
 
-  <groupId>com.powerme</groupId>
+  <groupId>com.CDA</groupId>
   <artifactId>powerme</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>PowerMe</name>
+  <name>PowerMeApp</name>
   <description>Application de réservation de bornes électriques entre particuliers</description>
 
   <properties>
     <java.version>21</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Force Logback 1.5.19 to fix CVE-2025-11226 -->
     <logback.version>1.5.19</logback.version>
