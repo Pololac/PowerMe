@@ -70,7 +70,8 @@ public class UserPrincipal implements UserDetails {
     }
 
     /**
-     * Pour les tests d'intégration Crée un UserPrincipal minimal sans rôles
+     * Pour les tests d'intégration.
+     * Crée un UserPrincipal minimal sans rôles
      */
     public static UserPrincipal fromActivationToken(String email) {
         return new UserPrincipal(
