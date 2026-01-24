@@ -1,23 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { User } from '../models/domain/user.model';
 import { map, Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { User } from '../models/domain/user.model';
 import { LoginRequest } from '../models/requests/login.request';
 import { LoginResponseDto } from '../models/dto/login.response.dto';
-import { RegisterRequest } from '../models/requests/register.request';
 import { MessageResponseDto } from '../models/dto/message.response.dto';
+import { RegisterRequest } from '../models/requests/register.request';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private http = inject(HttpClient);
-  private router = inject(Router);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
   readonly user = signal<User | null>(null);
-  readonly isLogged = computed(() => {
-    console.log('isLogged recomputed', this.user());
+  readonly isAuthenticated = computed(() => {
+    console.log('isAuthenticated recomputed', this.user());
     return this.user() !== null;
   });
 

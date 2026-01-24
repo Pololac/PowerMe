@@ -1,0 +1,5 @@
+export enum StationStatus {
+  AVAILABLE = 'AVAILABLE',
+  OCCUPIED = 'OCCUPIED',
+  UNAVAILABLE = 'UNAVAILABLE',
+}

@@ -1,0 +1,6 @@
+:host ::ng-deep .pm-datepicker {
+  --datepicker-primary-color: var(--color-mint-400);
+  --datepicker-primary-contrast: var(--color-white);
+  --datepicker-hover-background: var(--color-mint-200);
+  --datepicker-shadow-sm: 0 1px 2px rgba(0,0,0,0.12);
+}

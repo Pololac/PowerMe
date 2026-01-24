@@ -16,8 +16,8 @@ CREATE INDEX idx_charging_station_location_fk
     ON charging_station (charging_location_id);
 -- Index sur disponibilité (index partiel sélectif)
 CREATE INDEX idx_charging_station_active
-    ON charging_station (is_active)
-    WHERE is_active = TRUE;
+    ON charging_station (active)
+    WHERE active = TRUE;
 -- Vérification dispo d'une borne
 CREATE INDEX idx_unavailability_station_id
     ON unavailability_period (charging_station_id);

@@ -13,7 +13,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -45,6 +44,8 @@ public class ChargingLocation {
     private String name;
 
     private String description;
+
+    private String imagePath;
 
     // COORDONNÉES GPS
     /**
@@ -91,11 +92,8 @@ public class ChargingLocation {
     @OneToMany(mappedBy = "chargingLocation", cascade = CascadeType.REMOVE)
     private List<ChargingStation> chargingStations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chargingLocation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Photo> photos = new ArrayList<>();
 
-    // Constructeur JPA
-    public ChargingLocation() {
+    public ChargingLocation() {     // Constructeur JPA
     }
 
     // Lifecycle callbacks
@@ -158,22 +156,6 @@ public class ChargingLocation {
         createPoint();
     }
 
-    /**
-     * Ajoute une photo.
-     */
-    public void addPhoto(Photo photo) {
-        photos.add(photo);
-        photo.setChargingLocation(this);
-    }
-
-    /**
-     * Supprime une photo.
-     */
-    public void removePhoto(Photo photo) {
-        photos.remove(photo);
-        photo.setChargingLocation(null);
-    }
-
     // Getters et Setters
     public Long getId() {
         return id;
@@ -197,6 +179,14 @@ public class ChargingLocation {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public BigDecimal getLatitude() {
@@ -253,13 +243,5 @@ public class ChargingLocation {
 
     public void setChargingStations(List<ChargingStation> chargingStations) {
         this.chargingStations = chargingStations;
-    }
-
-    public List<Photo> getPhotos() {
-        return photos;
-    }
-
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
     }
 }

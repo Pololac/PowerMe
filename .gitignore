@@ -4,8 +4,7 @@
 .env
 *.local
 
-# Runtime env (secrets)
-env.js
+frontend/src/assets/env.js
 
 !.env.template
 

@@ -13,13 +13,13 @@ spring:
   # ====== JPA / HIBERNATE ======
   jpa:
     hibernate:
-      ddl-auto: validate # Hibernate modifie automatiquement la BDD
+      ddl-auto: validate # Flyway gère la structure, pas Hibernate
     show-sql: true # Affiche les requêtes SQL dans les logs
     properties:
       hibernate:
         format_sql: true # Formate les requêtes SQL (plus lisible)
         use_sql_comments: true # Ajoute des commentaires dans les requêtes
-        database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+        database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
 
   # ====== FLYWAY : SVG migrations ======
   flyway:
@@ -29,6 +29,13 @@ spring:
     validate-on-migrate: true
     clean-disabled: true
 
+  # ====== DATAS Dev ======
+  # Réinstalle les datas à chaque démarrage de l'application
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:db/seed/seed_dev_charging_data.sql
+
   # ====== MAIL : MailTrap ======
   mail:
     protocol: smtp
@@ -36,7 +43,6 @@ spring:
     port: 2525
     username: 4f87aafa32de42
     password: f6f97d0480ef78
-
 
 # ====== SERVEUR ======
 server:
@@ -50,11 +56,9 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG # Logs SQL détaillés
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # Paramètres SQL
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # Paramètres SQL
 
 # ====== MODE DEBUG ACTIVÉ ======
 app:
-  debug: true  # Messages d'erreur détaillés
+  debug: true # Messages d'erreur détaillés
   frontend-url: http://localhost:4200
-
-

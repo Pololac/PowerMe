@@ -92,7 +92,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
 
                         // Carte / bornes consultables sans compte
-                        .requestMatchers(HttpMethod.GET, "/api/charging-station/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/charging-locations/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/charging-stations/**").permitAll()
 
                         // Routes protégées
                         .requestMatchers("/api/booking/**").authenticated()

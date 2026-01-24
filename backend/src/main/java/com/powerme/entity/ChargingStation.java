@@ -43,13 +43,15 @@ public class ChargingStation {
     @Column(nullable = false)
     private String name;
 
+    private String imagePath;
+
     /**
      * Type de prise de la borne.
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false,
-            columnDefinition = "connector_type")   // Type PostgreSQL ENUM
-    private SocketType connectorType;
+            columnDefinition = "socket_type")
+    private SocketType socketType;
 
     /**
      * Puissance de la borne en kilowatts (kW).
@@ -59,8 +61,8 @@ public class ChargingStation {
      * </p>
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "max_power", nullable = false)
-    private ChargingPower maxPower;
+    @Column(name = "power", nullable = false)
+    private ChargingPower power;
 
     /**
      * Tarif horaire de la borne défini par le propriétaire.
@@ -72,10 +74,10 @@ public class ChargingStation {
     private BigDecimal hourlyRate;
 
     /**
-     * Indique si la borne est actuellement disponible à la réservation.
+     * Indique si la borne est actuellement disponible à la réservation. True by default
      */
     @Column(nullable = false)
-    private boolean isActive = true;
+    private boolean active = true;
 
     /**
      * Heure de début de disponibilité quotidienne (ex : "08:00"). Si null, disponible 24h/24.
@@ -105,9 +107,6 @@ public class ChargingStation {
     @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UnavailabilityPeriod> unavailabilityPeriods = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chargingStation", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Photo> photos = new ArrayList<>();
-
     // Timestamps
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
@@ -115,8 +114,8 @@ public class ChargingStation {
     @Column(nullable = false)
     private Instant updatedAt;
 
-    // Constructeur JPA
-    public ChargingStation() {
+    public ChargingStation() {     // Constructeur JPA
+
     }
 
     // Lifecycle callbacks
@@ -137,28 +136,21 @@ public class ChargingStation {
      * Permet d'obtenir la valeur numérique en kW.
      */
     public double getPowerInKilowatts() {
-        return maxPower != null ? maxPower.getKilowatts() : 0.0;
+        return power != null ? power.getKilowatts() : 0.0;
     }
 
     /**
      * Réactive la borne (car activée par défaut).
      */
     public void activate() {
-        this.isActive = true;
+        this.active = true;
     }
 
     /**
      * Désactive la borne.
      */
     public void deactivate() {
-        this.isActive = false;
-    }
-
-    /**
-     * Vérifie la dispo (dans le sens "est-elle en location").
-     */
-    public boolean isAvailable() {
-        return isActive;
+        this.active = false;
     }
 
     /**
@@ -179,23 +171,6 @@ public class ChargingStation {
         period.setChargingStation(null);
     }
 
-    /**
-     * Ajoute une photo.
-     */
-    public void addPhoto(Photo photo) {
-        photos.add(photo);
-        photo.setChargingStation(this);
-    }
-
-    /**
-     * Supprime une photo.
-     */
-    public void removePhoto(Photo photo) {
-        photos.remove(photo);
-        photo.setChargingStation(null);
-    }
-
-
     // Getters et Setters
     public Long getId() {
         return id;
@@ -213,20 +188,20 @@ public class ChargingStation {
         this.name = name;
     }
 
-    public SocketType getConnectorType() {
-        return connectorType;
+    public SocketType getSocketType() {
+        return socketType;
     }
 
-    public void setConnectorType(SocketType connectorType) {
-        this.connectorType = connectorType;
+    public void setSocketType(SocketType socketType) {
+        this.socketType = socketType;
     }
 
-    public ChargingPower getMaxPower() {
-        return maxPower;
+    public ChargingPower getPower() {
+        return power;
     }
 
-    public void setMaxPower(ChargingPower maxPower) {
-        this.maxPower = maxPower;
+    public void setPower(ChargingPower power) {
+        this.power = power;
     }
 
     public BigDecimal getHourlyRate() {
@@ -238,11 +213,11 @@ public class ChargingStation {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean active) {
-        this.isActive = active;
+        this.active = active;
     }
 
     public LocalTime getAvailableFrom() {
@@ -269,12 +244,12 @@ public class ChargingStation {
         this.chargingLocation = chargingLocation;
     }
 
-    public List<Photo> getPhotos() {
-        return photos;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public List<UnavailabilityPeriod> getUnavailabilityPeriods() {

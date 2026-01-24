@@ -8,12 +8,12 @@ spring:
   # ====== JPA / HIBERNATE ======
   jpa:
     hibernate:
-      ddl-auto: validate # Ne modifie PAS le schéma (sécurité)
+      ddl-auto: validate # Flyway gère la structure, pas Hibernate
     show-sql: false
     properties:
       hibernate:
         format_sql: false
-        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
 
   # ====== FLYWAY : SVG migrations ======
   flyway:
@@ -61,13 +61,12 @@ logging: # Seulement INFO et plus grave
 
   logback:
     rolling policy:
-      max-file-size: 50MB                    # Taille max d'un fichier
-      max-history: 30                        # Nombre de fichiers à garder
-      total-size-cap: 1GB                    # Taille totale max
-      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz  # Pattern de rotation
+      max-file-size: 50MB # Taille max d'un fichier
+      max-history: 30 # Nombre de fichiers à garder
+      total-size-cap: 1GB # Taille totale max
+      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz # Pattern de rotation
 
 # ====== MODE DEBUG DÉSACTIVÉ ======
 app:
-  debug: false  # Messages d'erreur génériques (sécurité)
+  debug: false # Messages d'erreur génériques (sécurité)
   frontend-url: https://powerme-app.placoste.dev
-

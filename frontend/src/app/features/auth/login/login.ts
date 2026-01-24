@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { LoginForm } from '../login-form/login-form';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LoginFormSubmit } from '../login-form/login-form-submit';
-import { AuthService } from '../../../core/services/auth-service';
 import { AuthLayout } from '../../../layout/auth-layout/auth-layout';
+import { AuthService } from '../../../core/services/auth-service';
 
 @Component({
   selector: 'app-login',
@@ -13,9 +13,9 @@ import { AuthLayout } from '../../../layout/auth-layout/auth-layout';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Login {
-  private auth = inject(AuthService);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   readonly errorMessage = signal<string | null>(null);
   readonly loading = signal(false);
@@ -31,7 +31,7 @@ export class Login {
         console.log('Auth user signal', this.auth.user());
 
         // Redirection
-        const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl') ?? '/';
+        const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl') || '/dashboard';
 
         this.router.navigateByUrl(redirectUrl);
       },

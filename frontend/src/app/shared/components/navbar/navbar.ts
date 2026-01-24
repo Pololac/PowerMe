@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../../core/services/auth-service';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { UserMenu } from '../user-menu/user-menu';
+import { AuthService } from '../../../core/services/auth-service';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -11,7 +12,16 @@ import { UserMenu } from '../user-menu/user-menu';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Navbar {
-  readonly auth = inject(AuthService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
 
-  readonly isLogged = this.auth.isLogged;
+  readonly isAuthenticated = this.auth.isAuthenticated;
+
+  readonly currentUrl = signal(this.router.url);
+
+  constructor() {
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd)).subscribe(() => {
+      this.currentUrl.set(this.router.url);
+    });
+  }
 }

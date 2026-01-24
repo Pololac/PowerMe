@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 /* =====================================
    POWERME DESIGN SYSTEM
@@ -79,12 +80,12 @@
   --text-h2-lh: 48px;
   --text-h3-size: 32px;
   --text-h3-lh: 40px;
-  --text-h4-size: 28px;
+  --text-h4-size: 26px;
   --text-h4-lh: 36px;
   --text-sub1-size: 24px;
   --text-sub1-lh: 32px;
   --text-sub2-size: 18px;
-  --text-sub2-lh: 28px;
+  --text-sub2-lh: 24px;
   --text-body1-size: 22px;
   --text-body1-lh: 28px;
   --text-body2-size: 18px;
@@ -154,63 +155,58 @@
     @apply h-full;
     background: var(--bg);
     color: var(--fg);
-    font-family: var(--font-body);
+    font-family: var(--font-body), sans-serif;
     font-size: 16px;
     line-height: 1.5;
   }
 
   .display-hero {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-size: var(--text-display-size);
     line-height: var(--text-display-lh);
     @apply font-bold;
   }
 
   .subtitle1 {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-weight: 500;
     font-size: var(--text-sub1-size);
     line-height: var(--text-sub1-lh);
   }
 
   .subtitle2 {
-    font-family: var(--font-title);
-    font-weight: 500;
+    font-family: var(--font-title), sans-serif;
+    font-weight: 400;
     font-size: var(--text-sub2-size);
     line-height: var(--text-sub2-lh);
   }
 
   h1 {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-size: var(--text-h1-size);
     line-height: var(--text-h1-lh);
     @apply font-bold;
   }
 
   h2 {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-size: var(--text-h2-size);
     line-height: var(--text-h2-lh);
     @apply font-semibold;
   }
 
   h3 {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-size: var(--text-h3-size);
     line-height: var(--text-h3-lh);
     @apply font-medium;
   }
 
   h4 {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-size: var(--text-h4-size);
     line-height: var(--text-h4-lh);
     @apply font-medium;
-  }
-
-  p {
-    font-size: var(--text-body2-size);
-    line-height: var(--text-body2-lh);
   }
 
   :is(input, textarea, select, button):focus-visible {
@@ -232,7 +228,7 @@
 @layer components {
   /* ========== NAVBAR LINK ========== */
   .navbar-link {
-    font-family: var(--font-title);
+    font-family: var(--font-title), sans-serif;
     font-size: 18px;
     font-weight: 600;
     line-height: 20px;
@@ -302,7 +298,7 @@
     height: 3.25rem;
     padding-inline: 1.5rem; /* 24px */
     font-size: 24px;
-    font-weight: semibold;
+    font-weight: bold;
     line-height: 22px;
   }
 
@@ -466,13 +462,17 @@
     border-bottom-width: var(--border-width);
   }
 
+  .card-footer {
+    border-top-width: var(--border-width);
+  }
+
+  .card-body {
+    padding: var(--spacing-lg);
+  }
+
   /* Variante card formulaire */
   .card--form .card-body {
     padding: 2.5rem;
-  }
-
-  .card-footer {
-    border-top-width: var(--border-width);
   }
 
   /* ========== FORMS ========== */
@@ -490,7 +490,7 @@
   .form-select,
   .form-textarea {
     @apply w-full transition-all;
-    font-family: var(--font-body);
+    font-family: var(--font-body), sans-serif;
     font-size: 1.125rem;
     padding: 0.875rem 1rem;
     height: 3rem;
@@ -549,12 +549,18 @@
 
   /* ========== NAVBAR ========== */
   .navbar {
-    @apply flex items-center justify-between;
+    @apply sticky top-0 z-50 flex items-center w-full;
     height: var(--header-height);
-    padding: 0 var(--spacing-xl);
     background: var(--bg-primary);
     border-bottom: var(--border-width) solid var(--border-color);
-    z-index: 50;
+    overflow-x: clip;
+  }
+
+  .navbar__inner {
+    @apply flex items-center justify-between w-full;
+    padding-inline: var(--spacing-xl);
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   /* ========== SIDEBAR ========== */
