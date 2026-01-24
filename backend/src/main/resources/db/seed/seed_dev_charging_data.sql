@@ -20,16 +20,23 @@ VALUES (1,
         'Owner',
         true),
        (2,
-        'user@test.com',
+        'user1@test.com',
         '$2a$10$N27.myA0wYPJmbFC37Y9dOa.YbpAC0IBNsbsii39M01zyTgHH7TRS',
-        'Dev',
-        'user',
+        'Dev1',
+        'User1',
+        true),
+       (3,
+        'user2@test.com',
+        '$2a$10$N27.myA0wYPJmbFC37Y9dOa.YbpAC0IBNsbsii39M01zyTgHH7TRS',
+        'Dev2',
+        'User2',
         true);
 
 INSERT INTO user_roles (user_id, role)
 VALUES (1, 'ROLE_USER'),
        (1, 'ROLE_OWNER'),
-        (2, 'ROLE_USER');
+       (2, 'ROLE_USER'),
+       (3, 'ROLE_USER');
 
 -- =========================
 -- ADDRESSES
@@ -162,13 +169,13 @@ INSERT INTO booking (
     hourly_rate_snapshot
 )
 VALUES (
-           '2026-01-20T09:00:00Z',
-           '2026-01-20T10:00:00Z',
+           '2026-02-18T08:00:00Z',
+           '2026-02-18T12:00:00Z',
            'ACCEPTED',
            10.00,
            now(),
            now(),
-           1,
+           2,
            10,
            'Station Test',
            'Adresse Test',
