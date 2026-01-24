@@ -161,6 +161,21 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Gère les tentatives de réservation sur des slots déjà réservées.
+     */
+    @ExceptionHandler(BookingConflictException.class)
+    public ProblemDetail handleBookingConflict(BookingConflictException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Conflit de réservation");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("slots", ex.getDetails());
+
+        logger.info("Booking conflict: {}", ex.getMessage());
+        return pd;
+    }
+
+
+    /**
      * Gère les violations de contraintes de base de données (clés uniques, clés étrangères).
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -193,11 +208,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ValidationException.class)
     public ProblemDetail handleValidationException(ValidationException ex) {
-        var pd = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
-                ex.getMessage()
-        );
+        var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         pd.setTitle("Erreur de validation");
+        pd.setDetail(ex.getMessage());
 
         logger.info("Validation error: {}", ex.getMessage());
         return pd;
