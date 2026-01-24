@@ -1,8 +1,8 @@
-import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
-import {NavigationEnd, Router, RouterLink, RouterLinkActive} from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { UserMenu } from '../user-menu/user-menu';
 import { AuthService } from '../../../core/services/auth-service';
-import {filter} from 'rxjs';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
