@@ -4,6 +4,9 @@
 .env
 *.local
 
+# Runtime env (secrets)
+env.js
+
 !.env.template
 
 # --- Global ---
