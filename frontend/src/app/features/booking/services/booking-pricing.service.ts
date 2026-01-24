@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   BookingPricingInput,
   BookingPricingResult,
-} from '../../../core/models/dto/booking-pricing-dto';
+} from '../../../core/models/dto/booking-pricing.dto';
 
 @Injectable({ providedIn: 'root' })
 export class BookingPricingService {

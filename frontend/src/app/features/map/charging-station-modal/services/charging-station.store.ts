@@ -1,11 +1,10 @@
-// core/services/charging-station/charging-station.store.ts
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { ChargingStationApi } from './charging-station.api';
-import { ChargingStationDetailDto } from '../../../../core/models/dto/charging-station-detail.dto';
+import {ChargingStationDetailDto} from '../../../../core/models/dto/charging-station-detail.dto';
 import {
-  ChargingStationAvailabilityDto,
-  ChargingStationTimeSlotDto,
+  ChargingStationAvailabilityDto, ChargingStationTimeSlotDto
 } from '../../../../core/models/dto/charging-station-availability.dto';
+
 
 @Injectable({ providedIn: 'root' })
 export class ChargingStationStore {

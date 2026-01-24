@@ -42,9 +42,22 @@
       </div>
     </div>
 
+    <!-- Encarts de statuts -->
+    @if (loading()) {
+      <div class="text-center py-4">
+        <span>Paiement en cours...</span>
+      </div>
+    }
+
     @if (success()) {
       <div class="alert alert-success text-center mx-2">
-        Paiement confirmé. Réservation enregistrée.
+        Paiement confirmé.
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger text-center mx-2">
+        {{ error() }}
       </div>
     }
 

@@ -4,6 +4,7 @@ export interface ChargingStationAvailabilityDto {
 }
 
 export interface ChargingStationTimeSlotDto {
+  index: number; // clé technique
   start: string; // HH:mm
   end: string; // HH:mm
   available: boolean;

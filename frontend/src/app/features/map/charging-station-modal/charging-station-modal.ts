@@ -7,7 +7,8 @@ export interface BookingPayload {
   stationId: number;
   stationName: string;
   hourlyRate: number;
-  slots: number;
+  date: string;
+  slots: number[]; // slotIndex[]
 }
 
 @Component({
@@ -22,6 +23,7 @@ export class ChargingStationModal {
 
   readonly station = this.stationStore.station;
   readonly loading = this.stationStore.loading;
+  readonly selectedSlots = this.stationStore.selectedSlots;
   readonly selectedSlotsCount = this.stationStore.selectedSlotsCount;
 
   readonly confirm = output<BookingPayload>();
@@ -31,15 +33,21 @@ export class ChargingStationModal {
     this.stationStore.loadAvailability(date);
   }
 
-  confirmReservation() {
+  confirmStationBooking() {
     const station = this.station();
-    if (!station) return;
+    const date = this.stationStore.date();
+    const slots = this.stationStore.selectedSlots();
+
+    if (!station || !date || slots.length === 0) return;
+
+    const slotIndexes = slots.map((slot) => slot.index);
 
     this.confirm.emit({
       stationId: station.id,
       stationName: station.name,
       hourlyRate: station.hourlyRate,
-      slots: this.selectedSlotsCount(),
+      date,
+      slots: slotIndexes,
     });
   }
 

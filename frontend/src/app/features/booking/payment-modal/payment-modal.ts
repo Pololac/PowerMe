@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, inject, input, output} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { BookingSummary } from '../../../core/models/dto/booking-summary.dto';
 import { CommonModule } from '@angular/common';
 import { ChargingLocationStore } from '../../map/charging-location-modal/services/charging-location.store';
@@ -16,6 +16,7 @@ export class PaymentModal {
   readonly summary = input.required<BookingSummary>();
   readonly loading = input<boolean>(false);
   readonly success = input<boolean>(false);
+  readonly error = input<string | null>(null);
 
   readonly address = computed(() =>
     this.locationStore.selectedLocation()?.address ?? ''
@@ -26,6 +27,7 @@ export class PaymentModal {
 
   onConfirm() {
     this.confirm.emit();
+
   }
 
   onBack() {
