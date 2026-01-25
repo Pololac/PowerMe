@@ -1,5 +1,6 @@
 package com.powerme.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
@@ -22,12 +23,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Gestionnaire global des exceptions pour l'application PowerMe.
- * Intercepte et formate toutes les exceptions levées par les contrôleurs.
- *
- * Conventions :
- * - Messages utilisateur : FRANÇAIS
- * - Logs développeur : ANGLAIS
+ * Gestionnaire global des exceptions pour l'application PowerMe. Intercepte et formate toutes les
+ * exceptions levées par les contrôleurs.
+ * <p>
+ * Conventions : - Messages utilisateur : FRANÇAIS - Logs développeur : ANGLAIS
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -48,22 +47,23 @@ public class GlobalExceptionHandler {
         pd.setTitle("Token Invalide");
         pd.setDetail(ex.getMessage());
 
-        logger.warn("Invalid token: {}", ex.getMessage());  
+        logger.warn("Invalid token: {}", ex.getMessage());
         return pd;
     }
 
     /**
-     * Gère les erreurs d'authentification Spring Security (email inexistant ou mot de passe incorrect).
+     * Gère les erreurs d'authentification Spring Security (email inexistant ou mot de passe
+     * incorrect).
      */
     @ExceptionHandler(BadCredentialsException.class)
     public ProblemDetail handleBadCredentials(BadCredentialsException ex) {
         var pd = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED,
-                "Email ou mot de passe incorrect. Veuillez réessayer."  
+                "Email ou mot de passe incorrect. Veuillez réessayer."
         );
-        pd.setTitle("Identifiants invalides");  
+        pd.setTitle("Identifiants invalides");
 
-        logger.warn("Failed login attempt: Bad credentials");  
+        logger.warn("Failed login attempt: Bad credentials");
         return pd;
     }
 
@@ -76,11 +76,11 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleDisabled(DisabledException ex) {
         var pd = ProblemDetail.forStatusAndDetail(
                 HttpStatus.FORBIDDEN,
-                "Votre compte n'est pas encore activé. Veuillez vérifier votre email pour le lien d'activation."  
+                "Votre compte n'est pas encore activé. Veuillez vérifier votre email pour le lien d'activation."
         );
-        pd.setTitle("Compte non activé");  
+        pd.setTitle("Compte non activé");
 
-        logger.warn("Login attempt on non-activated account");  
+        logger.warn("Login attempt on non-activated account");
         return pd;
     }
 
@@ -91,11 +91,11 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleLocked(LockedException ex) {
         var pd = ProblemDetail.forStatusAndDetail(
                 HttpStatus.FORBIDDEN,
-                "Ce compte a été supprimé. Veuillez contacter l'administrateur pour obtenir de l'aide."  
+                "Ce compte a été supprimé. Veuillez contacter l'administrateur pour obtenir de l'aide."
         );
-        pd.setTitle("Compte supprimé");  
+        pd.setTitle("Compte supprimé");
 
-        logger.warn("Login attempt on deleted account");  
+        logger.warn("Login attempt on deleted account");
         return pd;
     }
 
@@ -105,10 +105,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ProblemDetail handleUnauthorizedAccess(UnauthorizedAccessException ex) {
         var pd = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
-        pd.setTitle("Accès refusé");  
+        pd.setTitle("Accès refusé");
         pd.setDetail(ex.getMessage());
 
-        logger.warn("Access denied: {}", ex.getMessage());  
+        logger.warn("Access denied: {}", ex.getMessage());
         return pd;
     }
 
@@ -119,15 +119,29 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler({
             UserNotFoundException.class,
+            ChargingLocationNotFoundException.class,
             ChargingStationNotFoundException.class,
             BookingNotFoundException.class
     })
     public ProblemDetail handleNotFound(ServiceException ex) {
         var pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        pd.setTitle("Ressource non trouvée");  
+        pd.setTitle("Ressource non trouvée");
         pd.setDetail(ex.getMessage());
 
-        logger.info("Resource not found: {}", ex.getMessage());  
+        logger.info("Resource not found: {}", ex.getMessage());
+        return pd;
+    }
+
+    /**
+     * Gère les cas où une entité demandée n'existe pas. Étend RuntimeException.
+     */
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ProblemDetail handleEntityNotFound(EntityNotFoundException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        pd.setTitle("Ressource non trouvée");
+        pd.setDetail(ex.getMessage());
+
+        logger.info("Entity not found: {}", ex.getMessage());
         return pd;
     }
 
@@ -139,12 +153,27 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ProblemDetail handleUserAlreadyExists(UserAlreadyExistsException ex) {
         var pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        pd.setTitle("Utilisateur déjà existant");  
+        pd.setTitle("Utilisateur déjà existant");
         pd.setDetail(ex.getMessage());
 
-        logger.info("User already exists: {}", ex.getMessage());  
+        logger.info("User already exists: {}", ex.getMessage());
         return pd;
     }
+
+    /**
+     * Gère les tentatives de réservation sur des slots déjà réservées.
+     */
+    @ExceptionHandler(BookingConflictException.class)
+    public ProblemDetail handleBookingConflict(BookingConflictException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setTitle("Conflit de réservation");
+        pd.setDetail(ex.getMessage());
+        pd.setProperty("slots", ex.getDetails());
+
+        logger.info("Booking conflict: {}", ex.getMessage());
+        return pd;
+    }
+
 
     /**
      * Gère les violations de contraintes de base de données (clés uniques, clés étrangères).
@@ -157,34 +186,49 @@ public class GlobalExceptionHandler {
         String message = ex.getMessage().toLowerCase();
 
         if (message.contains("uk_user_email") || message.contains("email")) {
-            detail = "Cet email est déjà utilisé";  
+            detail = "Cet email est déjà utilisé";
         } else if (message.contains("fk_charging_location_owner")) {
-            detail = "Impossible de supprimer : cet utilisateur possède des lieux de recharge actifs";  
+            detail = "Impossible de supprimer : cet utilisateur possède des lieux de recharge actifs";
         } else if (message.contains("not-null") || message.contains("null")) {
-            detail = "Un champ obligatoire est manquant";  
+            detail = "Un champ obligatoire est manquant";
         }
 
         var pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, detail);
-        pd.setTitle("Erreur d'intégrité des données");  
+        pd.setTitle("Erreur d'intégrité des données");
 
-        logger.warn("Data integrity violation: {}", ex.getMessage());  
+        logger.warn("Data integrity violation: {}", ex.getMessage());
         return pd;
     }
 
     // ========== 400 - BAD REQUEST ==========
 
     /**
-     * Gère les erreurs de validation métier (ex: date de réservation antérieure à la date actuelle).
+     * Gère les erreurs de validation métier (ex: date de réservation antérieure à la date
+     * actuelle).
      */
     @ExceptionHandler(ValidationException.class)
     public ProblemDetail handleValidationException(ValidationException ex) {
-        var pd = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST,
-                ex.getMessage()
-        );
-        pd.setTitle("Erreur de validation");  
+        var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Erreur de validation");
+        pd.setDetail(ex.getMessage());
 
-        logger.info("Validation error: {}", ex.getMessage());  
+        logger.info("Validation error: {}", ex.getMessage());
+        return pd;
+    }
+
+    /**
+     * Gère les erreurs dues à des requêtes invalides côté client.
+     */
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            IllegalStateException.class
+    })
+    public ProblemDetail handleBadRequest(RuntimeException ex) {
+        var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Requête invalide");
+        pd.setDetail(ex.getMessage());
+
+        logger.warn("Bad request: {}", ex.getMessage());
         return pd;
     }
 
@@ -198,16 +242,17 @@ public class GlobalExceptionHandler {
                 .stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Valeur invalide",  
+                        fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage()
+                                : "Valeur invalide",
                         (existing, replacement) -> existing + "; " + replacement
                 ));
 
         var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        pd.setTitle("Erreur de validation");  
-        pd.setDetail("Plusieurs erreurs de validation sont survenues");  
+        pd.setTitle("Erreur de validation");
+        pd.setDetail("Plusieurs erreurs de validation sont survenues");
         pd.setProperty("errors", errors);
 
-        logger.info("Validation errors: {}", errors);  
+        logger.info("Validation errors: {}", errors);
         return pd;
     }
 
@@ -217,10 +262,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
         var pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        pd.setTitle("Violation de contrainte");  
+        pd.setTitle("Violation de contrainte");
         pd.setDetail(ex.getMessage());
 
-        logger.warn("Constraint violation: {}", ex.getMessage());  
+        logger.warn("Constraint violation: {}", ex.getMessage());
         return pd;
     }
 
@@ -235,17 +280,17 @@ public class GlobalExceptionHandler {
         String message = ex.getMessage().toLowerCase();
 
         if (message.contains("localdatetime") || message.contains("date")) {
-            detail = "Format de date invalide. Format attendu : yyyy-MM-ddTHH:mm:ss";  
+            detail = "Format de date invalide. Format attendu : yyyy-MM-ddTHH:mm:ss";
         } else if (message.contains("number") || message.contains("integer")) {
-            detail = "Format de nombre invalide";  
+            detail = "Format de nombre invalide";
         } else if (message.contains("boolean")) {
-            detail = "Valeur booléenne invalide. Attendu : true ou false";  
+            detail = "Valeur booléenne invalide. Attendu : true ou false";
         }
 
         var pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
-        pd.setTitle("Format de requête invalide");  
+        pd.setTitle("Format de requête invalide");
 
-        logger.info("Malformed JSON: {}", ex.getMessage());  
+        logger.info("Malformed JSON: {}", ex.getMessage());
         return pd;
     }
 
@@ -258,9 +303,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage()
         );
-        pd.setTitle("Erreur métier");  
+        pd.setTitle("Erreur métier");
 
-        logger.info("Business error: {}", ex.getMessage());  
+        logger.info("Business error: {}", ex.getMessage());
         return pd;
     }
 
@@ -273,11 +318,11 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleDataAccess(DataAccessException ex) {
         var pd = ProblemDetail.forStatusAndDetail(
                 HttpStatus.SERVICE_UNAVAILABLE,
-                "Service temporairement indisponible. Veuillez réessayer plus tard."  
+                "Service temporairement indisponible. Veuillez réessayer plus tard."
         );
-        pd.setTitle("Erreur de base de données");  
+        pd.setTitle("Erreur de base de données");
 
-        logger.error("Database access error: {}", ex.getMessage(), ex);  
+        logger.error("Database access error: {}", ex.getMessage(), ex);
         return pd;
     }
 
@@ -285,37 +330,38 @@ public class GlobalExceptionHandler {
      * Gère les échecs d'envoi d'email.
      */
     @ExceptionHandler(EmailDeliveryException.class)
-    public ProblemDetail handleEmailDelivery(EmailDeliveryException ex, HttpServletRequest request) {
+    public ProblemDetail handleEmailDelivery(EmailDeliveryException ex,
+            HttpServletRequest request) {
         var pd = ProblemDetail.forStatusAndDetail(
                 HttpStatus.SERVICE_UNAVAILABLE,
-                "Impossible d'envoyer l'email demandé. Veuillez réessayer plus tard."  
+                "Impossible d'envoyer l'email demandé. Veuillez réessayer plus tard."
         );
-        pd.setTitle("Échec d'envoi d'email");  
+        pd.setTitle("Échec d'envoi d'email");
         pd.setProperty("recipient", ex.getRecipient());
         pd.setProperty("subject", ex.getSubject());
 
         logger.error("Failed to send email to {} with subject '{}'",
-                ex.getRecipient(), ex.getSubject(), ex);  
+                ex.getRecipient(), ex.getSubject(), ex);
         return pd;
     }
 
     // ========== 500 - INTERNAL SERVER ERROR ==========
 
     /**
-     * Gère toutes les exceptions non prévues.
-     * En mode debug, expose le message d'erreur. En production, retourne un message générique.
+     * Gère toutes les exceptions non prévues. En mode debug, expose le message d'erreur. En
+     * production, retourne un message générique.
      */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGeneric(Exception ex) {
         var pd = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        pd.setTitle("Erreur inattendue");  
+        pd.setTitle("Erreur inattendue");
 
         if (debugMode) {
             pd.setDetail(ex.getMessage());
-            logger.error("Unhandled exception in DEBUG mode", ex);  
+            logger.error("Unhandled exception in DEBUG mode", ex);
         } else {
-            pd.setDetail("Une erreur inattendue s'est produite. Veuillez réessayer plus tard.");  
-            logger.error("Unhandled exception: {}", ex.getMessage(), ex);  
+            pd.setDetail("Une erreur inattendue s'est produite. Veuillez réessayer plus tard.");
+            logger.error("Unhandled exception: {}", ex.getMessage(), ex);
         }
 
         return pd;

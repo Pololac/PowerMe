@@ -1,0 +1,192 @@
+<main>
+  <!-- HERO -->
+  <section class="hero-landing">
+    <div class="container mx-auto px-4">
+      <div class="hero-text-container reveal stagger">
+        <h1 class="display-hero text-white">Chargez chez les particuliers</h1>
+
+        <p class="subtitle hidden md:block">
+          Trouvez des bornes de recharges chez les particuliers situés à proximité et suivez vos
+          consommations de manière personnalisée et transparente.
+        </p>
+
+        <!-- Version mobile -->
+        <p class="subtitle md:hidden">
+          Trouvez des bornes à proximité et suivez vos consommations facilement.
+        </p>
+
+        <div class="flex flex-wrap md:gap-4 gap-6 md:justify-start justify-center">
+          <button class="pm-btn pm-btn--primary pm-btn--md-lg" (click)="onFindStation()">
+            Trouver une borne
+          </button>
+
+          <button class="pm-btn pm-btn--primary-outline pm-btn--md-lg" (click)="onRentStation()">
+            Louez votre borne
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="py-[70px]">
+    <div class="container mx-auto px-4">
+      <h2 class="text-center mb-12">
+        Choisissez la recharge électrique <br />
+        entre particuliers
+      </h2>
+
+      <div
+        class="grid grid-cols-1 lg:grid-cols-3 gap-12 mx-auto lg:max-w-6xl justify-items-center reveal"
+      >
+        <!-- Feature 1 -->
+        <div class="pm-feature">
+          <img
+            src="/assets/images/landing/community.png"
+            alt="community"
+            class="mx-auto w-20 h-20"
+          />
+          <h3 class="mt-6">Communauté</h3>
+          <p class="mt-3 leading-7">
+            Impossible d’installer une borne électrique chez vous ? Heureusement, d’autres
+            conducteurs de voitures électriques vous prêtent la leur.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="pm-feature">
+          <img src="/assets/images/landing/position.png" alt="poximity" class="mx-auto w-20 h-20" />
+          <h3 class="mt-6">Proximité</h3>
+          <p class="mt-3 leading-7">
+            Difficile de trouver une borne électrique publique à proximité ? Tournez-vous vers les
+            milliers de bornes privés disponibles à proximité !
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="pm-feature">
+          <img src="/assets/images/landing/piggy.png" alt="piggy bank" class="mx-auto w-20 h-20" />
+          <h3 class="mt-6">Économie</h3>
+          <p class="mt-3 leading-7">
+            Les particuliers équipés d'une borne de recharge la mettent à votre disposition
+            moyennant quelques euros.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP MOBILE -->
+  <section class="py-[30px] bg-blue-50 reveal">
+    <div class="container mx-auto px-4 lg:px-[150px]">
+      <div class="flex flex-col lg:flex-row items-center justify-start gap-[40px] lg:gap-[80px]">
+        <div class="relative flex justify-center lg:justify-start">
+          <div
+            class="w-[430px] h-[430px] rounded-full bg-mint-200 flex items-center justify-center overflow-hidden"
+            style="box-shadow: var(--shadow-card)"
+          >
+            <img
+              src="/assets/images/landing/mockup_portable.png"
+              alt="Mockup application mobile PowerMe"
+              class="h-full object-cover"
+            />
+          </div>
+        </div>
+
+        <div class="text-center lg:text-left self-center">
+          <h2 class="mb-6">
+            Simplifiez-vous la vie en installant <br />
+            l’application PowerMe
+          </h2>
+
+          <p class="leading-7 mb-8">
+            Vous souhaitez localiser rapidement les bornes de recharge des particuliers situés à
+            proximité de chez vous ? Le plus simple est d’installer notre application sur votre
+            téléphone.
+          </p>
+
+          <button class="pm-btn pm-btn--secondary-outline pm-btn--md-lg">
+            Comment l’installer ?
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHIFFRES -->
+  <section class="py-[70px]">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="mb-12">
+        Repensez votre façon de faire <br />
+        le plein d’énergie
+      </h2>
+
+      <div class="mx-auto max-w-[1000px] grid grid-cols-1 lg:grid-cols-3 gap-12 reveal">
+        <div>
+          <p class="pm-kpi-number" data-target="550">550</p>
+          <p class="pm-kpi-text">Bornes disponibles</p>
+        </div>
+        <div>
+          <p class="pm-kpi-number" data-target="20000">20 000</p>
+          <p class="pm-kpi-text">Clients journaliers</p>
+        </div>
+        <div>
+          <p class="pm-kpi-number" data-target="250000">250 000</p>
+          <p class="pm-kpi-text">Recharges totalisées</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVIS -->
+  <section class="reveal py-20 bg-blue-50 reveal">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-center mb-12 reveal">Ce que disent nos clients</h2>
+      <app-review-slider></app-review-slider>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section
+    class="relative w-full overflow-visible"
+    style="height: 750px; background: var(--gradient-brand); padding-top: 50px"
+  >
+    <div class="container mx-auto px-4 text-center text-white">
+      <!-- Titre -->
+      <h2 class="mb-8 hidden md:block">Vous souhaitez recharger votre voiture</h2>
+      <!-- Titre mobile-->
+      <h2 class="mb-8 md:hidden">Envie de recharger votre voiture</h2>
+
+      <!-- Bouton -->
+      <button
+        class="pm-btn pm-btn--primary pm-btn--lg pm-cta font-semibold reveal"
+        (click)="onFindStation()"
+      >
+        Trouver une borne
+      </button>
+
+      <!-- Image mockup desktop -->
+      <div class="absolute left-1/2 -translate-x-1/2" style="bottom: -10px">
+        <picture>
+          <!-- Version mobile -->
+          <source
+            srcset="/assets/images/landing/mockup_desktop_mobile.webp"
+            media="(max-width: 768px)"
+          />
+
+          <!-- Version desktop -->
+          <img
+            src="/assets/images/landing/mockup_desktop.webp"
+            class="w-[250px] h-auto max-w-none md:w-[1200px]"
+            alt="Mockup PowerMe desktop"
+          />
+        </picture>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <section role="contentinfo" class="relative overflow-hidden bg-blue-50">
+    <app-footer />
+  </section>
+</main>

@@ -1,0 +1,111 @@
+.hero-landing {
+  position: relative;
+  color: #fff;
+  background-image: var(--gradient-hero), url('/assets/images/landing/hero-desktop.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 750px;
+  display: flex;
+  align-items: center;
+  padding: 150px 200px 150px 150px;
+}
+
+.hero-text-container {
+  width: 100%;
+  max-width: 850px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 35px;
+}
+
+.pm-feature {
+  border-radius: var(--radius-card);
+  border: 1px solid color-mix(in oklab, var(--fg) 10%, transparent);
+  background-color: color-mix(in oklab, white 80%, transparent);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(4px);
+  padding: 2.5rem;
+  text-align: center;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease-out;
+}
+
+/* Hover uniquement en desktop */
+@media (min-width: 768px) {
+  .pm-feature:hover {
+    transform: scale(1.02);
+  }
+}
+
+.pm-kpi-number {
+  font-family: var(--font-title);
+  font-size: var(--text-display-size);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--text-display-lh);
+  color: var(--color-blue-800);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.pm-kpi-text {
+  font-family: var(--font-title);
+  font-size: var(--text-h4-size);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--text-h3-lh);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.7s ease-out;
+}
+
+.stagger > * {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.6s ease-out;
+}
+
+.stagger.show > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stagger.show > *:nth-child(1) {
+  transition-delay: 0s;
+}
+.stagger.show > *:nth-child(2) {
+  transition-delay: 0.1s;
+}
+.stagger.show > *:nth-child(3) {
+  transition-delay: 0.2s;
+}
+.stagger.show > *:nth-child(4) {
+  transition-delay: 0.3s;
+}
+
+@media (max-width: 639px) {
+  .hero-landing {
+    background-image: var(--gradient-hero), url('/assets/images/landing/hero-mobile.webp');
+    background-size: cover;
+    background-position: center;
+    align-items: flex-start;
+    padding: 80px 40px;
+  }
+
+  .hero-text-container {
+    max-width: 100%;
+    gap: 35px;
+  }
+}

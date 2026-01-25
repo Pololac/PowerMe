@@ -1,13 +1,9 @@
 export const environment = {
-  production: false,
-  apiUrl: '/api', // ✅ Fonctionne en dev ET prod !
+  production: true,
+  apiBaseUrl: '/api', // OK en prod grâce au reverse proxy
 
-  // Features de développement
-  debug: true,
+  // Features de production
+  debug: false,
   enableMocks: false,
-  logLevel: 'debug',
-
-  // Services externes (clés de test)
-  mapboxToken: 'pk.test.123456',
-  stripePublicKey: 'pk_test_123456',
+  logLevel: 'error',
 };

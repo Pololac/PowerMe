@@ -6,6 +6,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,23 +24,27 @@ public class MailServiceImpl implements MailService {
         this.mailSender = mailSender;
     }
 
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     @Override
     public void sendActivationEmail(User user, String token) {
         String serverUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
         String message = """
                 Pour activer votre compte, cliquez sur <a href="%s">ce lien</a>
                 """
-                .formatted(serverUrl + "/api/account/validate/" + token);
+                .formatted(serverUrl + "/api/account/activate/" + token);
         sendBaseMail(user.getEmail(), message, "PowerMe - Activation du compte");
     }
 
     @Override
     public void sendResetPasswordEmail(User user, String token) {
-        String serverUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+        String resetUrl = frontendUrl + "/reset-password/" + token;
+
         String message = """
                 Pour réinitialiser votre mot de passe, cliquez sur <a href="%s">ce lien</a>
                 """
-                .formatted(serverUrl + "/reset-password.html?token=" + token);
+                .formatted(resetUrl);
         sendBaseMail(user.getEmail(), message, "PowerMe - Réinitialisation du mot de passe");
     }
 

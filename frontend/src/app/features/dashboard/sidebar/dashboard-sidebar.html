@@ -1,0 +1,28 @@
+<aside class="w-[280px] bg-white border-r border-[var(--border-color)] p-6 flex flex-col gap-6">
+  <!-- Header -->
+  <div>
+    <h2 class="text-lg font-bold">Mon compte</h2>
+    <a routerLink="/map" class="text-sm text-[var(--primary)] hover:underline">
+      ← Retour sur la carte
+    </a>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex flex-col gap-2 pm-menu">
+    @for (item of items; track item.label) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="bg-[var(--bg-secondary)] font-semibold"
+        class="pm-menu__item flex items-center gap-3"
+      >
+        <img
+          [src]="'/assets/icons/' + item.icon + '.svg'"
+          alt=""
+          class="w-6 h-6"
+          aria-hidden="true"
+        />
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</aside>

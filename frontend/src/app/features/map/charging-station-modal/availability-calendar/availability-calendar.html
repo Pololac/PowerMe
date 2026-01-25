@@ -1,0 +1,12 @@
+<div class="bg-white rounded-lg p-3">
+  <ngxsmk-datepicker
+    class="pm-datepicker"
+    mode="single"
+    [inline]="true"
+    [minDate]="today"
+    [yearRange]="1"
+    [locale]="'fr-FR'"
+    [value]="date()"
+    (valueChange)="onDateChange($event)"
+  />
+</div>

@@ -1,0 +1,38 @@
+<div class="grid grid-col gap-2">
+  <button
+    type="button"
+    class="self-center text-sm text-gray-500 disabled:opacity-30"
+    [disabled]="!canUp()"
+    (click)="up()"
+  >
+    ▲
+  </button>
+
+  <!-- Slots -->
+  @for (slot of visible(); track slot.start) {
+    <button
+      type="button"
+      class="px-3 py-2 rounded-xl border text-sm transition"
+      [disabled]="!slot.available"
+      [class.bg-gray-400]="!slot.available"
+      [class.text-grey-200]="!slot.available"
+      [class.cursor-not-allowed]="!slot.available"
+      [class.bg-mint-300]="isSelected(slot)"
+      [class.font-bold]="isSelected(slot)"
+      [class.bg-white]="slot.available && !isSelected(slot)"
+      (click)="select(slot)"
+    >
+      {{ slot.start }} – {{ slot.end }}
+    </button>
+  }
+
+  <!-- Flèche bas -->
+  <button
+    type="button"
+    class="self-center text-sm text-gray-500 disabled:opacity-30"
+    [disabled]="!canDown()"
+    (click)="down()"
+  >
+    ▼
+  </button>
+</div>

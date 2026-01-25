@@ -3,7 +3,6 @@ package com.powerme.service.security;
 import com.powerme.dto.LoginRequestDto;
 import com.powerme.dto.UserDto;
 import com.powerme.mapper.UserMapper;
-import com.powerme.utils.Sanitizer;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ public class AuthService {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-    private final UserMapper mapper;
 
     public AuthService(AuthenticationManager authManager,
             JwtService jwtService,
@@ -34,7 +32,6 @@ public class AuthService {
         this.authManager = authManager;
         this.jwtService = jwtService;
         this.refreshTokenService = refreshTokenService;
-        this.mapper = mapper;
     }
 
     public record LoginResult(String accessToken, String refreshToken, UserDto user) {

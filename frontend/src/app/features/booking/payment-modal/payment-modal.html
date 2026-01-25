@@ -1,0 +1,84 @@
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="card w-[420px]">
+
+    <div class="card-header">
+      <div class="flex flex-col items-center justify-center gap-2">
+        <h3>Paiement</h3>
+        <p class="subtitle1 text-blue-800">
+          {{ summary().stationName }}
+        </p>
+        <p class="text-md text-neutral-grey2 text-muted">
+          {{ address() }}
+        </p>
+      </div>
+    </div>
+
+    <div class="card-body space-y-3">
+      <div class="flex justify-between">
+        <p class="text-lg">
+          Temps de charge
+          <span class="text-neutral-grey2">
+            ({{ summary().hourlyRate }} €/h × {{ summary().durationHours }} h)
+          </span>
+        </p>
+        <span>
+          {{
+            summary().hourlyRate * summary().durationHours
+              | number:'1.2-2'
+          }} €
+        </span>
+      </div>
+
+      <div class="flex justify-between">
+        <p class="text-lg">Service</p>
+        <span>{{ summary().serviceFee | number:'1.2-2' }} €</span>
+      </div>
+
+      <hr />
+
+      <div class="flex justify-between font-semibold text-lg">
+        <span>Total</span>
+        <span>{{ summary().total | number:'1.2-2' }} €</span>
+      </div>
+    </div>
+
+    <!-- Encarts de statuts -->
+    @if (loading()) {
+      <div class="text-center py-4">
+        <span>Paiement en cours...</span>
+      </div>
+    }
+
+    @if (success()) {
+      <div class="alert alert-success text-center mx-2">
+        Paiement confirmé.
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger text-center mx-2">
+        {{ error() }}
+      </div>
+    }
+
+    <div class="card-footer flex justify-between gap-3">
+      <button
+        class="pm-btn pm-btn--sm-md pm-btn--primary-outline w-full"
+        (click)="onBack()"
+        [disabled]="loading()"
+      >
+        Retour
+      </button>
+
+      <button
+        class="pm-btn pm-btn--sm-md pm-btn--primary w-full "
+        (click)="onConfirm()"
+        [disabled]="loading() || success()"
+        [class.pm-btn--loading]="loading()"
+      >
+        Réserver
+      </button>
+    </div>
+
+  </div>
+</div>

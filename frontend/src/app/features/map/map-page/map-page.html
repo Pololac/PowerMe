@@ -1,0 +1,28 @@
+<div class="relative">
+  <app-map-view (locationSelected)="onLocationSelected($event)"></app-map-view>
+
+  <!-- Overlay UI -->
+  <div class="absolute top-8 left-10 z-40">
+    <div class="w-[450px]">
+      <app-search-location></app-search-location>
+    </div>
+
+    <!-- Modales -->
+    <div class="mt-4 flex items-start gap-4">
+      @if (selectedLocationId() !== null) {
+        <!-- Charging Location (toujours visible) -->
+        <div class="w-[340px] max-w-full">
+          <app-charging-location-modal (stationSelected)="onStationSelected($event)" />
+        </div>
+
+        <!-- BookingFlow -->
+        @if (bookingOpen()) {
+          <app-booking-flow
+            [locationId]="selectedLocationId()!"
+            (flowClosed)="closeBooking()"
+          />
+        }
+      }
+    </div>
+  </div>
+</div>

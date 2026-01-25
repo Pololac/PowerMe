@@ -1,0 +1,112 @@
+<div class="w-full">
+  <!-- Conteneur principal avec flex -->
+  <div class="flex items-center gap-2">
+    <!-- Barre de recherche -->
+    <div class="flex-1 bg-white rounded-lg shadow-lg overflow-hidden">
+      <div class="flex items-center px-4 h-12">
+        @if (!query()) {
+          <img src="/assets/icons/search.svg" alt="recherche" class="w-5 h-5" />
+        }
+        <input
+          type="text"
+          placeholder="Recherche une adresse ou un lieu"
+          class="flex-1 ml-3 text-base outline-none placeholder:text-gray-600"
+          [value]="query()"
+          (input)="onInput($event)"
+        />
+
+        <!-- Clear -->
+        @if (query()) {
+          <button class="text-gray-400 hover:text-gray-600 text-xl font-light" (click)="clear()">
+            ✕
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Icônes - Boutons séparés -->
+    <button
+      type="button"
+      class="bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+      (click)="openFilters()"
+      aria-label="Filtres"
+    >
+      <img src="/assets/icons/filter.svg" alt="filtres" class="w-6 h-6" />
+    </button>
+
+    <button
+      type="button"
+      class="bg-white rounded-lg shadow-lg p-3 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors"
+      (click)="openInfo()"
+      aria-label="Informations"
+    >
+      <img src="/assets/icons/infos-fill.svg" alt="info" class="w-6 h-6" />
+    </button>
+  </div>
+
+  <!-- Résultats -->
+  @if (results().length) {
+    <ul class="mt-2 bg-white rounded-lg shadow-lg overflow-hidden max-h-96 overflow-y-auto">
+      @for (f of results(); track f.id) {
+        <li>
+          <button
+            type="button"
+            class="w-full text-left px-4 py-3 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 transition-colors"
+            (click)="select(f)"
+          >
+            <div class="text-base font-medium text-gray-900 leading-snug">
+              {{ f.secondaryLabel }}
+            </div>
+            <div class="text-sm text-gray-500 leading-snug mt-0.5">
+              {{ f.label }}
+            </div>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>
+
+<!-- Modal Filtres -->
+@if (showFilters()) {
+  <div class="fixed inset-0 z-[100] bg-black/40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-900">Filtres</h2>
+        <button
+          type="button"
+          class="text-gray-400 hover:text-gray-600 text-2xl font-light leading-none"
+          (click)="closeModals()"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Contenu filtres -->
+      <div class="space-y-4"></div>
+    </div>
+  </div>
+}
+
+<!-- Modal Info -->
+@if (showInfo()) {
+  <div class="fixed inset-0 z-[100] bg-black/40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-900">Informations</h2>
+        <button
+          type="button"
+          class="text-gray-400 hover:text-gray-600 text-2xl font-light leading-none"
+          (click)="closeModals()"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="text-sm text-gray-600 space-y-3">
+        <p>Recherchez des bornes de recharge près de vous ou à une adresse spécifique.</p>
+        <p>Utilisez les filtres pour affiner votre recherche selon vos besoins.</p>
+      </div>
+    </div>
+  </div>
+}

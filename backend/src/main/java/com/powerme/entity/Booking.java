@@ -120,14 +120,6 @@ public class Booking {
     }
 
     // HELPERS
-    // Helper pour calculer le prix total
-    private void calculateTotalPrice() {
-/*        if (startTime != null && endTime != null && hourlyRateSnapshot != null) {
-            long durationInHours = Duration.between(startTime, endTime).toHours();
-            this.totalPrice = hourlyRateSnapshot.multiply(BigDecimal.valueOf(durationInHours));
-        }*/
-    }
-
     // Helper pour afficher le nom de la borne
     public String getDisplayStationName() {
         // Si la borne existe toujours, affiche son nom actuel
@@ -207,6 +199,30 @@ public class Booking {
 
     public void setChargingStation(ChargingStation chargingStation) {
         this.chargingStation = chargingStation;
+    }
+
+    public String getStationNameSnapshot() {
+        return stationNameSnapshot;
+    }
+
+    public void setStationNameSnapshot(String stationNameSnapshot) {
+        this.stationNameSnapshot = stationNameSnapshot;
+    }
+
+    public String getStationAddressSnapshot() {
+        return stationAddressSnapshot;
+    }
+
+    public void setStationAddressSnapshot(String stationAddressSnapshot) {
+        this.stationAddressSnapshot = stationAddressSnapshot;
+    }
+
+    public BigDecimal getHourlyRateSnapshot() {
+        return hourlyRateSnapshot;
+    }
+
+    public void setHourlyRateSnapshot(BigDecimal hourlyRateSnapshot) {
+        this.hourlyRateSnapshot = hourlyRateSnapshot;
     }
 
     public Instant getCreatedAt() {

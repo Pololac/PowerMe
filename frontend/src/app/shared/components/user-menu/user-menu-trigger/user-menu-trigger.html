@@ -1,0 +1,50 @@
+<button
+  type="button"
+  class="flex items-center gap-3 select-none rounded-md px-2 py-1 transition-all duration-150 hover:shadow-sm focus-visible:shadow-sm"
+  aria-label="Ouvrir le menu utilisateur"
+  (click)="toggleMenu.emit()"
+>
+  <!-- Avatar -->
+  <div class="pm-avatar bg-blue-600 text-white">
+    <svg viewBox="0 0 64 64" class="w-10 h-10" fill="none" aria-hidden="true">
+      <path
+        d="M32 33.3333C35.6819 33.3333 38.6666 30.3486 38.6666 26.6667C38.6666 22.9848 35.6819 20 32 20C28.3181 20 25.3333 22.9848 25.3333 26.6667C25.3333 30.3486 28.3181 33.3333 32 33.3333Z"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M42.6666 44.0002C42.6666 41.1712 41.5428 38.4581 39.5425 36.4577C37.5421 34.4573 34.829 33.3335 32 33.3335C29.171 33.3335 26.4579 34.4573 24.4575 36.4577C22.4571 38.4581 21.3333 41.1712 21.3333 44.0002"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M42.3333 43.6667C42.3333 40.8377 41.2095 38.1246 39.2091 36.1242C37.2087 34.1238 34.4956 33 31.6666 33C28.8376 33 26.1245 34.1238 24.1241 36.1242C22.1237 38.1246 20.9999 40.8377 20.9999 43.6667"
+        stroke="currentColor"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </div>
+
+  <!-- Chevron -->
+  <svg
+    viewBox="0 0 24 24"
+    class="w-4 h-4 transition-transform duration-200"
+    [class.rotate-180]="open()"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M7 9L12 14L17 9"
+      stroke="#212529"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+</button>
