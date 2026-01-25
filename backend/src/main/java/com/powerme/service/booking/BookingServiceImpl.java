@@ -16,10 +16,6 @@ import com.powerme.repository.ChargingStationRepository;
 import com.powerme.repository.UserRepository;
 import com.powerme.service.pricing.PricingService;
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +69,14 @@ public class BookingServiceImpl implements BookingService {
             BookingCreateRequestDto request,
             Long userId
     ) {
+        logger.info(
+                "Creating booking: userId={}, stationId={}, date={}, slotsCount={}",
+                userId,
+                request.stationId(),
+                request.date(),
+                request.slots().size()
+        );
+
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -95,16 +99,30 @@ public class BookingServiceImpl implements BookingService {
         );
 
         if (conflict) {
-            throw new BookingConflictException(
-                    "Un ou plusieurs créneaux sont déjà réservés",
-                    request.slots()
-            );
+                logger.warn(
+                        "Booking conflict detected: stationId={}, start={}, end={}, slots={}",
+                        station.getId(),
+                        range.start(),
+                        range.end(),
+                        request.slots()
+                );
+
+                throw new BookingConflictException(
+                        "Un ou plusieurs créneaux sont déjà réservés",
+                        request.slots()
+                );
         }
 
         // Calcul du prix final
         BigDecimal totalPrice = pricingService.computePrice(
                 station.getHourlyRate(),
                 range.slots()
+        );
+
+        logger.debug(
+                "Computed booking price: stationId={}, totalPrice={}",
+                station.getId(),
+                totalPrice
         );
 
         // Création de la réservation
@@ -121,41 +139,17 @@ public class BookingServiceImpl implements BookingService {
         booking.setHourlyRateSnapshot(station.getHourlyRate());
         booking.setStationAddressSnapshot(address.getFullAddress());
 
-        return bookingRepository.save(booking);
-    }
+        Booking saved = bookingRepository.save(booking);
 
+        logger.info(
+                "Booking created successfully: bookingId={}, userId={}, stationId={}, start={}, end={}",
+                saved.getId(),
+                userId,
+                station.getId(),
+                saved.getStartTime(),
+                saved.getEndTime()
+        );
 
-    // ==========================
-    // Helpers métier privés
-    // ==========================
-
-    private Instant computeStartTime(
-            LocalDate date,
-            List<Integer> slots
-    ) {
-        int firstSlot = Collections.min(slots);
-
-        return date
-                .atStartOfDay()
-                .plusMinutes(firstSlot * 30L)
-                .atZone(ZoneId.systemDefault())
-                .toInstant();
-    }
-
-    private Instant computeEndTime(
-            LocalDate date,
-            List<Integer> slots
-    ) {
-        int lastSlot = Collections.max(slots) + 1;
-
-        return date
-                .atStartOfDay()
-                .plusMinutes(lastSlot * 30L)
-                .atZone(ZoneId.systemDefault())
-                .toInstant();
-    }
-
-    private String buildFullAddress(ChargingLocation location) {
-        return String.format("%s", location.getAddress().getFullAddress());
+        return saved;
     }
 }

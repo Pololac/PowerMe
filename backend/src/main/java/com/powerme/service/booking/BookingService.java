@@ -2,7 +2,6 @@ package com.powerme.service.booking;
 
 import com.powerme.dto.BookingCreateRequestDto;
 import com.powerme.entity.Booking;
-import com.powerme.entity.User;
 import java.util.List;
 
 public interface BookingService {
