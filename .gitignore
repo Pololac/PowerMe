@@ -15,6 +15,8 @@ frontend/src/assets/env.js
 .idea/
 tmp/
 logs/
+coverage/
+
 
 # --- Docker ---
 *.log
@@ -30,6 +32,7 @@ frontend/.parcel-cache/
 frontend/.turbo/
 frontend/.output/
 frontend/.cache/
+frontend/coverage/
 
 # --- Java / Maven ---
 backend/target/
