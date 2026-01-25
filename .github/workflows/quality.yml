@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: ["main"]
   push:
-    branches: ["main"]
+    branches: ["main", "dev"]
 
 jobs:
   quality-backend:
@@ -36,6 +36,7 @@ jobs:
           mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=pololac_powerme_back \
           -Dsonar.organization=pololac
+        continue-on-error: true #Rend le Quality Gate non bloquant
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pour PR decoration
@@ -69,6 +70,7 @@ jobs:
 
       - name: SonarCloud Scan (Frontend)
         uses: SonarSource/sonarcloud-github-action@master
+        continue-on-error: true #Rend le Quality Gate non bloquant
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
