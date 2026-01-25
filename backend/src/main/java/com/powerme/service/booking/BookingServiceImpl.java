@@ -16,6 +16,7 @@ import com.powerme.repository.ChargingStationRepository;
 import com.powerme.repository.UserRepository;
 import com.powerme.service.pricing.PricingService;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,20 +70,21 @@ public class BookingServiceImpl implements BookingService {
             BookingCreateRequestDto request,
             Long userId
     ) {
-        logger.info(
-                "Creating booking: userId={}, stationId={}, date={}, slotsCount={}",
-                userId,
-                request.stationId(),
-                request.date(),
-                request.slots().size()
-        );
-
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
         ChargingStation station = chargingStationRepository
                 .findByIdWithLocationAndAddress(request.stationId())
                 .orElseThrow(ChargingStationNotFoundException::new);
+
+        LocalDate bookingDate = request.date(); // Normalisé
+        logger.info(
+            "Creating booking: userId={}, stationId={}, bookingDate={}, slotsCount={}",
+            user.getId(),
+            station.getId(),
+            bookingDate,
+            request.slots().size() // OK car calculé
+        );
 
         ChargingLocation location = station.getChargingLocation();
         Address address = location.getAddress();
@@ -100,17 +102,14 @@ public class BookingServiceImpl implements BookingService {
 
         if (conflict) {
                 logger.warn(
-                        "Booking conflict detected: stationId={}, start={}, end={}, slots={}",
+                        "Booking conflict detected: stationId={}, start={}, end={}, slotsCount={}",
                         station.getId(),
                         range.start(),
                         range.end(),
-                        request.slots()
+                        request.slots().size()
                 );
 
-                throw new BookingConflictException(
-                        "Un ou plusieurs créneaux sont déjà réservés",
-                        request.slots()
-                );
+                throw new BookingConflictException();
         }
 
         // Calcul du prix final
@@ -144,7 +143,7 @@ public class BookingServiceImpl implements BookingService {
         logger.info(
                 "Booking created successfully: bookingId={}, userId={}, stationId={}, start={}, end={}",
                 saved.getId(),
-                userId,
+                user.getId(),
                 station.getId(),
                 saved.getStartTime(),
                 saved.getEndTime()
