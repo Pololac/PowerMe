@@ -28,7 +28,6 @@ export class Login {
       next: ({ token, user }) => {
         this.loading.set(false);
         this.auth.setSession(token, user, rememberMe);
-        console.log('Auth user signal', this.auth.user());
 
         // Redirection
         const redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl') || '/dashboard';

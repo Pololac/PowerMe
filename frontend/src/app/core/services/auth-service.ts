@@ -17,7 +17,6 @@ export class AuthService {
 
   readonly user = signal<User | null>(null);
   readonly isAuthenticated = computed(() => {
-    console.log('isAuthenticated recomputed', this.user());
     return this.user() !== null;
   });
 
