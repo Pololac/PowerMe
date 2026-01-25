@@ -168,7 +168,6 @@ public class GlobalExceptionHandler {
         var pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
         pd.setTitle("Conflit de réservation");
         pd.setDetail(ex.getMessage());
-        pd.setProperty("slots", ex.getDetails());
 
         logger.info("Booking conflict: {}", ex.getMessage());
         return pd;
