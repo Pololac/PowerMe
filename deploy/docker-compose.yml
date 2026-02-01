@@ -9,12 +9,9 @@ services:
     container_name: powerme-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - "127.0.0.1:8081:80"
     networks:
       - powerme-network
-    depends_on:
-      - backend
     environment:
       - TZ=${TZ:-Europe/Paris}
     labels:
@@ -55,7 +52,7 @@ services:
     container_name: powerme-db
     restart: unless-stopped
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT:-5432}:5432" # Optionnel (peut être retiré en prod stricte)
     networks:
       - powerme-network
     environment:

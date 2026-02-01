@@ -21,7 +21,7 @@ RUN npm run build -- --configuration production
 # ========================================
 # STAGE 2: Nginx pour servir l'app
 # ========================================
-FROM nginx:1.25-alpine
+FROM nginx:1.25-alpine3.19-slim
 
 # Copier la configuration Nginx personnalisée
 COPY ../deploy/nginx.conf /etc/nginx/nginx.conf
