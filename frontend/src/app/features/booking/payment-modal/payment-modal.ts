@@ -18,16 +18,13 @@ export class PaymentModal {
   readonly success = input<boolean>(false);
   readonly error = input<string | null>(null);
 
-  readonly address = computed(() =>
-    this.locationStore.selectedLocation()?.address ?? ''
-  );
+  readonly address = computed(() => this.locationStore.selectedLocation()?.address ?? '');
 
   readonly confirm = output<void>();
   readonly back = output<void>();
 
   onConfirm() {
     this.confirm.emit();
-
   }
 
   onBack() {
