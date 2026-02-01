@@ -35,11 +35,9 @@ public class AuthService {
     }
 
     public record LoginResult(String accessToken, String refreshToken, UserDto user) {
-
     }
 
     public record RefreshResult(String accessToken, String refreshToken) {
-
     }
 
     /**

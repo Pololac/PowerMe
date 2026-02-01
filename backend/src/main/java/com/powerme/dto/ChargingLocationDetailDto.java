@@ -28,5 +28,4 @@ public record ChargingLocationDetailDto(
                 stations.size()
         );
     }
-
 }
