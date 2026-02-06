@@ -63,6 +63,7 @@ backend-integration-tests:
   services: # Nécessaire pr BDD tests via Testcontainers en Docker
     - name: docker:24-dind
       alias: docker
+  privileged: true # ⚠️ IDE râle mais GitLab accepte
   variables:
     DOCKER_HOST: "tcp://docker:2375" # Permet à Testcontainers de communiquer avec Docker-in-Docker
     DOCKER_TLS_CERTDIR: ""
