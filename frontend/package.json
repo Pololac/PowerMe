@@ -8,7 +8,7 @@
     "build:prod": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:ci": "ng test --watch=false --code-coverage --browsers=ChromeHeadless --include=src/**/login-form.spec.ts --include=src/**/login.spec.ts --include=src/**/auth-service.spec.ts",
+    "test:ci": "ng test --watch=false --code-coverage --browsers=ChromeHeadless --no-sandbox --include=src/**/login-form.spec.ts --include=src/**/login.spec.ts --include=src/**/auth-service.spec.ts",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
