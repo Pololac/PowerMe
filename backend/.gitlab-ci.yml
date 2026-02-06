@@ -5,6 +5,7 @@ stages:
 variables:
   MAVEN_VERSION: 3.9.11
   JAVA_VERSION: 21
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   BACKEND_IMAGE: $CI_REGISTRY_IMAGE/backend
   IMAGE_TAG: $CI_COMMIT_SHORT_SHA
 
@@ -19,7 +20,6 @@ cache:
 default:
   before_script:
     - cd backend
-    - export MAVEN_OPTS="-Dmaven.repo.local=.m2/repository"
 
 ##############################################
 # TESTS UNITAIRES
@@ -32,7 +32,7 @@ backend-unit-tests:
     - if: '$CI_COMMIT_BRANCH == "main"'
   image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
   script:
-    - mvn clean test
+    - mvn -B -f backend/pom.xml clean test
   coverage: "/Total.*?([0-9]{1,3})%/"
   artifacts:
     when: always
@@ -88,7 +88,7 @@ backend-integration-tests:
       done
     - docker info # Vérifier que Docker fonctionne
   script:
-    - mvn verify -DskipUnitTests
+    - mvn -B -f backend/pom.xml verify -DskipTests
   artifacts:
     when: always
     reports:
