@@ -17,10 +17,6 @@ cache:
     - .m2/repository
   policy: pull-push
 
-default:
-  before_script:
-    - cd backend
-
 ##############################################
 # TESTS UNITAIRES
 ##############################################
