@@ -10,17 +10,20 @@ variables:
 cache:
   key:
     files:
-      - package-lock.json   # Cache invalidé si package-lock.json change
+      - package-lock.json # Cache invalidé si package-lock.json change
   paths:
-    - .npm/  # Évite de re-télécharger les packages
+    - .npm/ # Évite de re-télécharger les packages
 
 default:
   before_script:
     - cd frontend
 
+##############################################
+# TESTS Jasmine
+##############################################
 frontend-tests:
   stage: test
-  image: trion/ng-cli-karma:latest   # Angular + Chrome inclus
+  image: trion/ng-cli-karma:17 # Angular + Chrome inclus
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
     - if: '$CI_COMMIT_BRANCH == "dev"'
@@ -28,16 +31,19 @@ frontend-tests:
   script:
     - npm ci
     - npm run test:ci
-  coverage: '/Statements\s*:\s*(\d+\.?\d*)%/'        # Pour UI GitLab
+  coverage: '/Statements\s*:\s*(\d+\.?\d*)%/' # Pour UI GitLab
   artifacts:
     when: always
     reports:
-      junit: coverage/junit.xml       # Pour tests JUnit ds GitLab
+      junit: coverage/junit.xml # Pour tests JUnit ds GitLab
     paths:
       - coverage/
     expire_in: 1 week
   allow_failure: false
 
+##############################################
+# BUILD FRONTEND (Docker)
+##############################################
 build-frontend:
   stage: build
   rules:
@@ -55,4 +61,3 @@ build-frontend:
       -t ${FRONTEND_IMAGE}:latest .
     - docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
     - docker push ${FRONTEND_IMAGE}:latest
-

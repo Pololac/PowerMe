@@ -17,7 +17,10 @@ export class ChargingLocationStore {
 
     this.api.getById(id).subscribe({
       next: (location) => this.selectedLocation.set(location),
-      error: () => this.selectedLocation.set(null),
+      error: () => {
+        this.selectedLocation.set(null);
+        this.loading.set(false);
+      },
       complete: () => this.loading.set(false),
     });
   }

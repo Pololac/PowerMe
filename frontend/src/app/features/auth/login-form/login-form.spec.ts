@@ -24,7 +24,7 @@ describe('LoginForm', () => {
 
     expect(component).toBeTruthy();
 
-    // Vérifie que les champs Email, Password et RememberMe
+    // Vérifie les champs Email, Password et RememberMe
     const inputEmail = debugElement.query(By.css('input[type="email"]'));
     expect(inputEmail).toBeTruthy();
     const inputPassword = debugElement.query(By.css('input[type="password"]'));

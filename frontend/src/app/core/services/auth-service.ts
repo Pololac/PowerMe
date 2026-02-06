@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import {catchError, EMPTY, map, Observable} from 'rxjs';
 import { Router } from '@angular/router';
 import { User } from '../models/domain/user.model';
 import { LoginRequest } from '../models/requests/login.request';
 import { LoginResponseDto } from '../models/dto/login.response.dto';
 import { MessageResponseDto } from '../models/dto/message.response.dto';
 import { RegisterRequest } from '../models/requests/register.request';
+import { LoggerService } from '../error/logger-service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +15,7 @@ import { RegisterRequest } from '../models/requests/register.request';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly logger = inject(LoggerService);
 
   readonly user = signal<User | null>(null);
   readonly isAuthenticated = computed(() => {
@@ -34,7 +36,7 @@ export class AuthService {
     } catch (e) {
       localStorage.removeItem('user');
       sessionStorage.removeItem('user');
-      console.warn('Failed to restore user from localStorage', e);
+      this.logger.warn('Failed to restore user from storage', e);
     }
   }
 
@@ -68,10 +70,18 @@ export class AuthService {
   refreshToken() {
     return this.http
       .post<{ accessToken: string }>('/auth/refresh', {}, { withCredentials: true })
-      .pipe(map((res) => res.accessToken));
+      .pipe(
+        map((res) => res.accessToken),
+        catchError((err) => {
+          this.logger.warn('Token refresh failed', err);
+          this.clearSession();
+          return EMPTY;
+        }),
+      );
   }
 
   logout() {
+    this.logger.info('User logged out');
     this.clearSession();
 
     this.router.navigateByUrl('/');

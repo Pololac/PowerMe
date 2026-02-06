@@ -9,8 +9,8 @@ WORKDIR /app
 # Copier package.json et package-lock.json
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm ci --only=production --silent
+# Installer les dépendances (besoin des devDependencies)
+RUN npm ci --silent
 
 # Copier le code source
 COPY . .
@@ -21,10 +21,10 @@ RUN npm run build -- --configuration production
 # ========================================
 # STAGE 2: Nginx pour servir l'app
 # ========================================
-FROM nginx:1.25-alpine
+FROM nginx:1.25-alpine3.19-slim
 
 # Copier la configuration Nginx personnalisée
-COPY ../deploy/nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copier les fichiers buildés depuis le stage précédent
 COPY --from=builder /app/dist/powerme/browser /usr/share/nginx/html

@@ -5,28 +5,29 @@ stages:
 # Désactive temporaire des pipelines automatiques
 workflow:
   rules:
-    - when: never  # Désactive automatiquement
+    - if: "$CI_COMMIT_BRANCH"
+    #- when: never  # Désactive automatiquement
 
 frontend-pipeline:
   stage: trigger
   rules:
-    - changes: [ "frontend/**/*" ]
+    - changes: ["frontend/**/*"]
   trigger:
     include: frontend/.gitlab-ci.yml
-    strategy: depend    # Attend la fin du pipeline enfant
+    strategy: depend # Attend la fin du pipeline enfant
 
 backend-pipeline:
   stage: trigger
   rules:
-    - changes: [ "backend/**/*" ]
+    - changes: ["backend/**/*"]
   trigger:
     include: backend/.gitlab-ci.yml
-    strategy: depend     # Attend la fin du pipeline enfant
+    strategy: depend # Attend la fin du pipeline enfant
 
-deploy:   # Ne se déclenche que si les deux précédents jobs sont terminés
+deploy: # Ne se déclenche que si les deux précédents jobs sont terminés
   stage: deploy
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   trigger:
     include: deploy/.gitlab-ci.yml
-    strategy: depend      # Attend la fin du pipeline enfant
+    strategy: depend # Attend la fin du pipeline enfant

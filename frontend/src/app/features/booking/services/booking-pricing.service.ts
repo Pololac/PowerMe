@@ -10,9 +10,7 @@ export class BookingPricingService {
     const durationHours = input.slots * 0.5;
     const serviceFee = 0.5;
 
-    const total =
-      serviceFee +
-      input.hourlyRate * durationHours;
+    const total = serviceFee + input.hourlyRate * durationHours;
 
     return {
       durationHours,

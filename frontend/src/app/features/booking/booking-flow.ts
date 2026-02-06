@@ -14,6 +14,7 @@ import { PaymentModal } from './payment-modal/payment-modal';
 import { PaymentService } from '../../core/services/payment.service';
 import { BookingApiService } from './services/booking-api.service';
 import { catchError, EMPTY, finalize, switchMap, tap } from 'rxjs';
+import { LoggerService } from '../../core/error/logger-service';
 
 @Component({
   selector: 'app-booking-flow',
@@ -26,6 +27,7 @@ export class BookingFlow {
   private readonly pricingService = inject(BookingPricingService);
   private readonly paymentService = inject(PaymentService);
   private readonly bookingApiService = inject(BookingApiService);
+  private readonly logger = inject(LoggerService);
 
   readonly locationId = input.required<number>();
 
@@ -98,7 +100,7 @@ export class BookingFlow {
           setTimeout(() => this.closeFlow(), 1500);
         }),
         catchError((err) => {
-          console.error(err);
+          this.logger.error('Payment succeeded but booking creation failed', err);
           this.paymentError.set('Une erreur est survenue lors de la réservation');
           return EMPTY;
         }),

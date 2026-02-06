@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Valide le token et charge l'utilisateur
             UserDetails user = jwtService.validateAuthToken(token);
 
-            // ⚠️ Place l'utilisateur dans le contexte de sécurité
+            // Place l'utilisateur dans le contexte de sécurité
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             user,

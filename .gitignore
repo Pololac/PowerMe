@@ -1,7 +1,7 @@
 # --- Secrets & Config (IMPORTANT) ---
-.env*
-.env.dev
 .env
+.env.*
+.env.dev
 *.local
 
 frontend/src/assets/env.js
