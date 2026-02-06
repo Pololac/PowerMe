@@ -23,19 +23,19 @@ deploy-prod:
     - |
       ssh $SSH_USER@$SSH_HOST << EOF
         cd "$DEPLOY_DIR"
-      
+
         echo "Connexion au registry GitLab..."
         echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-      
+
         echo "Récupération des nouvelles images..."
-        docker compose pull
-      
+        docker compose --env-file .env.prod pull
+
         echo "Rechargement de l'application..."
-        docker compose up -d
-      
+        docker compose --env-file .env.prod up -d
+
         echo "Nettoyage des anciennes images..."
         docker image prune -af --filter "until=24h"
-      
+
         echo "Vérification des services..."
         sleep 5
         docker compose ps
