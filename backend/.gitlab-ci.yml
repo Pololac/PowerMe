@@ -63,15 +63,30 @@ backend-integration-tests:
   services: # Nécessaire pr BDD tests via Testcontainers en Docker
     - name: docker:24-dind
       alias: docker
-  privileged: true # ⚠️ IDE râle mais GitLab accepte
   variables:
     DOCKER_HOST: "tcp://docker:2375" # Permet à Testcontainers de communiquer avec Docker-in-Docker
     DOCKER_TLS_CERTDIR: ""
-    TESTCONTAINERS_RYUK_DISABLED: "true" # Accélère la destruction des containers en CI
-    TESTCONTAINERS_CHECKS_DISABLE: "true" # Accélère encore plus
+    DOCKER_DRIVER: overlay2
+    TESTCONTAINERS_HOST_OVERRIDE: "docker" # Force Testcontainers à utiliser le service Docker
+    TESTCONTAINERS_RYUK_DISABLED: "false" # Ryuk doit être activé en DinD
+    TESTCONTAINERS_CHECKS_DISABLE: "true" # Accélère
   needs:
     - job: backend-unit-tests
       artifacts: true
+  before_script:
+    # Installe docker-cli (pas ds Alpine Maven) et vérifie que Docker est prêt
+    - apk add --no-cache docker-cli
+    - |
+      echo "Waiting for Docker daemon to be ready..."
+      for i in $(seq 1 30); do
+        if docker info > /dev/null 2>&1; then
+          echo "Docker is ready!"
+          break
+        fi
+        echo "Waiting for Docker... ($i/30)"
+        sleep 2
+      done
+    - docker info # Vérifier que Docker fonctionne
   script:
     - mvn verify -DskipUnitTests
   artifacts:
