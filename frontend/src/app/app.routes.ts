@@ -24,15 +24,17 @@ export const routes: Routes = [
   { path: 'map', component: MapPage },
   { path: 'faq', component: Faq },
 
-  // Auth = pages avec wrapper visuel
+  // Auth
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   //{ path: 'activate', component: ActivateAccount },
   { path: 'reset-password', component: ResetPasswordRequest },
   { path: 'reset-password/:token', component: ResetPasswordConfirm },
 
+  // Réservations
   { path: 'booking', component: BookingFlow, canActivate: [authGuard] },
 
+  // Dashboard
   {
     path: 'dashboard',
     component: DashboardLayout,
@@ -40,7 +42,6 @@ export const routes: Routes = [
     children: [
       // page par défaut du dashboard
       { path: '', pathMatch: 'full', redirectTo: 'profile' },
-
       { path: 'profile', component: Profile },
       { path: 'bookings', component: Bookings },
       { path: 'vehicles', component: Vehicles },
