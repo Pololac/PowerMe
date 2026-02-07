@@ -21,7 +21,6 @@ import { MapPage } from './features/map/map-page/map-page';
 
 export const routes: Routes = [
   { path: '', component: Landing },
-  { path: 'map', component: MapPage },
   { path: 'faq', component: Faq },
 
   // Auth
@@ -30,6 +29,12 @@ export const routes: Routes = [
   //{ path: 'activate', component: ActivateAccount },
   { path: 'reset-password', component: ResetPasswordRequest },
   { path: 'reset-password/:token', component: ResetPasswordConfirm },
+
+  // Map (lazy-loading)
+  {
+    path: 'map',
+    loadComponent: () => import('./features/map/map-page/map-page').then((m) => m.MapPage),
+  },
 
   // Réservations
   { path: 'booking', component: BookingFlow, canActivate: [authGuard] },
