@@ -1,5 +1,6 @@
 include:
-  - local: deploy/deploy-template-gitlab-ci.yml
+  - local: .gitlab/ci/build-template.yml
+  - local: .gitlab/ci/deploy-template.yml
 
 stages:
   - test
@@ -13,42 +14,57 @@ variables:
   BACKEND_IMAGE: $CI_REGISTRY_IMAGE/backend
   IMAGE_TAG: $CI_COMMIT_SHORT_SHA
 
-cache:
+# Définit le cache global avec une anchor (&maven-cache)
+.maven-cache: &maven-cache
   key:
     files:
-      - pom.xml # Un cache commun pour toutes les branches
+      - backend/pom.xml
   paths:
     - .m2/repository
   policy: pull-push
+  when: on_success
+
+# Applique le cache globalement
+cache: *maven-cache
+
+.backend-test-base:
+  image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
+  cache:
+    <<: *maven-cache # Référence au cache global
+  artifacts:
+    when: always
+    # Exporter les classes compilées pour SonarCloud
+    paths:
+      - backend/target/classes/
+      - backend/target/test-classes/
+    expire_in: 1 week
 
 ##############################################
 # TESTS UNITAIRES
 ##############################################
 backend-unit-tests:
   stage: test
+  extends: .backend-test-base
+
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
     - if: '$CI_COMMIT_BRANCH == "dev"'
     - if: '$CI_COMMIT_BRANCH == "main"'
-  image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
+
   script:
     - mvn -B -f backend/pom.xml clean test
+
   coverage: "/Total.*?([0-9]{1,3})%/"
   artifacts:
-    when: always
     reports:
       junit: backend/target/surefire-reports/TEST-*.xml
       coverage_report:
         coverage_format: jacoco
         path: backend/target/site/jacoco/jacoco.xml
     paths:
-      # Exporter les classes compilées pour SonarCloud
-      - backend/target/classes/
-      - backend/target/test-classes/
       # Rapports pour SonarCloud
       - backend/target/surefire-reports/
       - backend/target/site/jacoco/
-    expire_in: 1 week
   allow_failure: false
 
 ##############################################
@@ -56,10 +72,12 @@ backend-unit-tests:
 ##############################################
 backend-integration-tests:
   stage: test
+  extends: .backend-test-base
+
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev"'
     - if: '$CI_COMMIT_BRANCH == "main"'
-  image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
+
   services: # Nécessaire pr BDD tests via Testcontainers en Docker
     - name: docker:24-dind
       alias: docker
@@ -70,60 +88,58 @@ backend-integration-tests:
     TESTCONTAINERS_HOST_OVERRIDE: "docker" # Force Testcontainers à utiliser le service Docker
     TESTCONTAINERS_RYUK_DISABLED: "false" # Ryuk doit être activé en DinD
     TESTCONTAINERS_CHECKS_DISABLE: "true" # Accélère
+
   needs:
     - job: backend-unit-tests
       artifacts: true
+
   before_script:
     # Installe docker-cli (pas ds Alpine Maven) et vérifie que Docker est prêt
     - apk add --no-cache docker-cli
     - |
-      echo "Waiting for Docker daemon to be ready..."
+      echo "⏳ Attente du daemon Docker..."
       for i in $(seq 1 30); do
         if docker info > /dev/null 2>&1; then
-          echo "Docker is ready!"
+          echo "✅ Docker prêt!"
           break
         fi
         echo "Waiting for Docker... ($i/30)"
         sleep 2
       done
     - docker info # Vérifier que Docker fonctionne
+
   script:
     - mvn -B -f backend/pom.xml verify -DskipTests
+
   artifacts:
     when: always
     reports:
       junit: backend/target/failsafe-reports/TEST-*.xml
     paths:
-      - backend/target/classes/
-      - backend/target/test-classes/
       - backend/target/failsafe-reports/
-      - backend/target/site/jacoco/
-    expire_in: 1 day
-
   allow_failure: false
 
 ##############################################
 # BUILD BACKEND (Docker)
 ##############################################
 build-backend:
-  stage: build
+  extends: .build-docker-template
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
-  image: docker:24
-  services:
-    - docker:24-dind
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-  script:
-    - docker build --build-arg JAVA_VERSION=${JAVA_VERSION} -t ${BACKEND_IMAGE}:${IMAGE_TAG} -t ${BACKEND_IMAGE}:latest backend
-
-    - docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
-    - docker push ${BACKEND_IMAGE}:latest
+  variables:
+    BUILD_CONTEXT: backend
+    IMAGE_NAME: $BACKEND_IMAGE
+    BUILD_ARG_NAME: JAVA_VERSION
+    BUILD_ARG_VALUE: $JAVA_VERSION
   needs:
     - job: backend-unit-tests
       artifacts: true
     - job: backend-integration-tests
       artifacts: true
+  after_script:
+    - |
+      echo "🔍 Vérification de l'image buildée..."
+      docker run --rm ${BACKEND_IMAGE}:${IMAGE_TAG} java -version
 
 ##############################################
 # DEPLOY

@@ -1,0 +1,19 @@
+.build-docker-template:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+  script:
+    - |
+      docker build \
+        --build-arg ${BUILD_ARG_NAME}=${BUILD_ARG_VALUE} \
+        -t ${IMAGE_NAME}:${IMAGE_TAG} \
+        -t ${IMAGE_NAME}:latest \
+        ${BUILD_CONTEXT}
+
+    - docker push ${IMAGE_NAME}:${IMAGE_TAG}
+    - docker push ${IMAGE_NAME}:latest
