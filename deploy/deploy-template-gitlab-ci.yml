@@ -22,7 +22,7 @@
     - echo "🚀 Déploiement vers $APP_URL"
 
     - |
-      ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" << 'ENDSSH'
+      ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" << ENDSSH
         set -e
         cd "$DEPLOY_DIR"
         
