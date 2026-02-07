@@ -99,6 +99,7 @@ backend-integration-tests:
       - backend/target/failsafe-reports/
       - backend/target/site/jacoco/
     expire_in: 1 day
+
   allow_failure: false
 
 ##############################################
