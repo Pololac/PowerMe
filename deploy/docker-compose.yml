@@ -1,71 +1,165 @@
 services:
   # ========================================
-  # FRONTEND (Angular + Nginx)
-  # ========================================
-  frontend:
-    image: registry.gitlab.com/pololac/powerme/frontend:latest
-    container_name: powerme-frontend
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:8081:80"
-    networks:
-      - powerme-network
-    environment:
-      - TZ=${TZ:-Europe/Paris}
-
-  # ========================================
-  # BACKEND (Spring Boot)
-  # ========================================
-  backend:
-    image: registry.gitlab.com/pololac/powerme/backend:latest
-    container_name: powerme-backend
-    restart: unless-stopped
-    environment:
-      - TZ=${TZ:-Europe/Paris}
-      - SECURITY_JWT_SECRET=${SECURITY_JWT_SECRET}
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-      - SPRING_DATASOURCE_USERNAME=${DB_USER}
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASS}
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-      - SPRING_JPA_SHOW_SQL=false
-      - MAIL_HOST=${MAIL_HOST}
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
-    depends_on:
-      db:
-        condition: service_healthy
-    # PAS de ports = accessible uniquement via le réseau Docker
-    networks:
-      - powerme-network
-
-  # ========================================
   # DATABASE (PostgreSQL + PostGIS)
   # ========================================
   db:
     image: postgis/postgis:16-3.4-alpine
     container_name: powerme-db
+    profiles: ["backend", "all"] # Démarre avec profil "backend" OU all
     restart: unless-stopped
-    ports: # PAS de ports = accessible uniquement via le réseau Docker
-      - "127.0.0.1:5432:5432" # pr accès admin local (via psql sur VPS)
-    networks:
-      - powerme-network
+
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - TZ=${TZ:-Europe/Paris}
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+    ports:
+      - "127.0.0.1:5432:5432" # Accès admin local uniquement
+    networks:
+      - powerme-network
+
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # ========================================
+  # BACKEND (Spring Boot)
+  # ========================================
+  backend:
+    image: ${BACKEND_IMAGE}:${IMAGE_TAG}
+    container_name: powerme-backend
+    profiles: ["backend", "all"] # Démarre avec profil "backend" OU all
+    restart: unless-stopped
+
+    # User Spring
+    user: "1001:1001"
+
+    environment:
+      # Variables de connexion DB (depuis .env.prod)
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+
+      # Spring Boot
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+
+      # JWT
+      SECURITY_JWT_SECRET: ${SECURITY_JWT_SECRET}
+
+      # Email
+      MAIL_PROTOCOL: ${MAIL_PROTOCOL}
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
+      # Timezone
+      TZ: ${TZ:-Europe/Paris}
+
+    # ❌ PAS de ports exposés (Nginx fait le proxy)
+
+    volumes:
+      - ./logs:/app/logs # Synchro entre dossier logs conteneur (/var/log) avec le dossier du VPS
+    networks:
+      - powerme-network
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # ========================================
+  # FRONTEND (Angular + Nginx)
+  # ========================================
+  frontend:
+    image: ${FRONTEND_IMAGE}:${IMAGE_TAG}
+    container_name: powerme-frontend
+    profiles: ["frontend", "all"] # Démarre avec profil "frontend" OU all
+    restart: unless-stopped
+
+    environment:
+      - TZ=${TZ:-Europe/Paris}
+
+    # ❌ PAS de ports exposés (Nginx fait le proxy)
+
+    networks:
+      - powerme-network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost/ || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ========================================
+  # Nginx interne
+  # ========================================
+  nginx:
+    image: nginx:alpine
+    container_name: powerme-nginx
+    profiles: ["frontend", "all"] # Démarre avec profil "frontend" OU all
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:8080:80" # Exposé UNIQUEMENT en localhost
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx-logs:/var/log/nginx
+
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+    networks:
+      - powerme-network
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   postgres_data:
     driver: local
+    # Les logs backend sont montés directement depuis ./logs
+  nginx-logs:
 
 networks:
   powerme-network:
+    name: powerme-network
     driver: bridge

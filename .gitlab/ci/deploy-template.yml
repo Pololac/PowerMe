@@ -19,8 +19,7 @@
     - ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" "echo '✅ Connexion SSH réussie'"
 
   script:
-    - echo "🚀 Déploiement vers $APP_URL"
-
+    - echo "🚀 Déploiement de $SERVICE avec profil $PROFILE"
     - |
       ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" << ENDSSH
         set -e
@@ -29,21 +28,21 @@
         echo "🔐 Connexion au registry..."
         echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
-        echo "📥 Pull des images..."
-        docker compose --env-file .env.prod pull $SERVICE
+        echo "📥 Pull des images du profil $PROFILE..."
+        docker compose --profile $PROFILE pull
 
-        echo "🔄 Redémarrage..."
-        docker compose --env-file .env.prod up -d $SERVICE
+        echo "🔄 Restart des services du profil $PROFILE..."
+        docker compose --profile $PROFILE up -d
 
         echo "🧹 Nettoyage..."
         docker image prune -af --filter "until=24h"
 
         echo "✅ Vérification..."
         sleep 5
-        docker compose ps
-      ENDSSH
+        docker compose --profile $PROFILE ps
 
-    - echo "🎉 Déploiement réussi!"
+        echo "🎉 Déploiement du profil $PROFILE réussi!"
+      ENDSSH
 
   environment:
     name: production
