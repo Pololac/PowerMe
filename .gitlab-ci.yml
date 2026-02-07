@@ -9,26 +9,6 @@ workflow:
     - if: "$CI_COMMIT_BRANCH"
     #- when: never  # Désactive automatiquement
 
-frontend-pipeline:
-  stage: trigger
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      changes:
-        - frontend/**/*
-        - .gitlab/ci/pipeline-frontend.yml
-        - .gitlab/ci/build-template.yml
-        - .gitlab/ci/deploy-template.yml
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-      changes:
-        - frontend/**/*
-        - .gitlab/ci/pipeline-frontend.yml
-    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
-      changes:
-        - frontend/**/*
-  trigger:
-    include: .gitlab/ci/pipeline-frontend.yml
-    strategy: depend # Attend la fin du pipeline enfant
-
 backend-pipeline:
   stage: trigger
   rules:
@@ -47,4 +27,24 @@ backend-pipeline:
         - backend/**/*
   trigger:
     include: .gitlab/ci/pipeline-backend.yml
+    strategy: depend # Attend la fin du pipeline enfant
+
+frontend-pipeline:
+  stage: trigger
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - frontend/**/*
+        - .gitlab/ci/pipeline-frontend.yml
+        - .gitlab/ci/build-template.yml
+        - .gitlab/ci/deploy-template.yml
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      changes:
+        - frontend/**/*
+        - .gitlab/ci/pipeline-frontend.yml
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
+      changes:
+        - frontend/**/*
+  trigger:
+    include: .gitlab/ci/pipeline-frontend.yml
     strategy: depend # Attend la fin du pipeline enfant

@@ -74,6 +74,7 @@ deploy-frontend:
   extends: .deploy-template
   variables:
     SERVICE: frontend
+    PROFILE: frontend # Déploie frontend + nginx
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   needs:

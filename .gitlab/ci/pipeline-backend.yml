@@ -148,6 +148,7 @@ deploy-backend:
   extends: .deploy-template
   variables:
     SERVICE: backend
+    PROFILE: backend # Déploie backend + db
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   needs:
