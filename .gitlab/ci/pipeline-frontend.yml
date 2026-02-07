@@ -1,5 +1,6 @@
 include:
-  - local: deploy/deploy-template-gitlab-ci.yml
+  - local: .gitlab/ci/build-template.yml
+  - local: .gitlab/ci/deploy-template.yml
 
 stages:
   - test
@@ -54,19 +55,17 @@ frontend-tests:
 # BUILD FRONTEND (Docker)
 ##############################################
 build-frontend:
-  stage: build
+  extends: .build-docker-template
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
-  image: docker:24
-  services:
-    - docker:24-dind
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-  script:
-    - docker build --build-arg NODE_VERSION=${NODE_VERSION} -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest frontend
-
-    - docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
-    - docker push ${FRONTEND_IMAGE}:latest
+  variables:
+    BUILD_CONTEXT: frontend
+    IMAGE_NAME: $FRONTEND_IMAGE
+    BUILD_ARG_NAME: NODE_VERSION
+    BUILD_ARG_VALUE: $NODE_VERSION
+  needs:
+    - job: frontend-tests
+      artifacts: true
 
 ##############################################
 # DEPLOY

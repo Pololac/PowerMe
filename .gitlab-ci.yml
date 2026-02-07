@@ -1,7 +1,9 @@
 stages:
   - trigger
 
-# Désactive temporaire des pipelines automatiques
+variables:
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA
+
 workflow:
   rules:
     - if: "$CI_COMMIT_BRANCH"
@@ -10,15 +12,39 @@ workflow:
 frontend-pipeline:
   stage: trigger
   rules:
-    - changes: ["frontend/**/*"]
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - frontend/**/*
+        - .gitlab/ci/pipeline-frontend.yml
+        - .gitlab/ci/build-template.yml
+        - .gitlab/ci/deploy-template.yml
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      changes:
+        - frontend/**/*
+        - .gitlab/ci/pipeline-frontend.yml
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
+      changes:
+        - frontend/**/*
   trigger:
-    include: frontend/.gitlab-ci.yml
+    include: .gitlab/ci/pipeline-frontend.yml
     strategy: depend # Attend la fin du pipeline enfant
 
 backend-pipeline:
   stage: trigger
   rules:
-    - changes: ["backend/**/*"]
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - backend/**/*
+        - .gitlab/ci/pipeline-backend.yml
+        - .gitlab/ci/build-template.yml
+        - .gitlab/ci/deploy-template.yml
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      changes:
+        - backend/**/*
+        - .gitlab/ci/pipeline-backend.yml
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
+      changes:
+        - backend/**/*
   trigger:
-    include: backend/.gitlab-ci.yml
+    include: .gitlab/ci/pipeline-backend.yml
     strategy: depend # Attend la fin du pipeline enfant
