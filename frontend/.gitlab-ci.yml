@@ -63,11 +63,8 @@ build-frontend:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
-    - docker build \
-      --build-arg NODE_VERSION=${NODE_VERSION} \
-      -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
-      -t ${FRONTEND_IMAGE}:latest \
-      frontend
+    - docker build --build-arg NODE_VERSION=${NODE_VERSION} -t ${FRONTEND_IMAGE}:${IMAGE_TAG} -t ${FRONTEND_IMAGE}:latest frontend
+
     - docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
     - docker push ${FRONTEND_IMAGE}:latest
 
