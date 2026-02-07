@@ -117,7 +117,8 @@ build-backend:
     - docker build \
       --build-arg JAVA_VERSION=${JAVA_VERSION} \
       -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
-      -t ${BACKEND_IMAGE}:latest .
+      -t ${BACKEND_IMAGE}:latest \
+      backend
     - docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
     - docker push ${BACKEND_IMAGE}:latest
   needs:
