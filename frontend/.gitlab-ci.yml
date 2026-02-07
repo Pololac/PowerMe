@@ -1,6 +1,10 @@
+include:
+  - local: deploy/deploy-template-gitlab-ci.yml
+
 stages:
   - test
   - build
+  - deploy
 
 variables:
   NODE_VERSION: 20
@@ -70,3 +74,15 @@ build-frontend:
       -t ${FRONTEND_IMAGE}:latest .
     - docker push ${FRONTEND_IMAGE}:${IMAGE_TAG}
     - docker push ${FRONTEND_IMAGE}:latest
+
+##############################################
+# DEPLOY
+##############################################
+deploy-frontend:
+  extends: .deploy-template
+  variables:
+    SERVICE: frontend
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  needs:
+    - build-frontend
