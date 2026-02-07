@@ -13,7 +13,7 @@ spring:
     properties:
       hibernate:
         format_sql: false
-        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   # ====== FLYWAY : SVG migrations ======
   flyway:
@@ -45,6 +45,13 @@ server:
   error:
     include-stacktrace: never
     include-message: always
+
+# ====== HEALTH CHECK ======
+# Désactiver le health check mail
+management:
+  health:
+    mail:
+      enabled: false
 
 # ====== LOGGING MINIMAL ======
 logging: # Seulement INFO et plus grave
