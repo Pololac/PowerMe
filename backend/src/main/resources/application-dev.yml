@@ -19,7 +19,7 @@ spring:
       hibernate:
         format_sql: true # Formate les requêtes SQL (plus lisible)
         use_sql_comments: true # Ajoute des commentaires dans les requêtes
-        database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   # ====== FLYWAY : SVG migrations ======
   flyway:
