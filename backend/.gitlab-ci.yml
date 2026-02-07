@@ -114,11 +114,8 @@ build-backend:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
   script:
-    - docker build \
-      --build-arg JAVA_VERSION=${JAVA_VERSION} \
-      -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
-      -t ${BACKEND_IMAGE}:latest \
-      backend
+    - docker build --build-arg JAVA_VERSION=${JAVA_VERSION} -t ${BACKEND_IMAGE}:${IMAGE_TAG} -t ${BACKEND_IMAGE}:latest backend
+
     - docker push ${BACKEND_IMAGE}:${IMAGE_TAG}
     - docker push ${BACKEND_IMAGE}:latest
   needs:
