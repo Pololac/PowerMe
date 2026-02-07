@@ -56,26 +56,31 @@ frontend-tests:
 ##############################################
 build-frontend:
   extends: .build-docker-template
+
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+  needs:
+    - job: frontend-tests
+      artifacts: true
+
   variables:
     BUILD_CONTEXT: frontend
     IMAGE_NAME: $FRONTEND_IMAGE
     BUILD_ARG_NAME: NODE_VERSION
     BUILD_ARG_VALUE: $NODE_VERSION
-  needs:
-    - job: frontend-tests
-      artifacts: true
 
 ##############################################
 # DEPLOY
 ##############################################
 deploy-frontend:
   extends: .deploy-template
-  variables:
-    SERVICE: frontend
-    PROFILE: frontend # Déploie frontend + nginx
+
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
   needs:
     - build-frontend
+
+  variables:
+    SERVICE: frontend
+    PROFILE: frontend # Déploie frontend + nginx
+
