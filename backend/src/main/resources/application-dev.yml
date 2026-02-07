@@ -46,7 +46,7 @@ spring:
 
 # ====== SERVEUR ======
 server:
-  port: ${SERVER_PORT:8081} # Port du backend
+  port: 8080 # Port du backend
 
 # ====== LOGGING DÉTAILLÉ ======
 logging:

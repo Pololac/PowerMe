@@ -37,7 +37,7 @@ spring:
 
 # ====== SERVEUR ======
 server:
-  port: ${SERVER_PORT:8081}
+  port: 8080
   compression:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
@@ -57,7 +57,7 @@ logging: # Seulement INFO et plus grave
 
   # Logs sauvegardés en fichiers
   file:
-    name: /var/log/powerme/application.log
+    name: /app/logs/application.log
 
   logback:
     rolling policy:
