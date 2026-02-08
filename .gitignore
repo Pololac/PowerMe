@@ -4,7 +4,8 @@
 .env.dev
 *.local
 
-frontend/src/assets/env.js
+# Autorise les clés publiques frontend (MapTiler)
+!frontend/src/assets/env.js
 
 !.env.template
 

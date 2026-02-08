@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs';
 import { GeocodingResult } from '../search-location/geocoding-result.model';
-import { environment } from '../../../../environments/environment';
 import { runtimeEnv } from '../../../core/config/runtime-env';
 
 @Injectable({
