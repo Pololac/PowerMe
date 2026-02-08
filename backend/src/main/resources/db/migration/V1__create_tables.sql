@@ -8,6 +8,9 @@
 -- Puis:
 -- psql -U powerme_user -d powerme_dev -f schema-optimized.sql
 
+-- ⚠️ EN PROD ⚠️
+-- PAS BESOIN de DROP DATABASE / CREATE DATABASE
+-- Docker-compose l'a déjà créée via POSTGRES_DB=powerme_prod
 
 -- ============================================
 -- EXTENSION POSTGIS
