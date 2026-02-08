@@ -1,5 +1,5 @@
-import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth-layout',
@@ -9,9 +9,12 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthLayout {
-  private location = inject(Location);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  private readonly redirectUrl = this.route.snapshot.queryParamMap.get('redirectUrl') ?? '/';
 
   close(): void {
-    this.location.back();
+    this.router.navigateByUrl(this.redirectUrl);
   }
 }

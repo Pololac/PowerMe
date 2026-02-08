@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import {catchError, EMPTY, map, Observable} from 'rxjs';
+import { catchError, EMPTY, map, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { User } from '../models/domain/user.model';
 import { LoginRequest } from '../models/requests/login.request';
