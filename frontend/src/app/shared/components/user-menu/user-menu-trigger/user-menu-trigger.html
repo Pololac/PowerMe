@@ -1,11 +1,11 @@
 <button
   type="button"
-  class="flex items-center gap-3 select-none rounded-md px-2 py-1 transition-all duration-150 hover:shadow-sm focus-visible:shadow-sm"
+  class="flex items-center md:gap-3 select-none rounded-md px-2 py-1 transition-all duration-150 hover:shadow-sm focus-visible:shadow-sm"
   aria-label="Ouvrir le menu utilisateur"
   (click)="toggleMenu.emit()"
 >
   <!-- Avatar -->
-  <div class="pm-avatar bg-blue-600 text-white">
+  <div class="pm-avatar pm-avatar--lg-md bg-blue-600 text-white">
     <svg viewBox="0 0 64 64" class="w-10 h-10" fill="none" aria-hidden="true">
       <path
         d="M32 33.3333C35.6819 33.3333 38.6666 30.3486 38.6666 26.6667C38.6666 22.9848 35.6819 20 32 20C28.3181 20 25.3333 22.9848 25.3333 26.6667C25.3333 30.3486 28.3181 33.3333 32 33.3333Z"
@@ -34,7 +34,7 @@
   <!-- Chevron -->
   <svg
     viewBox="0 0 24 24"
-    class="w-4 h-4 transition-transform duration-200"
+    class="hidden md:flex w-4 h-4 transition-transform duration-200"
     [class.rotate-180]="open()"
     fill="none"
     aria-hidden="true"

@@ -226,24 +226,6 @@
 /* ===== COMPOSANTS ===== */
 
 @layer components {
-  /* ========== NAVBAR LINK ========== */
-  .navbar-link {
-    font-family: var(--font-title), sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 20px;
-    color: color-mix(in oklab, var(--fg) 85%, transparent);
-    transition: color 0.2s ease;
-  }
-
-  .navbar-link:hover {
-    color: var(--primary);
-  }
-
-  .navbar-link--active {
-    color: var(--primary);
-  }
-
   /* ========== BOUTONS ========== */
   /* ========== Base ========== */
   .pm-btn {
@@ -563,6 +545,31 @@
     min-width: 0;
   }
 
+  @media (max-width: 767px) {
+    .navbar {
+      --header-height: 4rem;   /* hauteur mobile */
+    }
+    .navbar__inner{
+      padding-inline: var(--spacing-lg);
+    }
+  }
+
+  .navbar-link {
+    font-family: var(--font-title), sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 20px;
+    color: color-mix(in oklab, var(--fg) 85%, transparent);
+    transition: color 0.2s ease;
+  }
+
+  .navbar-link:hover {
+    color: var(--primary);
+  }
+
+  .navbar-link--active {
+    color: var(--primary);
+  }
   /* ========== SIDEBAR ========== */
   .sidebar {
     @apply overflow-y-auto;
@@ -655,19 +662,18 @@
   /* ========== AVATARS ========== */
   .pm-avatar {
     @apply relative inline-grid place-items-center overflow-hidden rounded-full;
-    width: 2.75rem;
-    height: 2.75rem;
     border: 2px solid color-mix(in oklab, var(--fg) 10%, transparent);
     background: color-mix(in oklab, var(--fg) 6%, transparent);
   }
 
   .pm-avatar--sm {
-    @apply w-8 h-8;
+    @apply w-8 h-8; /* 2rem */
   }
 
-  .pm-avatar--lg {
-    width: 3.5rem;
-    height: 3.5rem;
+  @media (min-width: 768px) {
+    .pm-avatar--lg-md {
+      @apply w-14 h-14;
+    }
   }
 
   .pm-avatar__status {

@@ -1,7 +1,7 @@
 <nav class="navbar">
   <div class="navbar__inner">
     <!-- Logo -->
-    <div class="flex items-center gap-4 cursor-pointer">
+    <div class="cursor-pointer">
       <!-- Desktop -->
       <img
         src="/assets/icons/logo_long.svg"
@@ -59,6 +59,7 @@
       @if (!isAuthenticated()) {
         <button
           routerLink="/register"
+          [queryParams]="{ redirectUrl: currentUrl() }"
           class="pm-btn pm-btn--secondary-outline pm-btn--sm-md hidden md:inline-flex"
         >
           Inscription

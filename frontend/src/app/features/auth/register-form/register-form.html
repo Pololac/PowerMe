@@ -2,7 +2,7 @@
   <div class="space-y-5">
     <!-- Email -->
     <div>
-      <label class="form-label text-2xl" for="email">Email</label>
+      <label class="form-label text-xl md:text-2xl" for="email">Email</label>
       <input
         id="email"
         type="email"
@@ -26,7 +26,7 @@
 
     <!-- Password -->
     <div class="form-group">
-      <label class="form-label text-2xl" for="password">Mot de passe</label>
+      <label class="form-label text-xl md:text-2xl" for="password">Mot de passe</label>
       <input
         id="password"
         type="password"
@@ -52,7 +52,7 @@
 
     <!-- Password de confirmation -->
     <div class="form-group">
-      <label class="form-label text-2xl" for="password">Confirmer le mot de passe</label>
+      <label class="form-label text-xl md:text-2xl" for="password">Confirmer le mot de passe</label>
       <input
         id="confirmPassword"
         type="password"
@@ -65,7 +65,7 @@
         f.confirmPassword.errors?.['required'] &&
         (f.confirmPassword.dirty || f.confirmPassword.touched)
       ) {
-        <p id="password-error" class="form-error" role="alert">La confirmation est requise.</p>
+        <p id="confirmPassword-error" class="form-error" role="alert">La confirmation est requise.</p>
       }
       @if (
         form.errors?.['passwordMismatch'] && (f.confirmPassword.dirty || f.confirmPassword.touched)
