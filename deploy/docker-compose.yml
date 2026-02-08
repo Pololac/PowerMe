@@ -131,7 +131,8 @@ services:
       - nginx-logs:/var/log/nginx
 
     depends_on:
-      - frontend # Garantit que frontend démarre avant Nginx et Nginx peut proxy vers http://frontend:80
+      - frontend
+      - backend
 
     networks:
       - powerme-network
@@ -149,6 +150,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
 volumes:
   postgres_data:
