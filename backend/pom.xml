@@ -194,6 +194,7 @@
           <password>dev</password>
           <locations>
             <location>classpath:db/migration</location>
+            <location>classpath:db/seed</location>
           </locations>
         </configuration>
       </plugin>
