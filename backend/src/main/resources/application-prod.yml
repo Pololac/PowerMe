@@ -21,9 +21,9 @@ spring:
     locations: classpath:db/migration, classpath:db/seed
     schemas: public
     # Sécurité
-    clean-disabled: true          # Ne JAMAIS nettoyer en prod
-    validate-on-migrate: true     # Valider avant de migrer
-    baseline-on-migrate: true     # Pour DB existantes
+    clean-disabled: true # Ne JAMAIS nettoyer en prod
+    validate-on-migrate: true # Valider avant de migrer
+    baseline-on-migrate: true # Pour DB existantes
 
   # ====== EMAIL SMTP ======
   mail:
@@ -40,6 +40,7 @@ spring:
 # ====== SERVEUR ======
 server:
   port: 8080
+  forward-headers-strategy: framework
   compression:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
