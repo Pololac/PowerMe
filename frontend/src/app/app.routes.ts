@@ -17,7 +17,6 @@ import { DashboardLayout } from './features/dashboard/layout/dashboard-layout';
 import { Profile } from './features/dashboard/pages/profile/profile';
 import { Bookings } from './features/dashboard/pages/bookings/bookings';
 import { BookingFlow } from './features/booking/booking-flow';
-import { MapPage } from './features/map/map-page/map-page';
 
 export const routes: Routes = [
   { path: '', component: Landing },
