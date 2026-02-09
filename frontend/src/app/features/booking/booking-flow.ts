@@ -15,6 +15,8 @@ import { PaymentService } from '../../core/services/payment.service';
 import { BookingApiService } from './services/booking-api.service';
 import { catchError, EMPTY, finalize, switchMap, tap } from 'rxjs';
 import { LoggerService } from '../../core/error/logger-service';
+import { AuthService } from '../../core/services/auth-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-booking-flow',
@@ -24,6 +26,8 @@ import { LoggerService } from '../../core/error/logger-service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookingFlow {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly pricingService = inject(BookingPricingService);
   private readonly paymentService = inject(PaymentService);
   private readonly bookingApiService = inject(BookingApiService);
@@ -74,6 +78,13 @@ export class BookingFlow {
   }
 
   onConfirmPayment(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], {
+        queryParams: { redirectUrl: '/map' },
+      });
+      return;
+    }
+
     const summary = this.bookingSummary();
     if (!summary) return;
 
