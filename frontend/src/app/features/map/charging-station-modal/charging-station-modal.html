@@ -42,15 +42,18 @@
               Sélectionnez une date pour voir les disponibilités.
             </div>
           </div>
-          <div class="grid grid-cols-[400px_1fr]">
+          <div class="grid grid-cols-1 md:grid-cols-[400px_1fr] gap-4">
             <!-- Calendrier -->
-            <app-availability-calendar
+            <div class="w-full min-w-0">
+              <app-availability-calendar
               (dateSelected)="onDateSelected($event)"
-            />
+              />
+            </div>
+
 
             <!-- Slots -->
             @if (stationStore.availabilityLoading()) {
-              <div class="flex items-center justify-center text-sm text-gray-500">
+              <div class="w-full min-w-0 flex items-center justify-center text-sm text-gray-500">
                 Chargement des créneaux…
               </div>
             }

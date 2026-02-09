@@ -1,6 +1,21 @@
-:host ::ng-deep .pm-datepicker {
+:host ::ng-deep ngxsmk-datepicker.pm-datepicker {
   --datepicker-primary-color: var(--color-mint-400);
-  --datepicker-primary-contrast: var(--color-white);
+  --datepicker-primary-contrast: var(--color-neutral-white);
   --datepicker-hover-background: var(--color-mint-200);
-  --datepicker-shadow-sm: 0 1px 2px rgba(0,0,0,0.12);
+  --datepicker-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 375px) and (max-width: 479px) {
+  :host ::ng-deep .ngxsmk-calendar-container {
+    padding: 5px !important;
+  }
+  :host ::ng-deep .ngxsmk-header {
+    padding: 1px !important;
+    gap: 0 !important;
+  }
+  :host ::ng-deep .ngxsmk-month-year-selects{
+    gap: 0 !important;
+  }
 }
