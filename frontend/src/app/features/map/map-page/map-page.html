@@ -8,19 +8,21 @@
     </div>
 
     <!-- Modales -->
-    <div class="mt-4 flex items-start gap-4">
+    <div class="relative mt-4 md:flex md:items-start md:gap-4">
       @if (selectedLocationId() !== null) {
         <!-- Charging Location (toujours visible) -->
-        <div class="w-[340px] max-w-full">
+        <div class="relative z-10 w-[340px] max-w-full">
           <app-charging-location-modal (stationSelected)="onStationSelected($event)" />
         </div>
 
         <!-- BookingFlow -->
         @if (bookingOpen()) {
+        <div class="fixed inset-0 z-20 md:static md:inset-auto">
           <app-booking-flow
             [locationId]="selectedLocationId()!"
             (flowClosed)="closeBooking()"
           />
+        </div>
         }
       }
     </div>

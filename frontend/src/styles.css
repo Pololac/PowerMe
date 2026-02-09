@@ -579,27 +579,6 @@
     border-right: var(--border-width) solid var(--border-color);
   }
 
-  /* ========== TABLES ========== */
-  .table-responsive {
-    @apply overflow-x-auto;
-  }
-
-  .table {
-    @apply w-full border-collapse;
-  }
-
-  .table th,
-  .table td {
-    @apply text-left;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: var(--border-width) solid var(--border-color);
-  }
-
-  .table th {
-    @apply font-semibold;
-    background: var(--bg-secondary);
-  }
-
   /* ========== ALERTS ========== */
   .alert {
     @apply mb-3;
