@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -46,12 +44,12 @@ public class SecurityConfig {
 
     // Système d'authentification basé sur le UserDetailService et BCrypt
     // utilisé dans le AuthService.
-    @Bean
+/*    @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
-    }
+    }*/
 
     // injecté dans AuthService pour faire le login email/pwd
     @Bean
@@ -124,8 +122,8 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Indique à Spring comment authentifier email/pwd
-                .authenticationProvider(authenticationProvider())
+                // Indique à Spring comment authentifier email/pwd via le CustomUserDetailsService
+                .userDetailsService(userService)
 
                 // Injecte le filtre JWT (qui lit le Bearer et peuple SecurityContext)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -139,8 +137,11 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Proxy sur même serveur -> même origine = pas de restrictions CORS nécessaires
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("*"));    //
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:4200",
+                "https://powerme-app.placoste.dev"
+        ));
+        configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 
