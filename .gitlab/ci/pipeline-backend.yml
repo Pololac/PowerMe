@@ -65,7 +65,6 @@ backend-unit-tests:
       # Rapports pour SonarCloud
       - backend/target/surefire-reports/
       - backend/target/site/jacoco/
-
   allow_failure: false
 
 ##############################################
