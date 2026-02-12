@@ -1,10 +1,10 @@
-name: Code Quality
+name: Quality + Sync GitLab
 
 on:
   pull_request:
     branches: ["main"]
   push:
-    branches: ["main", "dev"]
+    branches: ["**"]
 
 jobs:
   quality-backend:
@@ -27,17 +27,17 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      # Tests unitaires uniquement (pas les tests d'intégration)
-      - name: Run Backend Unit Tests
-        run: mvn -B clean test
+      # Tests unitaires & tests d'intégration
+      - name: Run backend tests (unit + IT) with coverage
+        run: mvn -B clean verify
 
       - name: SonarCloud Scan (Backend)
-        # Limite l'analyse Sonar à la branche main
         if: github.ref == 'refs/heads/main'
         run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=pololac_powerme_back \
-          -Dsonar.organization=pololac
+          -Dsonar.organization=pololac \
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
         continue-on-error: true # Rend le Quality Gate non bloquant
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -88,3 +88,37 @@ jobs:
           args: >
             -Dsonar.projectKey=pololac_powerme_front
             -Dsonar.organization=pololac
+
+  sync-gitlab:
+    name: Sync to GitLab
+    runs-on: ubuntu-latest
+
+    needs:
+      - quality-backend
+      - quality-frontend
+
+    # Exécute uniquement si :
+    # - push sur main
+    # - pull_request vers main
+    if: |
+      false &&
+      success() &&
+      (
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        (github.event_name == 'pull_request' && github.base_ref == 'main')
+      )
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync to GitLab
+        uses: keninkujovic/gitlab-sync@2.1.0
+        with:
+          gitlab_url: ${{ secrets.GITLAB_URL }}
+          username: ${{ secrets.USERNAME }}
+          gitlab_pat: ${{ secrets.GITLAB_PAT }}
+          force_push: true
