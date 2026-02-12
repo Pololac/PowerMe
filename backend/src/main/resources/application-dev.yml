@@ -2,6 +2,11 @@
 # Configuration DEV
 # ==============================================
 
+security:
+  refresh-cookie:
+    secure: false   # Envoi cookie aussi sur connexion HTTP
+    same-site: Lax    # AntiCSRF : envoyé dans la plupart des cas
+
 spring:
   # ====== BASE DE DONNÉES ======
   datasource:
@@ -46,7 +51,7 @@ spring:
 
 # ====== SERVEUR ======
 server:
-  port: 8080 # Port du backend
+  port: 8080    # Port du backend en dev
 
 # ====== LOGGING DÉTAILLÉ ======
 logging:

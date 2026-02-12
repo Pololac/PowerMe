@@ -4,6 +4,11 @@
 # ⚠️ Toutes les variables sont OBLIGATOIRES (depuis .env)
 # ⚠️ Pas de valeurs par défaut
 
+security:
+  refresh-cookie:
+    secure: true   # N’envoi le cookie que sur une connexion HTTPS (⚠️ pb en dev)
+    same-site: Lax    # Anti-CSRF : envoyé ds la plupart des cas ("None" si urls front et back différentes = cross-site)
+
 spring:
   # ====== JPA / HIBERNATE ======
   jpa:
@@ -34,17 +39,15 @@ spring:
           starttls:
             enable: true
             required: true
-          connectiontimeout: 10000
+          connectiontimeout: 10000 #ms
           timeout: 10000
 
 # ====== SERVEUR ======
 server:
-  port: 8080
+  port: 8080  # Port interne du container Docker (derrière Nginx reverse proxy)
   forward-headers-strategy: framework
   compression:
-    enabled: true
-    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
-    min-response-size: 1024
+    enabled: false  # C'est Nginx Docker qui gère la compression
   error:
     include-stacktrace: never
     include-message: always

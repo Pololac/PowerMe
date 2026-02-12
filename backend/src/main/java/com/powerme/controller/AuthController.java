@@ -9,6 +9,8 @@ import com.powerme.exception.InvalidTokenException;
 import com.powerme.service.security.AuthService;
 import com.powerme.service.security.AuthService.LoginResult;
 import com.powerme.service.security.AuthService.RefreshResult;
+import com.powerme.service.security.JwtProperties;
+import com.powerme.service.security.RefreshCookieProperties;
 import com.powerme.service.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.time.Duration;
@@ -43,13 +45,15 @@ public class AuthController {
 
     public static final String REFRESH_COOKIE = "refresh-token";
     public static final String REFRESH_COOKIE_PATH = "/api/auth";
-    private final static boolean IS_PROD = false;      // TODO: true en prod (HTTPS)
-    private final static boolean IS_CROSS_SITE = false; // TODO: true si front ≠ domaine API
 
     private final AuthService authService;
+    private final JwtProperties jwtProps;
+    private final RefreshCookieProperties cookieProps;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtProperties jwtProps, RefreshCookieProperties cookieProps) {
         this.authService = authService;
+        this.jwtProps = jwtProps;
+        this.cookieProps = cookieProps;
     }
 
     /**
@@ -135,25 +139,20 @@ public class AuthController {
 
     // --- Helpers cookie ---
     private ResponseCookie generateCookie(String refreshToken) {
-        Duration maxAge = Duration.ofDays(30);    // aligné avec props.refreshTokenExpiration
-        String sameSite = IS_CROSS_SITE ? "None" : "Lax";
-
         return ResponseCookie.from(REFRESH_COOKIE, refreshToken)
-                .httpOnly(
-                        true) // Refresh token pas manipulable par le JS.
-                .secure(IS_PROD || IS_CROSS_SITE)  // En ppe "true" → envoyé qu'en HTTPS.
-                .sameSite(sameSite) // Cadre d'utilisation :
-                .path(REFRESH_COOKIE_PATH) // Indique le chemin où envoyer le token.
-                .maxAge(maxAge)
+                .httpOnly(true)                     // Refresh token pas manipulable par le JS
+                .secure(cookieProps.isSecure())     // si "true" → envoyé qu'en HTTPS
+                .sameSite(cookieProps.getSameSite())  // "Lax" en dev et prod (à cause du reverse-proxy)
+                .path(REFRESH_COOKIE_PATH)          // Indique le chemin où envoyer le token.
+                .maxAge(Duration.ofMillis(jwtProps.getRefreshTokenExpiration()))    // 30j par défaut
                 .build();
     }
 
     private ResponseCookie clearRefreshCookie() {
-        String sameSite = IS_CROSS_SITE ? "None" : "Lax";
         return ResponseCookie.from(REFRESH_COOKIE, "")
                 .httpOnly(true)
-                .secure(IS_PROD || IS_CROSS_SITE)
-                .sameSite(sameSite)
+                .secure(cookieProps.isSecure())
+                .sameSite(cookieProps.getSameSite())
                 .path(REFRESH_COOKIE_PATH)
                 .maxAge(0)
                 .build();
