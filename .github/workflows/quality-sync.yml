@@ -33,15 +33,19 @@ jobs:
 
       - name: SonarCloud Scan (Backend)
         if: github.ref == 'refs/heads/main'
-        run: |
-          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -Dsonar.projectKey=pololac_powerme_back \
-          -Dsonar.organization=pololac \
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        run: mvn -B sonar:sonar # Propriétés définies dans le pom.xml
         continue-on-error: true # Rend le Quality Gate non bloquant
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Pour PR decoration
+
+      - name: Publish Backend Test Results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Backend Tests
+          path: backend/target/*-reports/TEST-*.xml
+          reporter: java-junit
 
   quality-frontend:
     name: Frontend - Tests & SonarCloud
@@ -89,6 +93,14 @@ jobs:
             -Dsonar.projectKey=pololac_powerme_front
             -Dsonar.organization=pololac
 
+      - name: Publish Frontend Test Results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Frontend Tests
+          path: frontend/test-results/junit.xml
+          reporter: java-junit
+
   sync-gitlab:
     name: Sync to GitLab
     runs-on: ubuntu-latest
@@ -101,7 +113,6 @@ jobs:
     # - push sur main
     # - pull_request vers main
     if: |
-      false &&
       success() &&
       (
         (github.event_name == 'push' && github.ref == 'refs/heads/main') ||

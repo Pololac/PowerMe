@@ -11,7 +11,13 @@ module.exports = function (config) {
       },
     },
 
-    reporters: ['progress', 'kjhtml'],
+    reporters: ['progress', 'kjhtml', 'junit'],
+
+    junitReporter: {
+      outputDir: 'test-results',
+      outputFile: 'junit.xml',
+      useBrowserName: false,
+    },
 
     singleRun: true,
   });
