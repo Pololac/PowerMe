@@ -1,5 +1,11 @@
 name: Quality + Sync GitLab
 
+# workflow a le droit de créer des checks & des PR (nécessaire pr rapports Dorny)
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 on:
   pull_request:
     branches: ["main"]
@@ -8,7 +14,7 @@ on:
 
 jobs:
   quality-backend:
-    name: Backend - Tests & Sonar
+    name: Backend - Tests & SonarCloud
     runs-on: ubuntu-latest
 
     defaults:

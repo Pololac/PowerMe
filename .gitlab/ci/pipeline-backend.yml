@@ -39,85 +39,89 @@ cache: *maven-cache
       - backend/target/test-classes/
     expire_in: 1 week
 
-##############################################
-# TESTS UNITAIRES
-##############################################
-backend-unit-tests:
-  stage: test
-  extends: .backend-test-base
+# ##############################################
+# # TESTS UNITAIRES
+# ##############################################
+# backend-unit-tests:
+#   stage: test
+#   extends: .backend-test-base
 
-  rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*/'
+#     - if: '$CI_COMMIT_BRANCH == "dev"'
+#     - if: '$CI_COMMIT_BRANCH == "main"'
 
-  script:
-    - mvn -B -f backend/pom.xml clean test
+#   script:
+#     - mvn -B -f backend/pom.xml clean test
 
-  coverage: "/Total.*?([0-9]{1,3})%/"
-  artifacts:
-    reports:
-      junit: backend/target/surefire-reports/TEST-*.xml
-      coverage_report:
-        coverage_format: jacoco
-        path: backend/target/site/jacoco/jacoco.xml
-    paths:
-      # Rapports pour SonarCloud
-      - backend/target/surefire-reports/
-      - backend/target/site/jacoco/
-  allow_failure: false
+#   coverage: "/Total.*?([0-9]{1,3})%/"
+#   artifacts:
+#     reports:
+#       junit: backend/target/surefire-reports/TEST-*.xml
+#       coverage_report:
+#         coverage_format: jacoco
+#         path: backend/target/site/jacoco/jacoco.xml
+#     paths:
+#       # Rapports pour SonarCloud
+#       - backend/target/surefire-reports/
+#       - backend/target/site/jacoco/
+#   allow_failure: false
 
-##############################################
-# TESTS D’INTÉGRATION (Testcontainers)
-##############################################
-backend-integration-tests:
-  stage: test
-  extends: .backend-test-base
+# ##############################################
+# # TESTS D’INTÉGRATION (Testcontainers)
+# ##############################################
+# backend-integration-tests:
+#   stage: test
+#   extends: .backend-test-base
 
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "dev"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "dev"'
+#     - if: '$CI_COMMIT_BRANCH == "main"'
 
-  services: # Nécessaire pr BDD tests via Testcontainers en Docker
-    - name: docker:24-dind
-      alias: docker
-  variables:
-    DOCKER_HOST: "tcp://docker:2375" # Permet à Testcontainers de communiquer avec Docker-in-Docker
-    DOCKER_TLS_CERTDIR: ""
-    DOCKER_DRIVER: overlay2
-    TESTCONTAINERS_HOST_OVERRIDE: "docker" # Force Testcontainers à utiliser le service Docker
-    TESTCONTAINERS_RYUK_DISABLED: "false" # Ryuk doit être activé en DinD
-    TESTCONTAINERS_CHECKS_DISABLE: "true" # Accélère
+#   services: # Nécessaire pr BDD tests via Testcontainers en Docker
+#     - name: docker:24-dind
+#       alias: docker
+#   variables:
+#     DOCKER_HOST: "tcp://docker:2375" # Permet à Testcontainers de communiquer avec Docker-in-Docker
+#     DOCKER_TLS_CERTDIR: ""
+#     DOCKER_DRIVER: overlay2
+#     TESTCONTAINERS_HOST_OVERRIDE: "docker" # Force Testcontainers à utiliser le service Docker
+#     TESTCONTAINERS_RYUK_DISABLED: "false" # Ryuk doit être activé en DinD
+#     TESTCONTAINERS_CHECKS_DISABLE: "true" # Accélère
 
-  needs:
-    - job: backend-unit-tests
-      artifacts: true
+#   needs:
+#     - job: backend-unit-tests
+#       artifacts: true
 
-  before_script:
-    # Installe docker-cli (pas ds Alpine Maven) et vérifie que Docker est prêt
-    - apk add --no-cache docker-cli
-    - |
-      echo "⏳ Attente du daemon Docker..."
-      for i in $(seq 1 30); do
-        if docker info > /dev/null 2>&1; then
-          echo "✅ Docker prêt!"
-          break
-        fi
-        echo "Waiting for Docker... ($i/30)"
-        sleep 2
-      done
-    - docker info # Vérifier que Docker fonctionne
+#   before_script:
+#     # Installe docker-cli (pas ds Alpine Maven) et vérifie que Docker est prêt
+#     - apk add --no-cache docker-cli
+#     - |
+#       echo "⏳ Attente du daemon Docker..."
+#       for i in $(seq 1 30); do
+#         if docker info > /dev/null 2>&1; then
+#           echo "✅ Docker prêt!"
+#           break
+#         fi
+#         echo "Waiting for Docker... ($i/30)"
+#         sleep 2
+#       done
+#     - docker info # Vérifier que Docker fonctionne
 
-  script:
-    - mvn -B -f backend/pom.xml verify -DskipTests
+#   script:
+#     - mvn -B -f backend/pom.xml verify -DskipUTs=true
 
-  artifacts:
-    when: always
-    reports:
-      junit: backend/target/failsafe-reports/TEST-*.xml
-    paths:
-      - backend/target/failsafe-reports/
-  allow_failure: false
+#   artifacts:
+#     when: always
+#     reports:
+#       junit: backend/target/failsafe-reports/TEST-*.xml
+#     coverage_report:
+#       coverage_format: jacoco
+#       path: backend/target/site/jacoco/jacoco.xml
+#     paths:
+#       - backend/target/failsafe-reports/
+#       - backend/target/site/jacoco/
+#   allow_failure: false
 
 ##############################################
 # BUILD BACKEND (Docker)
@@ -131,11 +135,11 @@ build-backend:
     IMAGE_NAME: $BACKEND_IMAGE
     BUILD_ARG_NAME: JAVA_VERSION
     BUILD_ARG_VALUE: $JAVA_VERSION
-  needs:
-    - job: backend-unit-tests
-      artifacts: true
-    - job: backend-integration-tests
-      artifacts: true
+  # needs:
+  #   - job: backend-unit-tests
+  #     artifacts: true
+  #   - job: backend-integration-tests
+  #     artifacts: true
   after_script:
     - |
       echo "🔍 Vérification de l'image buildée..."
