@@ -2,6 +2,8 @@ package com.powerme.service.security;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,6 +27,9 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtAuthenticationFilter jwtFilter;
     private final CustomUserDetailsService userService;
+
+    @Value("${security.cors.allowed-origins}")
+    private String allowedOrigins;
 
     public SecurityConfig(
             AuthenticationConfiguration authenticationConfiguration,
@@ -51,7 +56,7 @@ public class SecurityConfig {
         return provider;
     }*/
 
-    // injecté dans AuthService pour faire le login email/pwd
+    // Injecté dans AuthService pour faire le login email/pwd
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -131,19 +136,24 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS pr dev : Autorise l'app Angular en local
+    // Config CORS: serveur indique aux navigateurs les domaines autorisés à accéder à ses ressources
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Proxy sur même serveur -> même origine = pas de restrictions CORS nécessaires
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:4200",
-                "https://powerme-app.placoste.dev"
+        // Domaines définis ds applications.yml pour dev et prod
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));
-        configuration.setAllowedMethods(Arrays.asList("*"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(List.of("*"));
+        // Important pour les cookies HttpOnly
         configuration.setAllowCredentials(true);
+        // Permet au navigateur de lire les headers Set-Cookie
+        configuration.setExposedHeaders(List.of(
+                "Set-Cookie",
+                "Authorization"
+        ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

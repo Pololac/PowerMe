@@ -8,8 +8,11 @@ import com.powerme.repository.RefreshTokenRepository;
 import com.powerme.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RefreshTokenService {
+    private static final Logger logger = LoggerFactory.getLogger(RefreshTokenService.class);
 
     private final RefreshTokenRepository refreshTokenRepo;
     private final UserRepository userRepo;
@@ -118,15 +122,26 @@ public class RefreshTokenService {
     /**
      * Supprime un refresh token donné (déconnexion ou invalidation).
      */
+    @Transactional
     public void deleteTokenFromBase(String token) {
-        refreshTokenRepo.findByToken(token)
-                .ifPresent(refreshTokenRepo::delete);
+        logger.info("Attempting to delete refresh token");
+
+        Optional<RefreshToken> tokenOpt = refreshTokenRepo.findByToken(token);
+
+        if (tokenOpt.isEmpty()) {
+            logger.warn("Token not found in database (already deleted or invalid)");
+            return;
+        }
+
+        refreshTokenRepo.delete(tokenOpt.get());
+        logger.info("Refresh token deleted successfully");
     }
 
     /**
      * Supprime tous les refresh token d'un user (suppression compte ou déconnexion de toutes ses
      * sessions sur différents supports).
      */
+    @Transactional
     public void deleteByUserId(Long userId) {
         refreshTokenRepo.deleteByUserId(userId);
     }

@@ -8,6 +8,10 @@ security:
   refresh-cookie:
     secure: true   # N’envoi le cookie que sur une connexion HTTPS (⚠️ pb en dev)
     same-site: Lax    # Anti-CSRF : envoyé ds la plupart des cas ("None" si urls front et back différentes = cross-site)
+    domain: .placoste.dev # Permet partage cookies entre les sous-domaines
+
+  cors:
+    allowed-origins: https://powerme-app.placoste.dev
 
 spring:
   # ====== JPA / HIBERNATE ======

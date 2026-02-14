@@ -14,6 +14,7 @@ import com.powerme.service.security.RefreshCookieProperties;
 import com.powerme.service.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -43,8 +44,11 @@ import org.springframework.web.bind.annotation.RestController;
 // @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class AuthController {
 
+    @Value("${security.refresh-cookie.domain}")
+    private String cookieDomain;
+
     public static final String REFRESH_COOKIE = "refresh-token";
-    public static final String REFRESH_COOKIE_PATH = "/api/auth";
+    public static final String REFRESH_COOKIE_PATH = "/";
 
     private final AuthService authService;
     private final JwtProperties jwtProps;
@@ -65,8 +69,7 @@ public class AuthController {
         // Retourne access, refresh, user
         LoginResult result = authService.login(request);
 
-        // On crée un cookie dans lequel on stocke le refresh token
-        // (voir méthode en bas de la classe).
+        // Formatage du refresh en cookie HttpOnly (voir méthode en bas de la classe).
         ResponseCookie refreshCookie = generateCookie(result.refreshToken());
 
         // Dans la réponse, on envoie le refresh-token dans le cookie et le jwt dans le body.
@@ -143,6 +146,7 @@ public class AuthController {
                 .httpOnly(true)                     // Refresh token pas manipulable par le JS
                 .secure(cookieProps.isSecure())     // si "true" → envoyé qu'en HTTPS
                 .sameSite(cookieProps.getSameSite())  // "Lax" en dev et prod (à cause du reverse-proxy)
+                .domain(cookieDomain)
                 .path(REFRESH_COOKIE_PATH)          // Indique le chemin où envoyer le token.
                 .maxAge(Duration.ofMillis(jwtProps.getRefreshTokenExpiration()))    // 30j par défaut
                 .build();
@@ -153,6 +157,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(cookieProps.isSecure())
                 .sameSite(cookieProps.getSameSite())
+                .domain(cookieDomain)
                 .path(REFRESH_COOKIE_PATH)
                 .maxAge(0)
                 .build();
