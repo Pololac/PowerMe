@@ -44,9 +44,6 @@ import org.springframework.web.bind.annotation.RestController;
 // @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class AuthController {
 
-    @Value("${security.refresh-cookie.domain}")
-    private String cookieDomain;
-
     public static final String REFRESH_COOKIE = "refresh-token";
     public static final String REFRESH_COOKIE_PATH = "/";
 
@@ -146,7 +143,7 @@ public class AuthController {
                 .httpOnly(true)                     // Refresh token pas manipulable par le JS
                 .secure(cookieProps.isSecure())     // si "true" → envoyé qu'en HTTPS
                 .sameSite(cookieProps.getSameSite())  // "Lax" en dev et prod (à cause du reverse-proxy)
-                .domain(cookieDomain)
+                .domain(cookieProps.getDomain())
                 .path(REFRESH_COOKIE_PATH)          // Indique le chemin où envoyer le token.
                 .maxAge(Duration.ofMillis(jwtProps.getRefreshTokenExpiration()))    // 30j par défaut
                 .build();
@@ -157,7 +154,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(cookieProps.isSecure())
                 .sameSite(cookieProps.getSameSite())
-                .domain(cookieDomain)
+                .domain(cookieProps.getDomain())
                 .path(REFRESH_COOKIE_PATH)
                 .maxAge(0)
                 .build();

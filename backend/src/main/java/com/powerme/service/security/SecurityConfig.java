@@ -31,6 +31,14 @@ public class SecurityConfig {
     @Value("${security.cors.allowed-origins}")
     private String allowedOrigins;
 
+    private static final String AUTH_REQUIRED_JSON = """
+        {
+            "title": "Authentication Required",
+            "status": 401,
+            "detail": "Full authentication is required to access this resource"
+        }
+        """;
+
     public SecurityConfig(
             AuthenticationConfiguration authenticationConfiguration,
             JwtAuthenticationFilter jwtFilter,
@@ -46,15 +54,6 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    // Système d'authentification basé sur le UserDetailService et BCrypt
-    // utilisé dans le AuthService.
-/*    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }*/
 
     // Injecté dans AuthService pour faire le login email/pwd
     @Bean
@@ -112,13 +111,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                            response.getWriter().write("""
-                                    {
-                                        "title": "Authentication Required",
-                                        "status": 401,
-                                        "detail": "Full authentication is required to access this resource"
-                                    }
-                                    """);
+                            response.getWriter().write(AUTH_REQUIRED_JSON);
                         })
                 )
 
