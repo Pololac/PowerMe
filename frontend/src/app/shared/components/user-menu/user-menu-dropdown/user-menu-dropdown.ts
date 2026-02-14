@@ -62,7 +62,6 @@ export class UserMenuDropdown {
       this.navigate(item.route);
       return;
     }
-
     item.action?.();
   }
 
@@ -72,7 +71,15 @@ export class UserMenuDropdown {
   }
 
   private logout(): void {
-    this.auth.logout();
-    this.closeMenu.emit();
+    this.auth.logout().subscribe({
+      next: () => {
+        console.log('Logout successful');
+        this.closeMenu.emit();
+      },
+      error: (err) => {
+        console.error('Logout failed:', err);
+        this.closeMenu.emit(); // On ferme quand même le menu
+      },
+    });
   }
 }

@@ -21,6 +21,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => {
     return this.user() !== null;
   });
+  readonly isLoggingOut = signal<boolean>(false);
 
   private storage: Storage = sessionStorage;
 
@@ -40,13 +41,15 @@ export class AuthService {
     }
   }
 
-  login(data: LoginRequest): Observable<{ token: string; user: User }> {
-    return this.http.post<LoginResponseDto>('/auth/login', data).pipe(
-      map((res) => ({
-        token: res.accessToken,
-        user: res.user,
-      })),
-    );
+  login(credentials: LoginRequest): Observable<{ token: string; user: User }> {
+    return this.http
+      .post<LoginResponseDto>('/auth/login', credentials, { withCredentials: true }) // Permet au navigateur d'enregistrer le refresh cookie
+      .pipe(
+        map((res) => ({
+          token: res.accessToken,
+          user: res.user,
+        })),
+      );
   }
 
   register(data: RegisterRequest): Observable<MessageResponseDto> {
@@ -80,11 +83,25 @@ export class AuthService {
       );
   }
 
-  logout() {
-    this.logger.info('User logged out');
-    this.clearSession();
+  logout(): Observable<void> {
+    this.logger.info('Initiating logout...');
+    this.isLoggingOut.set(true);
 
-    this.router.navigateByUrl('/');
+    return this.http.post<void>('/auth/logout', {}, { withCredentials: true }).pipe(
+      map(() => {
+        this.logger.info('Backend logout successful');
+        this.clearSession();
+        this.isLoggingOut.set(false);
+        this.router.navigateByUrl('/');
+      }),
+      catchError((err) => {
+        this.logger.error('Backend logout failed', err);
+        this.clearSession();
+        this.isLoggingOut.set(false);
+        this.router.navigateByUrl('/');
+        return EMPTY;
+      }),
+    );
   }
 
   setSession(token: string, user: User, rememberMe: boolean) {
