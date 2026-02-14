@@ -60,10 +60,16 @@ describe('AuthService', () => {
 
   it('should clear session and navigate on logout', () => {
     const router = TestBed.inject(Router);
+    const httpMock = TestBed.inject(HttpTestingController);
+
     spyOn(router, 'navigateByUrl');
 
     service.setSession('token', { id: 1 } as User, false);
-    service.logout();
+
+    service.logout().subscribe();
+
+    const req = httpMock.expectOne('/auth/logout');
+    req.flush({}); // simule succès backend
 
     expect(sessionStorage.getItem('token')).toBeNull();
     expect(sessionStorage.getItem('user')).toBeNull();
