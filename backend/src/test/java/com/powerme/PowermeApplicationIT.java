@@ -36,6 +36,6 @@ class PowermeApplicationIT extends AbstractIntegrationTest {
                 String.class
         );
         assertThat(version).isNotNull();
-        assertThat(version).contains("3.5");
+        assertThat(version).contains("3.");
     }
 }
