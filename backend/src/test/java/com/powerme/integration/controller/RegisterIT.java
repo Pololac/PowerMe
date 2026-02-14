@@ -37,11 +37,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureTestDatabase
-@AutoConfigureMockMvc   // Utilisé pour simuler des requêtes HTTP
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureMockMvc   // Utilisé pour simuler des requêtes HTTP
+@Transactional  // Rollback automatique après chaque test
 public class RegisterIT extends AbstractIntegrationTest {
 
     @Autowired
@@ -54,10 +56,10 @@ public class RegisterIT extends AbstractIntegrationTest {
     PasswordEncoder passwordEncoder;
 
     @MockitoBean
-    MailService mailService;
+    JwtService jwtService;
 
     @MockitoBean
-    JwtService jwtService;
+    MailService mailService;
 
     @MockitoBean
     RefreshTokenService refreshTokenService;

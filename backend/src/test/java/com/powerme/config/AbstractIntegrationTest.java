@@ -15,7 +15,7 @@ import org.testcontainers.utility.DockerImageName;
 public abstract class AbstractIntegrationTest {
 
     private static final DockerImageName POSTGIS_IMAGE =
-            DockerImageName.parse("postgis/postgis:17-3.5")
+            DockerImageName.parse("postgis/postgis:16-3.4-alpine")
                     .asCompatibleSubstituteFor("postgres");
 
     @SuppressWarnings("resource")

@@ -13,10 +13,10 @@
 -- Docker-compose l'a déjà créée via POSTGRES_DB=powerme_prod
 
 -- ============================================
--- EXTENSION POSTGIS
+-- EXTENSION POSTGIS (utile pour les tests)
 -- ============================================
 
--- CREATE EXTENSION IF NOT EXISTS postgis;
+    CREATE EXTENSION IF NOT EXISTS postgis;
 
 
 -- ============================================
