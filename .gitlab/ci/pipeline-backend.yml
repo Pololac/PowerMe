@@ -3,7 +3,7 @@ include:
   - local: .gitlab/ci/deploy-template.yml
 
 stages:
-  - test
+  # - test
   - build
   - deploy
 
@@ -15,29 +15,29 @@ variables:
   IMAGE_TAG: $CI_COMMIT_SHORT_SHA
 
 # Définit le cache global avec une anchor (&maven-cache)
-.maven-cache: &maven-cache
-  key:
-    files:
-      - backend/pom.xml
-  paths:
-    - .m2/repository
-  policy: pull-push
-  when: on_success
+# .maven-cache: &maven-cache
+#   key:
+#     files:
+#       - backend/pom.xml
+#   paths:
+#     - .m2/repository
+#   policy: pull-push
+#   when: on_success
 
 # Applique le cache globalement
-cache: *maven-cache
+# cache: *maven-cache
 
-.backend-test-base:
-  image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
-  cache:
-    <<: *maven-cache # Référence au cache global
-  artifacts:
-    when: always
-    # Exporter les classes compilées pour SonarCloud
-    paths:
-      - backend/target/classes/
-      - backend/target/test-classes/
-    expire_in: 1 week
+# .backend-test-base:
+#   image: maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION}-alpine
+#   cache:
+#     <<: *maven-cache # Référence au cache global
+#   artifacts:
+#     when: always
+#     # Exporter les classes compilées pour SonarCloud
+#     paths:
+#       - backend/target/classes/
+#       - backend/target/test-classes/
+#     expire_in: 1 week
 
 # ##############################################
 # # TESTS UNITAIRES

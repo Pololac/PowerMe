@@ -46,5 +46,4 @@ public class BookingController {
         Booking booking = bookingService.createBooking(request, userId);
         return bookingMapper.toDto(booking);
     }
-
 }

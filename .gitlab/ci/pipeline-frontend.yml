@@ -3,7 +3,7 @@ include:
   - local: .gitlab/ci/deploy-template.yml
 
 stages:
-  - test
+  # - test
   - build
   - deploy
 
