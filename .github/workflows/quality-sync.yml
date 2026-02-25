@@ -110,20 +110,10 @@ jobs:
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
 
-      - name: Print Chrome path
-        run: |
-          which chrome || true
-          which google-chrome || true
-          chrome --version || true
-          google-chrome --version || true
-
       - name: Run frontend tests with coverage
         run: npm run test:ci
         env:
-          CHROME_BIN: /usr/bin/google-chrome
-
-      - name: Run frontend tests with coverage
-        run: npm run test:ci
+          CHROME_BIN: /opt/hostedtoolcache/setup-chrome/chromium/1590094/x64/chrome
 
       - name: SonarCloud Scan (Frontend)
         # Limite l'analyse Sonar à la branche main
