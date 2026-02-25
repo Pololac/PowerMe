@@ -110,10 +110,17 @@ jobs:
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
 
+      - name: Print Chrome path
+        run: |
+          which chrome || true
+          which google-chrome || true
+          chrome --version || true
+          google-chrome --version || true
+
       - name: Run frontend tests with coverage
         run: npm run test:ci
         env:
-          CHROME_BIN: chrome
+          CHROME_BIN: /usr/bin/google-chrome
 
       - name: Run frontend tests with coverage
         run: npm run test:ci
