@@ -48,9 +48,7 @@
                   "with": "src/environments/environment.ts"
                 }
               ],
-              "allowedCommonJsDependencies": [
-                "maplibre-gl"
-              ],
+              "allowedCommonJsDependencies": ["maplibre-gl"],
               "budgets": [
                 {
                   "type": "initial",
@@ -106,7 +104,7 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": ["src/styles.test.css"]
           }
         },
         "lint": {

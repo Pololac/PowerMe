@@ -13,9 +13,35 @@ on:
     branches: ["**"]
 
 jobs:
+  # lance tests uniquement sur dossier modifié
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+
   quality-backend:
     name: Backend - Tests & SonarCloud
     runs-on: ubuntu-latest
+
+    # Lancé uniquement si backend modifié
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
 
     defaults:
       run:
@@ -57,6 +83,10 @@ jobs:
     name: Frontend - Tests & SonarCloud
     runs-on: ubuntu-latest
 
+    # Lancé uniquement si frontend modifié
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+
     defaults:
       run:
         working-directory: frontend
@@ -78,10 +108,12 @@ jobs:
         run: npm ci
 
       - name: Setup Chrome
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y chromium
-          echo "CHROME_BIN=/usr/bin/chromium" >> $GITHUB_ENV
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run frontend tests with coverage
+        run: npm run test:ci
+        env:
+          CHROME_BIN: chrome
 
       - name: Run frontend tests with coverage
         run: npm run test:ci
@@ -111,15 +143,17 @@ jobs:
     name: Sync to GitLab
     runs-on: ubuntu-latest
 
-    needs:
-      - quality-backend
-      - quality-frontend
+    needs: [changes, quality-backend, quality-frontend]
 
     # Exécute uniquement si :
     # - push sur main
     # - pull_request vers main
     if: |
-      success() &&
+      always() &&
+      (
+        needs.changes.outputs.frontend == 'true' ||
+        needs.changes.outputs.backend == 'true'
+      ) &&
       (
         (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
         (github.event_name == 'pull_request' && github.base_ref == 'main')
