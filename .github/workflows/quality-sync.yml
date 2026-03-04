@@ -109,11 +109,12 @@ jobs:
 
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
 
       - name: Run frontend tests with coverage
         run: npm run test:ci
         env:
-          CHROME_BIN: /opt/hostedtoolcache/setup-chrome/chromium/1590094/x64/chrome
+          CHROME_BIN: ${{ steps.setup-chrome.outputs.chrome-path }} # chemin dynamique
 
       - name: SonarCloud Scan (Frontend)
         # Limite l'analyse Sonar à la branche main
