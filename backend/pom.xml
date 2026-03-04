@@ -11,6 +11,7 @@
     <relativePath/> <!-- cherche artifact parent ds dépôts publics -->
   </parent>
 
+
   <groupId>com.CDA</groupId>
   <artifactId>powerme</artifactId>
   <version>0.0.1-SNAPSHOT</version>
