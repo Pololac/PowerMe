@@ -24,6 +24,8 @@
 
     <!-- Force Logback 1.5.19 to fix CVE-2025-11226 -->
     <logback.version>1.5.25</logback.version>
+    <!-- Force Jackson to fix CVE SNYK -->
+    <!-- <jackson-bom.version>2.18.6</jackson-bom.version> -->
 
     <!-- SonarCloud config de base -->
     <sonar.organization>pololac</sonar.organization>
