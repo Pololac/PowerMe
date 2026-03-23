@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild } from '@angular/core';
 import { ReviewCard } from '../review-card/review-card';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-review-slider',
-  imports: [CommonModule, ReviewCard],
+  imports: [ReviewCard],
   templateUrl: './review-slider.html',
   styleUrl: './review-slider.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

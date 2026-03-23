@@ -1,7 +1,7 @@
 # ========================================
 # STAGE 1: Build Angular
 # ========================================
-ARG NODE_VERSION=20
+ARG NODE_VERSION=22
 FROM node:${NODE_VERSION}-alpine AS builder
 
 WORKDIR /app
@@ -21,8 +21,8 @@ RUN npm run build -- --configuration production
 # ========================================
 # STAGE 2: Nginx pour servir l'app
 # ========================================
-FROM nginx:1.25-alpine3.19-slim
-RUN apk add --no-cache curl 
+FROM nginx:1.27-alpine
+RUN apk add --no-cache curl
 
 # Copier la configuration Nginx personnalisée
 COPY nginx.conf /etc/nginx/nginx.conf

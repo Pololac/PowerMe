@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { MapService } from '../services/map-service';
 import { GeocodingService } from '../services/geocoding-service';
-import { CommonModule } from '@angular/common';
+
 import { GeocodingResult } from './geocoding-result.model';
 
 @Component({
   selector: 'app-search-location',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './search-location.html',
   styleUrl: './search-location.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -25,11 +25,11 @@
 
     <!-- Étoiles -->
     <div class="text-yellow-400 text-base leading-none mt-1 md:mt-0">
-      <ng-container *ngFor="let i of starsArray; let index = index">
+      @for (i of starsArray; track i; let index = $index) {
         <span>
           {{ index < rating ? '★' : '☆' }}
         </span>
-      </ng-container>
+      }
     </div>
   </div>
 

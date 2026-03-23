@@ -15,13 +15,14 @@
 
   <!-- Slider container -->
   <div #container class="flex overflow-x-auto gap-8 scroll-smooth py-6 no-scrollbar">
-    <app-review-card
-      *ngFor="let r of reviews"
-      [author]="r.author"
-      [city]="r.city"
-      [rating]="r.rating"
-      [text]="r.text"
-      [avatarUrl]="r.avatarUrl"
-    ></app-review-card>
+    @for (r of reviews; track r) {
+      <app-review-card
+        [author]="r.author"
+        [city]="r.city"
+        [rating]="r.rating"
+        [text]="r.text"
+        [avatarUrl]="r.avatarUrl"
+      ></app-review-card>
+    }
   </div>
 </div>

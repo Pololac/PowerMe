@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
-<testsuite name="Chrome Headless 144.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-02-25T11:44:43" id="0" hostname="MacBook-Air-de-polo81.local" tests="11" errors="0" failures="0" time="0.062">
+<testsuite name="Chrome Headless 146.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-03-23T21:11:29" id="0" hostname="MacBook-Air-de-polo81.local" tests="11" errors="0" failures="0" time="0.048">
   <properties>
-    <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/144.0.0.0 Safari/537.36"/>
+    <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/146.0.0.0 Safari/537.36"/>
   </properties>
-  <testcase name="LoginForm should create a form with credentials inputs" time="0.033" classname="LoginForm"/>
-  <testcase name="LoginForm should NOT emit output if form is invalid" time="0.002" classname="LoginForm"/>
+  <testcase name="Login should call AuthService.login with email and password" time="0.025" classname="Login"/>
+  <testcase name="Login should display specific message when account is not activated" time="0.003" classname="Login"/>
+  <testcase name="Login should set session and redirect to /dashboard on success" time="0.002" classname="Login"/>
+  <testcase name="Login should display error message on 401 error" time="0.001" classname="Login"/>
+  <testcase name="LoginForm should trigger output if inputs are valid" time="0.008" classname="LoginForm"/>
   <testcase name="LoginForm should display validation errors on submit" time="0.002" classname="LoginForm"/>
-  <testcase name="LoginForm should trigger output if inputs are valid" time="0.009" classname="LoginForm"/>
-  <testcase name="Login should display specific message when account is not activated" time="0.007" classname="Login"/>
-  <testcase name="Login should call AuthService.login with email and password" time="0.001" classname="Login"/>
-  <testcase name="Login should display error message on 401 error" time="0.002" classname="Login"/>
-  <testcase name="Login should set session and redirect to /dashboard on success" time="0.001" classname="Login"/>
+  <testcase name="LoginForm should create a form with credentials inputs" time="0.002" classname="LoginForm"/>
+  <testcase name="LoginForm should NOT emit output if form is invalid" time="0.001" classname="LoginForm"/>
   <testcase name="AuthService should clear session and navigate on logout" time="0.003" classname="AuthService"/>
+  <testcase name="AuthService should store session in sessionStorage when rememberMe is false" time="0" classname="AuthService"/>
   <testcase name="AuthService should login and map response to token + user" time="0.001" classname="AuthService"/>
-  <testcase name="AuthService should store session in sessionStorage when rememberMe is false" time="0.001" classname="AuthService"/>
   <system-out>
-    <![CDATA[Chrome Headless 144.0.0.0 (Mac OS 10.15.7) INFO: '[FRONT][INFO]', 'Initiating logout...', undefined
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) INFO: '[FRONT][INFO]', 'Backend logout successful', undefined
+    <![CDATA[Chrome Headless 146.0.0.0 (Mac OS 10.15.7) INFO: '[FRONT][INFO]', 'Initiating logout...', undefined
+,Chrome Headless 146.0.0.0 (Mac OS 10.15.7) INFO: '[FRONT][INFO]', 'Backend logout successful', undefined
 
 ]]>
   </system-out>
