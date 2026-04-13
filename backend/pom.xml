@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.12</version>
+    <version>3.5.13</version>
     <relativePath/> <!-- cherche artifact parent ds dépôts publics -->
   </parent>
 
@@ -71,6 +71,7 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
+      <version>11.8.1</version>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
@@ -144,7 +145,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>2.21.1</version>
+      <version>2.21.2</version>
     </dependency>
 
     <!-- ==================== TESTS ==================== -->
