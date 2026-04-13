@@ -163,6 +163,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: refs/heads/main
 
       - name: Sync to GitLab
         uses: keninkujovic/gitlab-sync@2.1.0
