@@ -21,7 +21,7 @@ RUN npm run build -- --configuration production
 # ========================================
 # STAGE 2: Nginx pour servir l'app
 # ========================================
-FROM nginx:1.27-alpine
+FROM nginx:1.29.8-alpine
 RUN apk add --no-cache curl
 
 # Copier la configuration Nginx personnalisée
