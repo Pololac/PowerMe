@@ -7,10 +7,9 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.5.13</version>
+    <version>3.5.14</version>
     <relativePath/> <!-- cherche artifact parent ds dépôts publics -->
   </parent>
-
 
   <groupId>com.CDA</groupId>
   <artifactId>powerme</artifactId>
