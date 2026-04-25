@@ -143,32 +143,26 @@ jobs:
 
     needs: [changes, quality-backend, quality-frontend]
 
-    # Exécute uniquement si :
-    # - push sur main
-    # - pull_request vers main
+    # Synchronisation GitLab uniquement sur push vers main,
+    # si les jobs de qualité n'ont pas échoué (skippés ou réussis = OK)
     if: |
       always() &&
-      (
-        needs.changes.outputs.frontend == 'true' ||
-        needs.changes.outputs.backend == 'true'
-      ) &&
-      (
-        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-        (github.event_name == 'pull_request' && github.base_ref == 'main')
-      )
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.quality-backend.result != 'failure' &&
+      needs.quality-frontend.result != 'failure'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: refs/heads/main
+          ref: main
 
-      - name: Sync to GitLab
-        uses: keninkujovic/gitlab-sync@2.1.0
-        with:
-          gitlab_url: ${{ secrets.GITLAB_URL }}
-          username: ${{ secrets.USERNAME }}
-          gitlab_pat: ${{ secrets.GITLAB_PAT }}
-          force_push: true
+      - name: Push to GitLab
+        env:
+          GITLAB_URL: ${{ secrets.GITLAB_URL }}
+          GITLAB_USER: ${{ secrets.USERNAME }}
+          GITLAB_PAT: ${{ secrets.GITLAB_PAT }}
+        run: |
+          git remote add gitlab "https://${GITLAB_USER}:${GITLAB_PAT}@${GITLAB_URL#https://}"
+          git push gitlab main --force
