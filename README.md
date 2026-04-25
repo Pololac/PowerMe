@@ -94,8 +94,8 @@ psql -h localhost -U votre_user -d votre_db
 
 ### Frontend (Angular)
 
-- **Node.js 22.20.0**
-- **npm 10.9.3**
+- **Node.js 22.14.0**
+- **npm 11.11**
 
 ```bash
 # Télécharger et installer nvm :

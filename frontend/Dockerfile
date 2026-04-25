@@ -9,8 +9,12 @@ WORKDIR /app
 # Copier package.json et package-lock.json
 COPY package*.json ./
 
-# Installer les dépendances (besoin des devDependencies)
-RUN npm install -g npm@11 && npm ci
+# npm 11 requis par Angular 20 (engines)
+# Upgrade npm dans une couche dédiée (évite le bug promise-retry)
+RUN npm install -g npm@11 --force
+
+COPY package*.json ./
+RUN npm ci
 
 # Copier le code source
 COPY . .
