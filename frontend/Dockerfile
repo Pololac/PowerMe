@@ -10,8 +10,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # npm 11 requis par Angular 20 (engines)
-# Upgrade npm dans une couche dédiée (évite le bug promise-retry)
-RUN npm install -g npm@11 --force
+# Active npm 11 via corepack (méthode officielle Node)
+RUN corepack enable && corepack prepare npm@11.0.0 --activate
 
 COPY package*.json ./
 RUN npm ci
