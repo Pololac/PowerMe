@@ -113,7 +113,7 @@ node -v # Doit afficher "v22.20.0".
 npm -v # Doit afficher "10.9.3".
 ```
 
-- **Angular CLI 20.2.2**
+- **Angular CLI 21.2.3**
 
 Installation : `npm install -g @angular/cli@20.2.2`
 
@@ -137,7 +137,7 @@ Dépendances listées dans `pom.xml`
 Dépendances listées dans `package-lock.json`
 `npx ng version`
 
-- **Angular 20** - Framework frontend
+- **Angular 21.2** - Framework frontend
 - **RxJS 7.8.0** - Programmation réactive
 
 ## 🔨 Build

@@ -1,19 +1,15 @@
 # ========================================
 # STAGE 1: Build Angular
 # ========================================
-ARG NODE_VERSION=22
+ARG NODE_VERSION=22.14
 FROM node:${NODE_VERSION}-alpine AS builder
 
 WORKDIR /app
 
 # Copier package.json et package-lock.json
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
-# npm 11 requis par Angular 20 (engines)
-# Active npm 11 via corepack (méthode officielle Node)
-RUN corepack enable && corepack prepare npm@11.0.0 --activate
-
-COPY package*.json ./
+# Installer les dépendances (npm 10 natif suffit)
 RUN npm ci
 
 # Copier le code source
