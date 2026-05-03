@@ -54,7 +54,7 @@
     "@angular/compiler-cli": "^21.2.5",
     "@types/jasmine": "~6.0.0",
     "angular-eslint": "20.3.0",
-    "eslint": "^9.35.0",
+    "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "jasmine-core": "~6.2.0",
