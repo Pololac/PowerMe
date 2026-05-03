@@ -119,7 +119,7 @@ jobs:
       - name: SonarCloud Scan (Frontend)
         # Limite l'analyse Sonar à la branche main
         if: github.ref == 'refs/heads/main'
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@v8
         continue-on-error: true #Rend le Quality Gate non bloquant
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
