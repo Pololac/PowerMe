@@ -14,7 +14,6 @@ import com.powerme.service.security.RefreshCookieProperties;
 import com.powerme.service.security.UserPrincipal;
 import jakarta.validation.Valid;
 import java.time.Duration;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
