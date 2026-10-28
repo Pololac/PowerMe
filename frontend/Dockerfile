@@ -21,8 +21,7 @@ RUN npm run build -- --configuration production
 # ========================================
 # STAGE 2: Nginx pour servir l'app
 # ========================================
-FROM nginx:1.29.8-alpine3.23-slim
-RUN apk add --no-cache curl
+FROM nginx:1.31.2-alpine3.23-slim
 
 # Copier la configuration Nginx personnalisée
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -35,7 +34,7 @@ EXPOSE 80
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1/ || exit 1
 
 # Démarrer Nginx
 CMD ["nginx", "-g", "daemon off;"]
