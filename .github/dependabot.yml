@@ -8,21 +8,3 @@ updates:
     groups:
       actions:
         patterns: ["*"]
-
-  # Backend Java (Maven)
-  - package-ecosystem: "maven"
-    directory: "/backend"
-    schedule:
-      interval: "weekly"
-    groups:
-      maven-minor-patch:
-        update-types: ["minor", "patch"]
-
-  # Frontend Angular (npm)
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    schedule:
-      interval: "weekly"
-    groups:
-      npm-minor-patch:
-        update-types: ["minor", "patch"]
