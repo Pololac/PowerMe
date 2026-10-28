@@ -21,7 +21,7 @@ RUN mvn clean package -DskipTests -B
 # ========================================
 # STAGE 2: Image finale légère
 # ========================================
-FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine
+FROM eclipse-temurin:21.0.12.1_1-jre-alpine
 
 WORKDIR /app
 
