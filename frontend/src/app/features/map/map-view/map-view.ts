@@ -8,8 +8,13 @@ import {
   signal,
 } from '@angular/core';
 import { MapService } from '../services/map-service';
-import maplibregl from 'maplibre-gl';
+import * as maplibregl from 'maplibre-gl';
 import { ChargingLocationStore } from '../charging-location-modal/services/charging-location.store';
+
+// maplibre-gl v6 is ESM-only: with a bundler the worker file must be served as an asset (see angular.json)
+maplibregl.setWorkerUrl(
+  new URL(`./maplibre-gl-worker.mjs?v=${maplibregl.getVersion()}`, import.meta.url).toString(),
+);
 
 @Component({
   selector: 'app-map-view',
