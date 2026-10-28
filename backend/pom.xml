@@ -19,6 +19,9 @@
 
   <properties>
     <java.version>21</java.version>
+
+    <!-- Jackson 3 patch release ahead of the Boot BOM (3.1.7): Snyk critical deserialization, fixed in 3.1.8 -->
+    <jackson-bom.version>3.1.8</jackson-bom.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- SonarCloud config de base -->
