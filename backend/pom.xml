@@ -19,6 +19,9 @@
 
   <properties>
     <java.version>21</java.version>
+
+    <!-- Single Flyway version for core, database modules and Maven plugin (overrides the Boot BOM) -->
+    <flyway.version>13.5.0</flyway.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- SonarCloud config de base -->
@@ -55,7 +58,6 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
-      <version>12.8.1</version>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
@@ -203,7 +205,7 @@
       <plugin>
         <groupId>org.flywaydb</groupId>
         <artifactId>flyway-maven-plugin</artifactId>
-        <version>12.8.1</version>
+        <version>${flyway.version}</version>
         <configuration>
           <url>jdbc:postgresql://localhost:5432/powerme_dev</url>
           <user>powerme_user</user>
